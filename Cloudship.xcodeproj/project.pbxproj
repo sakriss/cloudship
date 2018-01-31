@@ -15,6 +15,7 @@
 		162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC61E2021043A00C19DCE /* HourlyViewController.swift */; };
 		162DC6212021048700C19DCE /* DailyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6202021048700C19DCE /* DailyViewController.swift */; };
 		162DC623202104AF00C19DCE /* CurrentlyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC622202104AF00C19DCE /* CurrentlyViewController.swift */; };
+		162DC6252022278D00C19DCE /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6242022278D00C19DCE /* Configuration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		162DC61E2021043A00C19DCE /* HourlyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyViewController.swift; sourceTree = "<group>"; };
 		162DC6202021048700C19DCE /* DailyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewController.swift; sourceTree = "<group>"; };
 		162DC622202104AF00C19DCE /* CurrentlyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyViewController.swift; sourceTree = "<group>"; };
+		162DC6242022278D00C19DCE /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
 				162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
 				162DC6102020FAAB00C19DCE /* Info.plist */,
+				162DC6242022278D00C19DCE /* Configuration.swift */,
 			);
 			path = Cloudship;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				162DC6252022278D00C19DCE /* Configuration.swift in Sources */,
 				162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */,
 				162DC623202104AF00C19DCE /* CurrentlyViewController.swift in Sources */,
 				162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */,
