@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var currentTempLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -23,6 +25,12 @@ class ViewController: UIViewController {
         //do something amazing
         print("We should be getting the weather array back here, please!!!!!!")
         print(WeatherController.shared.weatherArray)
+        
+        print("Here is your current temp")
+        print(WeatherController.shared.weather?.currently?.temperature)
+        DispatchQueue.main.async {
+            self.currentTempLabel.text = String(describing: WeatherController.shared.weather?.currently?.temperature)
+        }
     }
 
     override func didReceiveMemoryWarning() {

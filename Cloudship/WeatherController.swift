@@ -14,11 +14,11 @@ class WeatherController: Codable {
     
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
     
-    private var weatherInfo: WeatherInfo?
+    var weather: Weather?
     
-    var weatherArray:[Weather] {
-        if let theArray = self.weatherInfo?.weather {
-            return theArray
+    var weatherArray: [Weather] {
+        if let theArray = weather {
+            return [theArray]
         }
         return []
     }
@@ -26,7 +26,7 @@ class WeatherController: Codable {
     func fetchWeatherInfo() {
         URLSession.shared.dataTask(with: URL(string: "https://api.darksky.net/forecast/f7bc7a2bca5a3df8d3492ec37f730f60/47.197882,-122.170778")!) { (data:Data?, response:URLResponse?, error:Error?) in
             if let data = data {
-                self.weatherInfo = ( try? JSONDecoder().decode(WeatherInfo.self, from: data))
+                self.weather = ( try? JSONDecoder().decode(Weather.self, from: data)) 
                 NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
             }
         }.resume()
