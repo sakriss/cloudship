@@ -11,9 +11,10 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var userLocationLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var highTempLabel: UILabel!
+    @IBOutlet weak var lowTempLabel: UILabel!
+    @IBOutlet weak var currentSummaryLabel: UILabel!
     
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
@@ -35,19 +36,38 @@ class ViewController: UIViewController {
         print("We should be getting the weather array back here, please!!!!!!")
         print(WeatherController.shared.weatherArray)
         
-        if let currentTemp = WeatherController.shared.weather?.currently?.temperature {
+        let dataPoint = WeatherController.shared.weather
+        
+        if let currentTemp = dataPoint?.currently?.temperature {
             DispatchQueue.main.async {
                 self.currentTempLabel.text = String(currentTemp)
             }
         }
         
-        if let dailyHighTemp = WeatherController.shared.weather?.daily?.data?[0].temperatureMax {
+        if let dailyHighTemp = dataPoint?.daily?.data?[0].temperatureMax {
             DispatchQueue.main.async {
                 self.highTempLabel.text = String(dailyHighTemp)
             }
         }
+        
+        if let dailyLowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+            DispatchQueue.main.async {
+                self.lowTempLabel.text = String(dailyLowTemp)
+            }
+        }
+        
+        if let currentSummary = dataPoint?.daily?.data?[0].summary {
+            DispatchQueue.main.async {
+                self.currentSummaryLabel.text = String(currentSummary)
+            }
+        }
+        
+//        if let currentSummary = WeatherController.shared.weather?.daily?.data?[0]. {
+//            DispatchQueue.main.async {
+//                self.currentSummaryLabel.text = String(currentSummary)
+//            }
+//        }
     }
-    
     
 }
 
@@ -62,35 +82,36 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
         for location in locations {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
+            
+            let geocoder = CLGeocoder()
+            geocoder.reverseGeocodeLocation(location) { (placemarks:[CLPlacemark]?, error: Error?) in
+                if let error = error {
+                    print(error)
+                    return
+                }
+                if let placemarks = placemarks {
+                    for placemark in placemarks {
+                        var addressString = placemark.subThoroughfare ?? ""
+                        addressString.append(" ")
+                        addressString.append(placemark.thoroughfare ?? "")
+                        addressString.append(" ")
+                        addressString.append(placemark.locality ?? "")
+                        addressString.append(", ")
+                        addressString.append(placemark.administrativeArea ?? "")
+//                        addressString.append(" ")
+//                        addressString.append(placemark.postalCode ?? "")
+                        
+                        self.navigationItem.title = addressString
+                    }
+                }
+            }
         }
         
-        //        var userLocation:[CLLocation] = locations
-        //
-        //        let geocoder = CLGeocoder()
-        //        geocoder.reverseGeocodeLocation(userLocation) { (placemarks:[CLPlacemark]?, error: Error?) in
-        //            if let error = error {
-        //                print(error)
-        //                return
-        //            }
-        //            if let placemarks = placemarks {
-        //                for placemark in placemarks {
-        //                    var addressString = placemark.subThoroughfare ?? ""
-        //                    addressString.append(" ")
-        //                    addressString.append(placemark.thoroughfare ?? "")
-        //                    addressString.append("\n")
-        //                    addressString.append(placemark.locality ?? "")
-        //                    addressString.append(", ")
-        //                    addressString.append(placemark.administrativeArea ?? "")
-        //                    addressString.append(" ")
-        //                    addressString.append(placemark.postalCode ?? "")
-        //
-        //                    cell.catAddressLabel.text = addressString
-        //                }
-        //            }
-        //        }
     }
+    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
     }
