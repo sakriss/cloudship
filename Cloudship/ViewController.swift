@@ -39,20 +39,23 @@ class ViewController: UIViewController {
         let dataPoint = WeatherController.shared.weather
         
         if let currentTemp = dataPoint?.currently?.temperature {
+            let newCurrentTemp = String(format: "%.0f", currentTemp)
             DispatchQueue.main.async {
-                self.currentTempLabel.text = String(currentTemp)
+                self.currentTempLabel.text = newCurrentTemp + "\u{00B0}"
             }
         }
         
         if let dailyHighTemp = dataPoint?.daily?.data?[0].temperatureMax {
+            let newDailyTemp = String(format: "%.0f", dailyHighTemp)
             DispatchQueue.main.async {
-                self.highTempLabel.text = String(dailyHighTemp)
+                self.highTempLabel.text = newDailyTemp + "\u{00B0}"
             }
         }
         
         if let dailyLowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+            let newDailyLowTemp = String(format: "%.0f", dailyLowTemp)
             DispatchQueue.main.async {
-                self.lowTempLabel.text = String(dailyLowTemp)
+                self.lowTempLabel.text = newDailyLowTemp + "\u{00B0}"
             }
         }
         

@@ -10,6 +10,7 @@ import UIKit
 
 class DailyTableViewCell: UITableViewCell {
     
+    @IBOutlet weak var dailySummaryLabel: UILabel!
     @IBOutlet weak var dayOfWeekLabel: UILabel!
     @IBOutlet weak var dailyHighTempLabel: UILabel!
     @IBOutlet weak var dailyLowTempLabel: UILabel!

@@ -9,16 +9,16 @@
 import UIKit
 
 class DailyViewController: UIViewController {
-
+    
     @IBOutlet weak var dailyForcastTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
         self.dailyForcastTableView.estimatedRowHeight = 150
     }
-
+    
 }
 
 extension DailyViewController: UITableViewDataSource {
@@ -35,43 +35,48 @@ extension DailyViewController: UITableViewDataSource {
         let dataPoint = WeatherController.shared.weather
         
         let time = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
-            
-            let dateString = "\(time)" // the date string to be parsed
-            let df1 = DateFormatter()
-            df1.locale = Locale(identifier: "en_US_POSIX")
-            df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            if let date = df1.date(from: dateString) {
-                print(date)
-                let df2 = DateFormatter()
-                df2.dateStyle = .full
-//                df2.timeStyle = .short
-                let string = df2.string(from: date)
-                DispatchQueue.main.async {
-                    cell.dayOfWeekLabel.text = string
-                }
-            } else {
-                print("Unable to parse date string")
-            }
         
-        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax {
+        let dateString = "\(time)" // the date string to be parsed
+        let df1 = DateFormatter()
+        df1.locale = Locale(identifier: "en_US_POSIX")
+        df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        if let date = df1.date(from: dateString) {
+            let df2 = DateFormatter()
+            df2.dateStyle = .full
+            let string = df2.string(from: date)
             DispatchQueue.main.async {
-                cell.dailyHighTempLabel.text = String(highTemp)
+                cell.dayOfWeekLabel.text = string
+            }
+        } else {
+            print("Unable to parse date string")
+        }
+        if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {
+            DispatchQueue.main.async {
+                cell.dailySummaryLabel.text = String(dailySummary)
+            }
+        }
+        
+        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax, let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+            let newHighTemp = String(format: "%.0f", highTemp)
+            let newLowTemp = String(format: "%.0f", lowTemp)
+            DispatchQueue.main.async {
+                //cell.dailyHighTempLabel.text = String(format: "%.0f", highTemp)
+                cell.dailyHighTempLabel.text = newHighTemp + "\u{00B0}/" + newLowTemp + "\u{00B0}"
             }
         }
         
         if let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+            let newLowTemp = String(format: "%.0f", lowTemp)
             DispatchQueue.main.async {
-                cell.dailyLowTempLabel.text = String(lowTemp)
+                cell.dailyLowTempLabel.text = newLowTemp + "\u{00B0}"
             }
         }
         
         if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
             DispatchQueue.main.async {
-                cell.dailyPercipPercent.text = String(precipChance)
+                cell.dailyPercipPercent.text = String(format: "%.2f%%", precipChance)
             }
         }
-        
-        cell.backgroundColor = UIColor.green
         return cell
     }
     
