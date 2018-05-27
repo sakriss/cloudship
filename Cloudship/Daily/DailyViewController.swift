@@ -65,13 +65,6 @@ extension DailyViewController: UITableViewDataSource {
             }
         }
         
-        if let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
-            let newLowTemp = String(format: "%.0f", lowTemp)
-            DispatchQueue.main.async {
-                cell.dailyLowTempLabel.text = newLowTemp + "\u{00B0}"
-            }
-        }
-        
         if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
             DispatchQueue.main.async {
                 cell.dailyPercipPercent.text = String(format: "%.2f%%", precipChance)

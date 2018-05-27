@@ -13,7 +13,6 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var highTempLabel: UILabel!
-    @IBOutlet weak var lowTempLabel: UILabel!
     @IBOutlet weak var currentSummaryLabel: UILabel!
     
     let locationManager = CLLocationManager()
@@ -38,24 +37,18 @@ class ViewController: UIViewController {
         
         let dataPoint = WeatherController.shared.weather
         
-        if let currentTemp = dataPoint?.currently?.temperature {
+        if let currentTemp = dataPoint?.currently?.temperature, let currentCondition = dataPoint?.currently?.summary {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
             DispatchQueue.main.async {
-                self.currentTempLabel.text = newCurrentTemp + "\u{00B0}"
+                self.currentTempLabel.text = newCurrentTemp + "\u{00B0} - " + currentCondition
             }
         }
         
-        if let dailyHighTemp = dataPoint?.daily?.data?[0].temperatureMax {
-            let newDailyTemp = String(format: "%.0f", dailyHighTemp)
+        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax, let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+            let newHighTemp = String(format: "%.0f", highTemp)
+            let newLowTemp = String(format: "%.0f", lowTemp)
             DispatchQueue.main.async {
-                self.highTempLabel.text = newDailyTemp + "\u{00B0}"
-            }
-        }
-        
-        if let dailyLowTemp = dataPoint?.daily?.data?[0].temperatureLow {
-            let newDailyLowTemp = String(format: "%.0f", dailyLowTemp)
-            DispatchQueue.main.async {
-                self.lowTempLabel.text = newDailyLowTemp + "\u{00B0}"
+                self.highTempLabel.text = newHighTemp + "\u{00B0}/" + newLowTemp + "\u{00B0}"
             }
         }
         
