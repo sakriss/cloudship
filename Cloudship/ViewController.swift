@@ -11,6 +11,8 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var currentConditionLabel: UILabel!
+    @IBOutlet weak var lowTempLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var highTempLabel: UILabel!
     @IBOutlet weak var currentSummaryLabel: UILabel!
@@ -37,18 +39,30 @@ class ViewController: UIViewController {
         
         let dataPoint = WeatherController.shared.weather
         
-        if let currentTemp = dataPoint?.currently?.temperature, let currentCondition = dataPoint?.currently?.summary {
+        if let currentTemp = dataPoint?.currently?.temperature {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
             DispatchQueue.main.async {
-                self.currentTempLabel.text = newCurrentTemp + "\u{00B0} - " + currentCondition
+                self.currentTempLabel.text = newCurrentTemp
             }
         }
         
-        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax, let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+        if let currentCondition = dataPoint?.currently?.summary {
+            DispatchQueue.main.async {
+                self.currentConditionLabel.text = currentCondition
+            }
+        }
+        
+        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
             let newHighTemp = String(format: "%.0f", highTemp)
+            DispatchQueue.main.async {
+                self.highTempLabel.text = newHighTemp + "\u{00B0}"
+            }
+        }
+        
+        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
             let newLowTemp = String(format: "%.0f", lowTemp)
             DispatchQueue.main.async {
-                self.highTempLabel.text = newHighTemp + "\u{00B0}/" + newLowTemp + "\u{00B0}"
+                self.lowTempLabel.text = newLowTemp + "\u{00B0}"
             }
         }
         
@@ -72,7 +86,7 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.locationAuthStatus = status
         if status == .authorizedWhenInUse {
-            print("We can get your location, muahahahaha")
+            print("We can now get your location")
             manager.requestLocation()
         }
     }

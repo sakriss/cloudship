@@ -36,7 +36,36 @@ class WeatherController: Codable {
         }.resume()
     }
     
-
-    
 }
+
+
+class LocationService: NSObject, CLLocationManagerDelegate {
+    
+    let locationManager = CLLocationManager()
+    var locationAuthStatus: CLAuthorizationStatus = .notDetermined
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        self.locationAuthStatus = status
+        if status == .authorizedWhenInUse {
+            print("We can now get your location, in WeatherController")
+            manager.requestLocation()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        for location in locations {
+            print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
+            //TODO get coords and give them back to fetch weather
+            
+            
+        }
+        
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+}
+
 
