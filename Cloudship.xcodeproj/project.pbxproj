@@ -30,6 +30,7 @@
 		162DC6212021048700C19DCE /* DailyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6202021048700C19DCE /* DailyViewController.swift */; };
 		162DC623202104AF00C19DCE /* CurrentlyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC622202104AF00C19DCE /* CurrentlyViewController.swift */; };
 		162DC6252022278D00C19DCE /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6242022278D00C19DCE /* Configuration.swift */; };
+		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		162DC6202021048700C19DCE /* DailyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewController.swift; sourceTree = "<group>"; };
 		162DC622202104AF00C19DCE /* CurrentlyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyViewController.swift; sourceTree = "<group>"; };
 		162DC6242022278D00C19DCE /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 				1620610120AF63EE004E00BD /* Hourly.swift */,
 				162DC61E2021043A00C19DCE /* HourlyViewController.swift */,
 				1620610320AF6462004E00BD /* HourlyData.swift */,
+				1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */,
 			);
 			path = Hourly;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
 				1620610020AF61BE004E00BD /* Weather.swift in Sources */,
+				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
 				1620611A20B5C781004E00BD /* DailyTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

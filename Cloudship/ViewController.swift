@@ -11,6 +11,7 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var currentAddressLabel: UILabel!
     @IBOutlet weak var currentConditionLabel: UILabel!
     @IBOutlet weak var lowTempLabel: UILabel!
     @IBOutlet weak var currentTempLabel: UILabel!
@@ -68,12 +69,6 @@ class ViewController: UIViewController {
                 self.currentSummaryLabel.text = String(currentSummary)
             }
         }
-        
-//        if let currentSummary = WeatherController.shared.weather?.daily?.data?[0]. {
-//            DispatchQueue.main.async {
-//                self.currentSummaryLabel.text = String(currentSummary)
-//            }
-//        }
     }
     
 }
