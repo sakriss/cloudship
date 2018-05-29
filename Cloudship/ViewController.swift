@@ -28,14 +28,11 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
-        WeatherController.shared.fetchWeatherInfo()
         
     }
     
     @objc func weatherDataFetched () {
-        //do something amazing
-        print("We should be getting the weather array back here, please!!!!!!")
-        print(WeatherController.shared.weatherArray)
+        //now that data is parsed, we can display it
         
         let dataPoint = WeatherController.shared.weather
         
@@ -95,6 +92,8 @@ extension ViewController: CLLocationManagerDelegate {
         
         for location in locations {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
+            
+            WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude)
             
             let geocoder = CLGeocoder()
             geocoder.reverseGeocodeLocation(location) { (placemarks:[CLPlacemark]?, error: Error?) in
