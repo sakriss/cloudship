@@ -31,6 +31,7 @@
 		162DC623202104AF00C19DCE /* CurrentlyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC622202104AF00C19DCE /* CurrentlyViewController.swift */; };
 		162DC6252022278D00C19DCE /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6242022278D00C19DCE /* Configuration.swift */; };
 		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
+		1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAC20BF5555006FF7F5 /* Gif.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		162DC622202104AF00C19DCE /* CurrentlyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyViewController.swift; sourceTree = "<group>"; };
 		162DC6242022278D00C19DCE /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
+		1646BDAC20BF5555006FF7F5 /* Gif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 		162DC5F82020FAAB00C19DCE = {
 			isa = PBXGroup;
 			children = (
+				1646BDAC20BF5555006FF7F5 /* Gif.swift */,
 				162DC6032020FAAB00C19DCE /* Cloudship */,
 				162DC6022020FAAB00C19DCE /* Products */,
 			);
@@ -245,6 +248,7 @@
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
+				1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */,
 				162DC6252022278D00C19DCE /* Configuration.swift in Sources */,
 				162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */,
 				1620610A20AF6689004E00BD /* Minutely.swift in Sources */,

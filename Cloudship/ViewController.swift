@@ -11,6 +11,7 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var backgroundAnimatedImage: UIImageView!
     @IBOutlet weak var currentAddressLabel: UILabel!
     @IBOutlet weak var currentConditionLabel: UILabel!
     @IBOutlet weak var lowTempLabel: UILabel!
@@ -69,6 +70,12 @@ class ViewController: UIViewController {
                 self.currentSummaryLabel.text = String(currentSummary)
             }
         }
+
+        //attempting to load animated gif
+            DispatchQueue.main.async {
+                self.backgroundAnimatedImage.loadGif(asset: "weather")
+        }
+        
     }
     
 }
@@ -105,8 +112,8 @@ extension ViewController: CLLocationManagerDelegate {
                         addressString.append(placemark.locality ?? "")
                         addressString.append(", ")
                         addressString.append(placemark.administrativeArea ?? "")
-//                        addressString.append(" ")
-//                        addressString.append(placemark.postalCode ?? "")
+                        //                        addressString.append(" ")
+                        //                        addressString.append(placemark.postalCode ?? "")
                         
                         self.navigationItem.title = addressString
                     }

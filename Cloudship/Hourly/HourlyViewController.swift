@@ -68,24 +68,12 @@ extension HourlyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        //        if let hour = dataPoint?.hourly?.data?[indexPath.row].time {
-        //            DispatchQueue.main.async {
-        //                cell.dayOfWeekLabel.text = String(day)
-        //            }
-        //        }
-        
         if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.row].temperature {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
             DispatchQueue.main.async {
                 cell.hourlyTempLabel.text = newHighTemp + "\u{00B0}"
             }
         }
-        
-//        if dataPoint?.hourly?.data?[indexPath.row].icon == "partly-cloudy-day" {
-//            DispatchQueue.main.async {
-//                cell.conditionIconImage.image = UIImage(named: "partlycloudy.png")
-//            }
-//        }
         
         let conditionIcon = dataPoint?.hourly?.data?[indexPath.row].icon
         switch conditionIcon {
