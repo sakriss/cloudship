@@ -32,11 +32,41 @@ extension HourlyViewController: UITableViewDataSource {
         }
         let dataPoint = WeatherController.shared.weather
         
-//        if let day = dataPoint?.hourly?.data?[indexPath.row].time {
-//            DispatchQueue.main.async {
-//                cell.dayOfWeekLabel.text = String(day)
-//            }
-//        }
+        let time = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
+        let dateString = "\(time)" // the date string to be parsed
+        let df1 = DateFormatter()
+        df1.locale = Locale(identifier: "en_US")
+        df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        if let date = df1.date(from: dateString) {
+            let format = "EE"
+            let df2 = DateFormatter()
+            df2.dateFormat = format
+            let string = df2.string(from: date)
+            DispatchQueue.main.async {
+                cell.dayOfWeekLabel.text = string
+            }
+        } else {
+            print("Unable to parse date string")
+        }
+        
+        let hourlyTime = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
+        let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+        let df3 = DateFormatter()
+        df3.locale = Locale(identifier: "en_US")
+        df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        if let hour = df3.date(from: dailyHourString) {
+            let format = "ha"
+            let df4 = DateFormatter()
+            df4.dateFormat = format
+            df4.amSymbol = "AM"
+            df4.pmSymbol = "PM"
+            let string = df4.string(from: hour)
+            DispatchQueue.main.async {
+                cell.hourlyHourLabel.text = string
+            }
+        } else {
+            print("Unable to parse date string")
+        }
         
         //        if let hour = dataPoint?.hourly?.data?[indexPath.row].time {
         //            DispatchQueue.main.async {
@@ -53,7 +83,7 @@ extension HourlyViewController: UITableViewDataSource {
         
         if let hourlyCondition = dataPoint?.hourly?.data?[indexPath.row].summary {
             DispatchQueue.main.async {
-                cell.hourlyConditionLabel.text = String(hourlyCondition)
+                cell.hourlyConditionLabel.text = "PCL"
             }
         }
         

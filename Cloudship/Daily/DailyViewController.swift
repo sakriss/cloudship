@@ -34,9 +34,9 @@ extension DailyViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
-        let time = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
+        let dailyTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
         
-        let dateString = "\(time)" // the date string to be parsed
+        let dateString = "\(dailyTime)" // the date string to be parsed
         let df1 = DateFormatter()
         df1.locale = Locale(identifier: "en_US_POSIX")
         df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
@@ -50,6 +50,7 @@ extension DailyViewController: UITableViewDataSource {
         } else {
             print("Unable to parse date string")
         }
+        
         if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {
             DispatchQueue.main.async {
                 cell.dailySummaryLabel.text = String(dailySummary)

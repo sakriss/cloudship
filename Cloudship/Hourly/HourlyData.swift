@@ -9,7 +9,7 @@
 import UIKit
 
 class HourlyData: Codable {
-    private(set) var time: Date?
+    private(set) var time: Double?
     private(set) var summary: String?
     private(set) var icon: String?
     private(set) var precipIntensity: Double?
