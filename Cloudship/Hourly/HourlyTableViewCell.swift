@@ -10,6 +10,7 @@ import UIKit
 
 class HourlyTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var conditionIconImage: UIImageView!
     @IBOutlet weak var dayOfWeekLabel: UILabel!
     @IBOutlet weak var hourlyHourLabel: UILabel!
     @IBOutlet weak var hourlyConditionLabel: UILabel!

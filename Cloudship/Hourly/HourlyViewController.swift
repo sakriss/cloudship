@@ -81,9 +81,57 @@ extension HourlyViewController: UITableViewDataSource {
             }
         }
         
-        if let hourlyCondition = dataPoint?.hourly?.data?[indexPath.row].summary {
+//        if dataPoint?.hourly?.data?[indexPath.row].icon == "partly-cloudy-day" {
+//            DispatchQueue.main.async {
+//                cell.conditionIconImage.image = UIImage(named: "partlycloudy.png")
+//            }
+//        }
+        
+        let conditionIcon = dataPoint?.hourly?.data?[indexPath.row].icon
+        switch conditionIcon {
+        case "partly-cloudy-day":
             DispatchQueue.main.async {
-                cell.hourlyConditionLabel.text = "PCL"
+                cell.conditionIconImage.image = UIImage(named: "mostlycloudy.png")
+            }
+        case "partly-cloudy-night":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "cloudynight.png")
+            }
+        case "cloudy":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "cloudy.png")
+            }
+        case "clear-day":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "sunny.png")
+            }
+        case "clear-night":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "clearnight.png")
+            }
+        case "rain":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "rain.png")
+            }
+        case "snow":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "snow.png")
+            }
+        case "sleet":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "sleet.png")
+            }
+        case "wind":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "wind.png")
+            }
+        case "fog":
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "fog.png")
+            }
+        default:
+            DispatchQueue.main.async {
+                cell.conditionIconImage.image = UIImage(named: "default.png")
             }
         }
         
