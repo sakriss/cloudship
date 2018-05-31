@@ -19,11 +19,19 @@ class ViewController: UIViewController {
     @IBOutlet weak var highTempLabel: UILabel!
     @IBOutlet weak var currentSummaryLabel: UILabel!
     
+    let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.addSubview(activityIndicator)
+        // Set up its size (the super view bounds usually)
+        activityIndicator.frame = view.bounds
+        // Start the loading animation
+        activityIndicator.startAnimating()
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -35,6 +43,9 @@ class ViewController: UIViewController {
     
     @objc func weatherDataFetched () {
         //now that data is parsed, we can display it
+        DispatchQueue.main.async {
+            self.activityIndicator.removeFromSuperview()
+        }
         
         let dataPoint = WeatherController.shared.weather
         
