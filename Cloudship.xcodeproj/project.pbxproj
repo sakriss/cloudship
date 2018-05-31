@@ -32,6 +32,7 @@
 		162DC6252022278D00C19DCE /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6242022278D00C19DCE /* Configuration.swift */; };
 		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
 		1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAC20BF5555006FF7F5 /* Gif.swift */; };
+		1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		162DC6242022278D00C19DCE /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
 		1646BDAC20BF5555006FF7F5 /* Gif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
+		1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutelyTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +132,7 @@
 				1620610920AF6689004E00BD /* Minutely.swift */,
 				1620610B20AF66B1004E00BD /* MinutelyData.swift */,
 				1620611720B31F4A004E00BD /* MinutelyViewController.swift */,
+				1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */,
 			);
 			path = Minutely;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */,
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
+				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
 				1620610020AF61BE004E00BD /* Weather.swift in Sources */,
 				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
 				1620611A20B5C781004E00BD /* DailyTableViewCell.swift in Sources */,

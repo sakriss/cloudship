@@ -85,7 +85,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" alpha="0.29999999999999999" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6Py-FL-SAU">
+                            <imageView userInteractionEnabled="NO" alpha="0.40000000000000002" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6Py-FL-SAU">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                             </imageView>
                         </subviews>
@@ -257,9 +257,38 @@
                     <view key="view" contentMode="scaleToFill" id="nJa-YM-2GV">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="vZh-2t-nkV">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MinutelyTableViewCell" id="qQg-RZ-kpr" customClass="MinutelyTableViewCell" customModule="Cloudship" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qQg-RZ-kpr" id="YCh-2P-vE3">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="q9o-Ut-CeL" id="hED-93-iK5"/>
+                                    <outlet property="delegate" destination="q9o-Ut-CeL" id="jsF-jM-Hbu"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="KCv-nI-8xd" firstAttribute="bottom" secondItem="vZh-2t-nkV" secondAttribute="bottom" id="3j7-sj-Vfu"/>
+                            <constraint firstItem="KCv-nI-8xd" firstAttribute="trailing" secondItem="vZh-2t-nkV" secondAttribute="trailing" id="RWM-Ld-bHA"/>
+                            <constraint firstItem="vZh-2t-nkV" firstAttribute="leading" secondItem="KCv-nI-8xd" secondAttribute="leading" id="WyZ-KY-Hw4"/>
+                            <constraint firstItem="vZh-2t-nkV" firstAttribute="top" secondItem="KCv-nI-8xd" secondAttribute="top" id="eDq-yZ-kCF"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="KCv-nI-8xd"/>
                     </view>
+                    <connections>
+                        <outlet property="minutelyTableView" destination="vZh-2t-nkV" id="HBa-MG-RRC"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0bh-Wr-90z" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -317,7 +346,7 @@
                                                     <color key="textColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mostlycloudy" translatesAutoresizingMaskIntoConstraints="NO" id="1WD-qA-m29">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1WD-qA-m29">
                                                     <rect key="frame" x="90" y="29" width="20" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="GNe-zH-cUC"/>
@@ -395,7 +424,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                         <constraints>
                             <constraint firstItem="hYb-ay-UN1" firstAttribute="top" secondItem="Z5v-K3-IHM" secondAttribute="bottom" constant="4" id="28o-Dd-thl"/>
                             <constraint firstItem="hYb-ay-UN1" firstAttribute="top" secondItem="3ew-An-rNa" secondAttribute="bottom" constant="4" id="2J4-ZQ-3aD"/>
@@ -446,7 +475,4 @@
             <point key="canvasLocation" x="-764" y="43"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="mostlycloudy" width="72" height="72"/>
-    </resources>
 </document>
