@@ -10,6 +10,10 @@ import UIKit
 
 class MinutelyTableViewCell: UITableViewCell {
 
-
+    @IBOutlet weak var minutelyWindLabel: UILabel!
+    @IBOutlet weak var minutelyPrecipLabel: UILabel!
+    @IBOutlet weak var minutelyTempLabel: UILabel!
+    @IBOutlet weak var minutelyMinuteLabel: UILabel!
+    
 }
 

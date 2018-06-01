@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var currentTempLabel: UILabel!
     @IBOutlet weak var highTempLabel: UILabel!
     @IBOutlet weak var currentSummaryLabel: UILabel!
+    @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
     
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
@@ -79,6 +80,12 @@ class ViewController: UIViewController {
         if let currentSummary = dataPoint?.daily?.data?[0].summary {
             DispatchQueue.main.async {
                 self.currentSummaryLabel.text = String(currentSummary)
+            }
+        }
+        
+        if let lookingAhead = dataPoint?.minutely?.summary {
+            DispatchQueue.main.async {
+                self.minutelyLookingAheadLabel.text = lookingAhead
             }
         }
 

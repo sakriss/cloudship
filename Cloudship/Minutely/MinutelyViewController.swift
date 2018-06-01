@@ -35,6 +35,24 @@ extension MinutelyViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
+        let minutelyTime = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
+        let minutelyMinuteString = "\(minutelyTime)" // the date string to be parsed
+        let df3 = DateFormatter()
+        df3.locale = Locale(identifier: "en_US")
+        df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        if let hour = df3.date(from: minutelyMinuteString) {
+            let format = "ha"
+            let df4 = DateFormatter()
+            df4.dateFormat = format
+            df4.amSymbol = "AM"
+            df4.pmSymbol = "PM"
+            let string = df4.string(from: hour)
+            DispatchQueue.main.async {
+                cell.minutelyMinuteLabel.text = string
+            }
+        } else {
+            print("Unable to parse date string")
+        }
         
         return cell
     }

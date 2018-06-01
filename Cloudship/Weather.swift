@@ -18,7 +18,7 @@ class Weather: Codable {
     private(set) var minutely: Minutely?
     private(set) var hourly: Hourly?
     private(set) var daily: Daily?
-    //private(set) var flags: Flags?
+    private(set) var alerts: [Alerts]?
     
 
 }
