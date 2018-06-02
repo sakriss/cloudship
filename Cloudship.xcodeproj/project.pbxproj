@@ -33,6 +33,8 @@
 		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
 		1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAC20BF5555006FF7F5 /* Gif.swift */; };
 		1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */; };
+		168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168C8CF820C255A800D0413C /* AlertsViewController.swift */; };
+		168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +66,8 @@
 		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
 		1646BDAC20BF5555006FF7F5 /* Gif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
 		1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutelyTableViewCell.swift; sourceTree = "<group>"; };
+		168C8CF820C255A800D0413C /* AlertsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsViewController.swift; sourceTree = "<group>"; };
+		168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +167,8 @@
 			isa = PBXGroup;
 			children = (
 				1620610F20AF6770004E00BD /* Alerts.swift */,
+				168C8CF820C255A800D0413C /* AlertsViewController.swift */,
+				168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -251,9 +257,11 @@
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
+				168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */,
 				1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */,
 				162DC6252022278D00C19DCE /* Configuration.swift in Sources */,
 				162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */,
+				168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */,
 				1620610A20AF6689004E00BD /* Minutely.swift in Sources */,
 				1620610820AF6582004E00BD /* DailyData.swift in Sources */,
 				1620611620AF6FAC004E00BD /* WeatherInfo.swift in Sources */,
@@ -407,10 +415,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 6QK74KTAZV;
+				DEVELOPMENT_TEAM = SJGQK6GQ37;
 				INFOPLIST_FILE = Cloudship/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -422,10 +430,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 6QK74KTAZV;
+				DEVELOPMENT_TEAM = SJGQK6GQ37;
 				INFOPLIST_FILE = Cloudship/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

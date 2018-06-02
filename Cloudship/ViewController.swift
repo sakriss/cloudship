@@ -10,6 +10,11 @@ import UIKit
 import CoreLocation
 
 class ViewController: UIViewController {
+ 
+    @IBOutlet weak var alertViewContainer: UIView!
+    @IBAction func alertActiveButton(_ sender: Any) {
+        print("Alert button pressed")
+    }
     
     @IBOutlet weak var backgroundAnimatedImage: UIImageView!
     @IBOutlet weak var currentAddressLabel: UILabel!
@@ -39,7 +44,7 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
-        
+        alertViewContainer.isHidden = true
     }
     
     @objc func weatherDataFetched () {
@@ -88,6 +93,15 @@ class ViewController: UIViewController {
                 self.minutelyLookingAheadLabel.text = lookingAhead
             }
         }
+        
+        if let alertsActive = dataPoint?.alerts?[0] {
+            print(alertsActive)
+            
+            DispatchQueue.main.async {
+                self.alertViewContainer.isHidden = false
+            }
+        }
+        
 
         //attempting to load animated gif
             DispatchQueue.main.async {
