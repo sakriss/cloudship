@@ -11,19 +11,21 @@ import CoreLocation
 
 class ViewController: UIViewController {
  
-    @IBOutlet weak var alertViewContainer: UIView!
-    @IBAction func alertActiveButton(_ sender: Any) {
-        print("Alert button pressed")
-    }
+    @IBOutlet weak var currentlyTableView: UITableView!
     
-    @IBOutlet weak var backgroundAnimatedImage: UIImageView!
-    @IBOutlet weak var currentAddressLabel: UILabel!
-    @IBOutlet weak var currentConditionLabel: UILabel!
-    @IBOutlet weak var lowTempLabel: UILabel!
-    @IBOutlet weak var currentTempLabel: UILabel!
-    @IBOutlet weak var highTempLabel: UILabel!
-    @IBOutlet weak var currentSummaryLabel: UILabel!
-    @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
+    
+//    @IBOutlet weak var alertViewContainer: UIView!
+//    @IBAction func alertActiveButton(_ sender: Any) {
+//        print("Alert button pressed")
+//    }
+    
+//    @IBOutlet weak var backgroundAnimatedImage: UIImageView!
+//    @IBOutlet weak var currentConditionLabel: UILabel!
+//    @IBOutlet weak var lowTempLabel: UILabel!
+//    @IBOutlet weak var currentTempLabel: UILabel!
+//    @IBOutlet weak var highTempLabel: UILabel!
+//    @IBOutlet weak var currentSummaryLabel: UILabel!
+//    @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
     
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
@@ -44,69 +46,74 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
-        alertViewContainer.isHidden = true
+//        alertViewContainer.isHidden = true
     }
     
     @objc func weatherDataFetched () {
+        
         //now that data is parsed, we can display it
         DispatchQueue.main.async {
             self.activityIndicator.removeFromSuperview()
         }
         
-        let dataPoint = WeatherController.shared.weather
-        
-        if let currentTemp = dataPoint?.currently?.temperature {
-            let newCurrentTemp = String(format: "%.0f", currentTemp)
-            DispatchQueue.main.async {
-                self.currentTempLabel.text = newCurrentTemp
-            }
+        DispatchQueue.main.async {
+            self.currentlyTableView.reloadData()
         }
         
-        if let currentCondition = dataPoint?.currently?.summary {
-            DispatchQueue.main.async {
-                self.currentConditionLabel.text = currentCondition
-            }
-        }
-        
-        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
-            let newHighTemp = String(format: "%.0f", highTemp)
-            DispatchQueue.main.async {
-                self.highTempLabel.text = newHighTemp + "\u{00B0}"
-            }
-        }
-        
-        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
-            let newLowTemp = String(format: "%.0f", lowTemp)
-            DispatchQueue.main.async {
-                self.lowTempLabel.text = newLowTemp + "\u{00B0}"
-            }
-        }
-        
-        if let currentSummary = dataPoint?.daily?.data?[0].summary {
-            DispatchQueue.main.async {
-                self.currentSummaryLabel.text = String(currentSummary)
-            }
-        }
-        
-        if let lookingAhead = dataPoint?.minutely?.summary {
-            DispatchQueue.main.async {
-                self.minutelyLookingAheadLabel.text = lookingAhead
-            }
-        }
-        
-        if let alertsActive = dataPoint?.alerts?[0] {
-            print(alertsActive)
-            
-            DispatchQueue.main.async {
-                self.alertViewContainer.isHidden = false
-            }
-        }
-        
-
-        //attempting to load animated gif
-            DispatchQueue.main.async {
-                self.backgroundAnimatedImage.loadGif(asset: "weather")
-        }
+//        let dataPoint = WeatherController.shared.weather
+//
+//        if let currentTemp = dataPoint?.currently?.temperature {
+//            let newCurrentTemp = String(format: "%.0f", currentTemp)
+//            DispatchQueue.main.async {
+//                self.currentTempLabel.text = newCurrentTemp
+//            }
+//        }
+//
+//        if let currentCondition = dataPoint?.currently?.summary {
+//            DispatchQueue.main.async {
+//                self.currentConditionLabel.text = currentCondition
+//            }
+//        }
+//
+//        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
+//            let newHighTemp = String(format: "%.0f", highTemp)
+//            DispatchQueue.main.async {
+//                self.highTempLabel.text = newHighTemp + "\u{00B0}"
+//            }
+//        }
+//
+//        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+//            let newLowTemp = String(format: "%.0f", lowTemp)
+//            DispatchQueue.main.async {
+//                self.lowTempLabel.text = newLowTemp + "\u{00B0}"
+//            }
+//        }
+//
+//        if let currentSummary = dataPoint?.daily?.data?[0].summary {
+//            DispatchQueue.main.async {
+//                self.currentSummaryLabel.text = String(currentSummary)
+//            }
+//        }
+//
+//        if let lookingAhead = dataPoint?.minutely?.summary {
+//            DispatchQueue.main.async {
+//                cell.minutelyLookingAheadLabel.text = lookingAhead
+//            }
+//        }
+//
+//        if let alertsActive = dataPoint?.alerts?[0] {
+//            print(alertsActive)
+//
+//            DispatchQueue.main.async {
+//                alertViewContainer.isHidden = false
+//            }
+//        }
+//
+//
+//        //attempting to load animated gif
+//            DispatchQueue.main.async {
+//                self.backgroundAnimatedImage.loadGif(asset: "weather")
+//        }
         
     }
     
@@ -160,3 +167,72 @@ extension ViewController: CLLocationManagerDelegate {
     }
 }
 
+extension ViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
+            return UITableViewCell()
+        }
+        
+        let dataPoint = WeatherController.shared.weather
+        
+        if let currentTemp = dataPoint?.currently?.temperature {
+            let newCurrentTemp = String(format: "%.0f", currentTemp)
+            DispatchQueue.main.async {
+                cell.currentTempLabel.text = newCurrentTemp
+            }
+        }
+        
+        if let currentCondition = dataPoint?.currently?.summary {
+            DispatchQueue.main.async {
+                cell.currentConditionLabel.text = currentCondition
+            }
+        }
+        
+        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
+            let newHighTemp = String(format: "%.0f", highTemp)
+            DispatchQueue.main.async {
+                cell.highTempLabel.text = newHighTemp + "\u{00B0}"
+            }
+        }
+        
+        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+            let newLowTemp = String(format: "%.0f", lowTemp)
+            DispatchQueue.main.async {
+                cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
+            }
+        }
+        
+        if let currentSummary = dataPoint?.daily?.data?[0].summary {
+            DispatchQueue.main.async {
+                cell.currentSummaryLabel.text = String(currentSummary)
+            }
+        }
+        
+        if let lookingAhead = dataPoint?.minutely?.summary {
+            DispatchQueue.main.async {
+                cell.minutelyLookingAheadLabel.text = lookingAhead
+            }
+        }
+
+        if let alertsActive = dataPoint?.alerts?[0] {
+            print(alertsActive)
+
+            DispatchQueue.main.async {
+                cell.alertViewContainer.isHidden = false
+            }
+        }
+        
+        //attempting to load animated gif
+        DispatchQueue.main.async {
+            cell.backgroundAnimatedImage.loadGif(asset: "weather")
+        }
+
+        
+        return cell
+    }
+}
