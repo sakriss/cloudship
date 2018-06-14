@@ -58,7 +58,7 @@ class ViewController: UIViewController {
     }
     
     @objc func refreshData(sender:AnyObject) {
-        WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.latitude)!)
+        WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
         weatherDataFetched()
         DispatchQueue.main.async {
             self.currentlyTableView.reloadData()
