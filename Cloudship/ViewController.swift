@@ -15,19 +15,6 @@ class ViewController: UIViewController {
     
     var lastLocation: CLLocation? = nil
     
-//    @IBOutlet weak var alertViewContainer: UIView!
-//    @IBAction func alertActiveButton(_ sender: Any) {
-//        print("Alert button pressed")
-//    }
-    
-//    @IBOutlet weak var backgroundAnimatedImage: UIImageView!
-//    @IBOutlet weak var currentConditionLabel: UILabel!
-//    @IBOutlet weak var lowTempLabel: UILabel!
-//    @IBOutlet weak var currentTempLabel: UILabel!
-//    @IBOutlet weak var highTempLabel: UILabel!
-//    @IBOutlet weak var currentSummaryLabel: UILabel!
-//    @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
-    
     private let refreshControl = UIRefreshControl()
     
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
@@ -52,7 +39,7 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
 //        alertViewContainer.isHidden = true
         
-        refreshControl.tintColor = UIColor(red:0.25, green:0.72, blue:0.85, alpha:1.0)
+        refreshControl.tintColor = UIColor.black
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...")
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
@@ -62,10 +49,7 @@ class ViewController: UIViewController {
         locationManager.requestLocation()
         //WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
         weatherDataFetched()
-        DispatchQueue.main.async {
-            self.currentlyTableView.reloadData()
-            self.refreshControl.endRefreshing()
-        }
+
     }
     
     @objc func weatherDataFetched () {
@@ -79,63 +63,6 @@ class ViewController: UIViewController {
             self.currentlyTableView.reloadData()
             self.refreshControl.endRefreshing()
         }
-        
-        
-        
-//        let dataPoint = WeatherController.shared.weather
-//
-//        if let currentTemp = dataPoint?.currently?.temperature {
-//            let newCurrentTemp = String(format: "%.0f", currentTemp)
-//            DispatchQueue.main.async {
-//                self.currentTempLabel.text = newCurrentTemp
-//            }
-//        }
-//
-//        if let currentCondition = dataPoint?.currently?.summary {
-//            DispatchQueue.main.async {
-//                self.currentConditionLabel.text = currentCondition
-//            }
-//        }
-//
-//        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
-//            let newHighTemp = String(format: "%.0f", highTemp)
-//            DispatchQueue.main.async {
-//                self.highTempLabel.text = newHighTemp + "\u{00B0}"
-//            }
-//        }
-//
-//        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
-//            let newLowTemp = String(format: "%.0f", lowTemp)
-//            DispatchQueue.main.async {
-//                self.lowTempLabel.text = newLowTemp + "\u{00B0}"
-//            }
-//        }
-//
-//        if let currentSummary = dataPoint?.daily?.data?[0].summary {
-//            DispatchQueue.main.async {
-//                self.currentSummaryLabel.text = String(currentSummary)
-//            }
-//        }
-//
-//        if let lookingAhead = dataPoint?.minutely?.summary {
-//            DispatchQueue.main.async {
-//                cell.minutelyLookingAheadLabel.text = lookingAhead
-//            }
-//        }
-//
-//        if let alertsActive = dataPoint?.alerts?[0] {
-//            print(alertsActive)
-//
-//            DispatchQueue.main.async {
-//                alertViewContainer.isHidden = false
-//            }
-//        }
-//
-//
-//        //attempting to load animated gif
-//            DispatchQueue.main.async {
-//                self.backgroundAnimatedImage.loadGif(asset: "weather")
-//        }
         
     }
     
