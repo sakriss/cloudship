@@ -58,6 +58,7 @@ class ViewController: UIViewController {
         DispatchQueue.main.async {
             self.activityIndicator.removeFromSuperview()
             self.currentlyTableView.reloadData()
+            
 //            self.refreshControl.endRefreshing()
         }
         
@@ -73,6 +74,14 @@ extension ViewController: CLLocationManagerDelegate {
             print("We can now get your location")
             manager.requestLocation()
         }
+    }
+    
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        self.refreshControl.endRefreshing()
+//    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        self.refreshControl.endRefreshing()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -181,13 +190,13 @@ extension ViewController: UITableViewDataSource {
         }
         
         //attempting to load animated gif
+        //TODO: load animation based on current weather conditions
         DispatchQueue.main.async {
             cell.backgroundAnimatedImage.loadGif(asset: "weather")
         }
-        DispatchQueue.main.async {
-            self.refreshControl.endRefreshing()
-        }
-        
+     
         return cell
     }
+    
+
 }
