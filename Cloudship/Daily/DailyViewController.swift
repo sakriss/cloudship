@@ -16,7 +16,7 @@ class DailyViewController: UIViewController {
         super.viewDidLoad()
         
         self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
-        self.dailyForcastTableView.estimatedRowHeight = 150
+        self.dailyForcastTableView.estimatedRowHeight = 120
     }
     
 }

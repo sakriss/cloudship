@@ -13,6 +13,7 @@ class ViewController: UIViewController {
  
     @IBOutlet weak var currentlyTableView: UITableView!
     
+    var lastLocation: CLLocation? = nil
     
 //    @IBOutlet weak var alertViewContainer: UIView!
 //    @IBAction func alertActiveButton(_ sender: Any) {
@@ -27,6 +28,8 @@ class ViewController: UIViewController {
 //    @IBOutlet weak var currentSummaryLabel: UILabel!
 //    @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
     
+    private let refreshControl = UIRefreshControl()
+    
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
     let locationManager = CLLocationManager()
@@ -38,6 +41,7 @@ class ViewController: UIViewController {
         view.addSubview(activityIndicator)
         // Set up its size (the super view bounds usually)
         activityIndicator.frame = view.bounds
+        
         // Start the loading animation
         activityIndicator.startAnimating()
         
@@ -47,6 +51,19 @@ class ViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
 //        alertViewContainer.isHidden = true
+        
+        refreshControl.tintColor = UIColor.blue
+        refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
+        self.currentlyTableView.addSubview(refreshControl)
+    }
+    
+    @objc func refreshData(sender:AnyObject) {
+        WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.latitude)!)
+        weatherDataFetched()
+        DispatchQueue.main.async {
+            self.currentlyTableView.reloadData()
+            self.refreshControl.endRefreshing()
+        }
     }
     
     @objc func weatherDataFetched () {
@@ -58,7 +75,10 @@ class ViewController: UIViewController {
         
         DispatchQueue.main.async {
             self.currentlyTableView.reloadData()
+            self.refreshControl.endRefreshing()
         }
+        
+        
         
 //        let dataPoint = WeatherController.shared.weather
 //
@@ -134,6 +154,7 @@ extension ViewController: CLLocationManagerDelegate {
         for location in locations {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
             
+            lastLocation = location
             WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude)
             
             let geocoder = CLGeocoder()
