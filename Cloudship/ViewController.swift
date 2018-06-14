@@ -40,15 +40,20 @@ class ViewController: UIViewController {
 //        alertViewContainer.isHidden = true
         
         refreshControl.tintColor = UIColor.black
+        refreshControl.backgroundColor = UIColor.lightGray
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...")
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
     }
     
     @objc func refreshData(sender:AnyObject) {
+        DispatchQueue.main.async {
+            self.refreshControl.beginRefreshing()
+        }
         locationManager.requestLocation()
         //WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
-        weatherDataFetched()
+        
+//        self.refreshControl.endRefreshing()
 
     }
     
@@ -58,10 +63,9 @@ class ViewController: UIViewController {
         DispatchQueue.main.async {
             self.activityIndicator.removeFromSuperview()
             self.currentlyTableView.reloadData()
-            
-//            self.refreshControl.endRefreshing()
+
+            self.refreshControl.endRefreshing()
         }
-        
     }
     
 }
@@ -74,14 +78,6 @@ extension ViewController: CLLocationManagerDelegate {
             print("We can now get your location")
             manager.requestLocation()
         }
-    }
-    
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        self.refreshControl.endRefreshing()
-//    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        self.refreshControl.endRefreshing()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -144,56 +140,48 @@ extension ViewController: UITableViewDataSource {
         
         if let currentTemp = dataPoint?.currently?.temperature {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
-            DispatchQueue.main.async {
                 cell.currentTempLabel.text = newCurrentTemp
-            }
+            
         }
         
         if let currentCondition = dataPoint?.currently?.summary {
-            DispatchQueue.main.async {
                 cell.currentConditionLabel.text = currentCondition
-            }
+            
         }
         
         if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
             let newHighTemp = String(format: "%.0f", highTemp)
-            DispatchQueue.main.async {
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
-            }
+            
         }
         
         if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
             let newLowTemp = String(format: "%.0f", lowTemp)
-            DispatchQueue.main.async {
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
-            }
+            
         }
         
         if let currentSummary = dataPoint?.daily?.data?[0].summary {
-            DispatchQueue.main.async {
                 cell.currentSummaryLabel.text = String(currentSummary)
-            }
+            
         }
         
         if let lookingAhead = dataPoint?.minutely?.summary {
-            DispatchQueue.main.async {
                 cell.minutelyLookingAheadLabel.text = lookingAhead
-            }
+            
         }
 
         if let alertsActive = dataPoint?.alerts?[0] {
             print(alertsActive)
 
-            DispatchQueue.main.async {
                 cell.alertViewContainer.isHidden = false
-            }
+            
         }
         
         //attempting to load animated gif
         //TODO: load animation based on current weather conditions
-        DispatchQueue.main.async {
             cell.backgroundAnimatedImage.loadGif(asset: "weather")
-        }
+        
      
         return cell
     }
