@@ -59,7 +59,8 @@ class ViewController: UIViewController {
     }
     
     @objc func refreshData(sender:AnyObject) {
-        WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
+        locationManager.requestLocation()
+        //WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
         weatherDataFetched()
         DispatchQueue.main.async {
             self.currentlyTableView.reloadData()
@@ -186,6 +187,12 @@ extension ViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
+    }
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return currentlyTableView.bounds.size.height
     }
 }
 
