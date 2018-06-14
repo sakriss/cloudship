@@ -51,9 +51,6 @@ class ViewController: UIViewController {
             self.refreshControl.beginRefreshing()
         }
         locationManager.requestLocation()
-        //WeatherController.shared.fetchWeatherInfo(latitude: (lastLocation?.coordinate.latitude)!, longitude: (lastLocation?.coordinate.longitude)!)
-        
-//        self.refreshControl.endRefreshing()
 
     }
     
@@ -178,7 +175,7 @@ extension ViewController: UITableViewDataSource {
             
         }
         
-        //attempting to load animated gif
+        //load animated gif
         //TODO: load animation based on current weather conditions
             cell.backgroundAnimatedImage.loadGif(asset: "weather")
         
