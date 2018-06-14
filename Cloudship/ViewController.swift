@@ -57,11 +57,8 @@ class ViewController: UIViewController {
         //now that data is parsed, we can display it
         DispatchQueue.main.async {
             self.activityIndicator.removeFromSuperview()
-        }
-        
-        DispatchQueue.main.async {
             self.currentlyTableView.reloadData()
-            self.refreshControl.endRefreshing()
+//            self.refreshControl.endRefreshing()
         }
         
     }
@@ -187,7 +184,9 @@ extension ViewController: UITableViewDataSource {
         DispatchQueue.main.async {
             cell.backgroundAnimatedImage.loadGif(asset: "weather")
         }
-
+        DispatchQueue.main.async {
+            self.refreshControl.endRefreshing()
+        }
         
         return cell
     }
