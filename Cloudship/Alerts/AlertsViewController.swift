@@ -22,6 +22,12 @@ class AlertsViewController: UIViewController {
 
 }
 
+extension AlertsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return alertsTableView.bounds.size.height
+    }
+}
+
 extension AlertsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return (WeatherController.shared.weather?.alerts?.count)!
@@ -36,22 +42,18 @@ extension AlertsViewController: UITableViewDataSource {
         let dataPoint = WeatherController.shared.weather
         
         if let alertsTitle = dataPoint?.alerts?[0].title {
-            DispatchQueue.main.async {
-                cell.alertTitleLabel.text = String(alertsTitle)
-            }
+                cell.alertTitleLabel.text = String(alertsTitle.uppercased())
+
         }
         
         if let alertsSeverity = dataPoint?.alerts?[0].severity {
-            DispatchQueue.main.async {
-                cell.alertSeverityLabel.text = String(alertsSeverity)
-            }
+                cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
         }
         
         if let alertsDescription = dataPoint?.alerts?[0].description {
-            DispatchQueue.main.async {
                 cell.alertDescriptionLabel.text = String(alertsDescription)
-            }
         }
+        cell.backgroundColor = UIColor.lightGray
 
         return cell
     }

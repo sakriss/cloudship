@@ -178,8 +178,7 @@ extension ViewController: UITableViewDataSource {
         //load animated gif
         //TODO: load animation based on current weather conditions
             cell.backgroundAnimatedImage.loadGif(asset: "weather")
-        
-     
+    
         return cell
     }
     

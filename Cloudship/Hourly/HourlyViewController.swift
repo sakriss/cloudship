@@ -42,9 +42,8 @@ extension HourlyViewController: UITableViewDataSource {
             let df2 = DateFormatter()
             df2.dateFormat = format
             let string = df2.string(from: date)
-            DispatchQueue.main.async {
                 cell.dayOfWeekLabel.text = string
-            }
+
         } else {
             print("Unable to parse date string")
         }
@@ -61,78 +60,59 @@ extension HourlyViewController: UITableViewDataSource {
             df4.amSymbol = "AM"
             df4.pmSymbol = "PM"
             let string = df4.string(from: hour)
-            DispatchQueue.main.async {
                 cell.hourlyHourLabel.text = string
-            }
         } else {
             print("Unable to parse date string")
         }
         
         if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.row].temperature {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
-            DispatchQueue.main.async {
                 cell.hourlyTempLabel.text = newHighTemp + "\u{00B0}"
-            }
         }
         
         let conditionIcon = dataPoint?.hourly?.data?[indexPath.row].icon
         switch conditionIcon {
         case "partly-cloudy-day":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "mostlycloudy.png")
-            }
+
         case "partly-cloudy-night":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "cloudynight.png")
-            }
+
         case "cloudy":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "cloudy.png")
-            }
+
         case "clear-day":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "sunny.png")
-            }
+
         case "clear-night":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "clearnight.png")
-            }
+            
         case "rain":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "rain.png")
-            }
+            
         case "snow":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "snow.png")
-            }
+            
         case "sleet":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "sleet.png")
-            }
+            
         case "wind":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "wind.png")
-            }
+            
         case "fog":
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "fog.png")
-            }
+            
         default:
-            DispatchQueue.main.async {
                 cell.conditionIconImage.image = UIImage(named: "default.png")
-            }
+
         }
         
         if let precipChance = dataPoint?.hourly?.data?[indexPath.row].precipProbability {
-            DispatchQueue.main.async {
                 cell.hourlyPrecipLabel.text = String(format: "%.2f%%", precipChance)
-            }
         }
         
         if let windData = dataPoint?.hourly?.data?[indexPath.row].windSpeed {
-            DispatchQueue.main.async {
                 cell.hourlyWindLabel.text = String(windData)
-            }
         }
         
         return cell
