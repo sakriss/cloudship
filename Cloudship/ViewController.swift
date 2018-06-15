@@ -44,6 +44,10 @@ class ViewController: UIViewController {
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...")
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
+        
+//        let barButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon.png"), style: .plain, target: self, action: nil)
+//        self.navigationItem.rightBarButtonItem  = barButtonItem
+        
     }
     
     @objc func refreshData(sender:AnyObject) {
