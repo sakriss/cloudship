@@ -103,7 +103,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1w0-v6-eMH">
-                                                    <rect key="frame" x="98" y="399" width="178" height="100.5"/>
+                                                    <rect key="frame" x="98" y="405" width="178" height="94.5"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tiI-jI-KAK">
                                                             <rect key="frame" x="13" y="29" width="153" height="30"/>
@@ -125,7 +125,7 @@
                                                     <color key="backgroundColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Hi" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="06k-yg-Rb7">
-                                                    <rect key="frame" x="231" y="65" width="16.5" height="21"/>
+                                                    <rect key="frame" x="231" y="65" width="17" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -140,6 +140,7 @@
                                                 <constraint firstAttribute="trailing" secondItem="1w0-v6-eMH" secondAttribute="trailing" constant="99" id="B6K-G0-dvf"/>
                                                 <constraint firstItem="87w-t3-JIJ" firstAttribute="top" secondItem="EIg-nJ-eZF" secondAttribute="bottom" constant="-6" id="BeA-cN-5vh"/>
                                                 <constraint firstItem="06k-yg-Rb7" firstAttribute="top" secondItem="hqs-Ws-Wy3" secondAttribute="bottom" constant="-1" id="Bsq-Bl-YTg"/>
+                                                <constraint firstItem="1w0-v6-eMH" firstAttribute="top" secondItem="9ef-Pe-bge" secondAttribute="bottom" constant="154" id="C17-xN-CkW"/>
                                                 <constraint firstItem="Jly-ve-yUo" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="CB7-ms-dN0"/>
                                                 <constraint firstItem="EIg-nJ-eZF" firstAttribute="top" secondItem="hqs-Ws-Wy3" secondAttribute="bottom" constant="-1" id="E3B-ZM-WPR"/>
                                                 <constraint firstItem="hqs-Ws-Wy3" firstAttribute="top" secondItem="5O0-Ep-bDj" secondAttribute="bottom" constant="15" id="HoU-Vz-2OF"/>
@@ -157,7 +158,6 @@
                                                 <constraint firstItem="EBM-zb-2To" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="116" id="iBt-ak-NwV"/>
                                                 <constraint firstItem="13q-KG-CpP" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="jn3-wN-weB"/>
                                                 <constraint firstItem="5O0-Ep-bDj" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="k7u-B2-btn"/>
-                                                <constraint firstItem="1w0-v6-eMH" firstAttribute="top" secondItem="9ef-Pe-bge" secondAttribute="bottom" constant="140" id="koF-Eb-gOK"/>
                                                 <constraint firstItem="9ef-Pe-bge" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="lW7-X9-gGg"/>
                                                 <constraint firstItem="06k-yg-Rb7" firstAttribute="leading" secondItem="Xvb-FG-bFe" secondAttribute="trailing" constant="15" id="mOH-tp-mCY"/>
                                                 <constraint firstItem="EBM-zb-2To" firstAttribute="top" secondItem="13q-KG-CpP" secondAttribute="bottom" constant="98" id="maX-u0-zpp"/>
@@ -166,7 +166,7 @@
                                                 <constraint firstItem="4Jm-Hd-pxv" firstAttribute="leading" secondItem="Xvb-FG-bFe" secondAttribute="trailing" constant="15" id="nYo-QN-bqF"/>
                                                 <constraint firstItem="EIg-nJ-eZF" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="104" id="orv-ai-0Sw"/>
                                                 <constraint firstItem="5O0-Ep-bDj" firstAttribute="leading" secondItem="Jly-ve-yUo" secondAttribute="trailing" constant="115" id="pq2-NW-hMZ"/>
-                                                <constraint firstItem="9ef-Pe-bge" firstAttribute="top" secondItem="EBM-zb-2To" secondAttribute="bottom" constant="20" id="sSl-6z-LIZ"/>
+                                                <constraint firstItem="9ef-Pe-bge" firstAttribute="top" secondItem="EBM-zb-2To" secondAttribute="bottom" constant="12" id="sSl-6z-LIZ"/>
                                                 <constraint firstItem="iHQ-yS-fh4" firstAttribute="leading" secondItem="5O0-Ep-bDj" secondAttribute="trailing" constant="108" id="tPb-VF-RWp"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="hqs-Ws-Wy3" secondAttribute="trailing" constant="5" id="ve5-Am-dk3"/>
                                                 <constraint firstItem="4Jm-Hd-pxv" firstAttribute="top" secondItem="06k-yg-Rb7" secondAttribute="bottom" constant="-6" id="wDL-2o-2S9"/>
@@ -201,6 +201,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="vWb-Mk-ded">
                         <barButtonItem key="backBarButtonItem" title="Back" id="RHy-e9-D5h"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="settingsicon6pt" style="plain" id="H6w-FV-hYc"/>
                     </navigationItem>
                     <connections>
                         <outlet property="currentlyTableView" destination="KPi-hx-XPu" id="Uxi-Sx-2YU"/>
@@ -579,4 +580,7 @@
             <point key="canvasLocation" x="-764" y="43"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="settingsicon6pt" width="25" height="25"/>
+    </resources>
 </document>

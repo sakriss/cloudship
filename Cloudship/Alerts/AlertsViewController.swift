@@ -24,7 +24,7 @@ class AlertsViewController: UIViewController {
 
 extension AlertsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return alertsTableView.bounds.size.height
+        return alertsTableView.bounds.size.height - 50
     }
 }
 

@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
         
-//        let barButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon.png"), style: .plain, target: self, action: nil)
+//        let barButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon25pt.png"), style: .plain, target: self, action: nil)
 //        self.navigationItem.rightBarButtonItem  = barButtonItem
         
     }
@@ -181,7 +181,7 @@ extension ViewController: UITableViewDataSource {
         
         //load animated gif
         //TODO: load animation based on current weather conditions
-            cell.backgroundAnimatedImage.loadGif(asset: "weather")
+        cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
     
         return cell
     }
