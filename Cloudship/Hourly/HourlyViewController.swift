@@ -38,7 +38,7 @@ extension HourlyViewController: UITableViewDataSource {
         df1.locale = Locale(identifier: "en_US")
         df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
         if let date = df1.date(from: dateString) {
-            let format = "EE"
+            let format = "EEEE"
             let df2 = DateFormatter()
             df2.dateFormat = format
             let string = df2.string(from: date)
