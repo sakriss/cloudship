@@ -60,10 +60,8 @@ extension DailyViewController: UITableViewDataSource {
         if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax, let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
             let newHighTemp = String(format: "%.0f", highTemp)
             let newLowTemp = String(format: "%.0f", lowTemp)
-            DispatchQueue.main.async {
                 //cell.dailyHighTempLabel.text = String(format: "%.0f", highTemp)
                 cell.dailyHighTempLabel.text = newHighTemp + "\u{00B0}/" + newLowTemp + "\u{00B0}"
-            }
         }
         
         let percentFormatter = NumberFormatter()
