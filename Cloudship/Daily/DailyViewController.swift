@@ -66,10 +66,11 @@ extension DailyViewController: UITableViewDataSource {
             }
         }
         
+        let percentFormatter = NumberFormatter()
+        percentFormatter.numberStyle = .percent
+
         if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
-            DispatchQueue.main.async {
-                cell.dailyPercipPercent.text = String(format: "%.2f%%", precipChance)
-            }
+                cell.dailyPercipPercent.text = percentFormatter.string(from: precipChance as NSNumber)
         }
         return cell
     }

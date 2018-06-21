@@ -107,8 +107,11 @@ extension HourlyViewController: UITableViewDataSource {
 
         }
         
+        let percentFormatter = NumberFormatter()
+        percentFormatter.numberStyle = .percent
+        
         if let precipChance = dataPoint?.hourly?.data?[indexPath.row].precipProbability {
-                cell.hourlyPrecipLabel.text = String(format: "%.2f%%", precipChance)
+            cell.hourlyPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
         }
         
         if let windData = dataPoint?.hourly?.data?[indexPath.row].windSpeed {
