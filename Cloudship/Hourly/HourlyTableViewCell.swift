@@ -17,5 +17,6 @@ class HourlyTableViewCell: UITableViewCell {
     @IBOutlet weak var hourlyTempLabel: UILabel!
     @IBOutlet weak var hourlyPrecipLabel: UILabel!
     @IBOutlet weak var hourlyWindLabel: UILabel!
+    @IBOutlet weak var windBearingIcon: UIImageView!
     
 }

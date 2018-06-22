@@ -114,6 +114,32 @@ extension HourlyViewController: UITableViewDataSource {
             cell.hourlyPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
         }
         
+        if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {
+            
+            switch windBearingIcon {
+            case 0:
+                cell.windBearingIcon.image = UIImage(named: "north.png")
+            case 1...89:
+                cell.windBearingIcon.image = UIImage(named: "northeast.png")
+            case 90:
+                cell.windBearingIcon.image = UIImage(named: "east.png")
+            case 91...179:
+                cell.windBearingIcon.image = UIImage(named: "southeast.png")
+            case 180:
+                cell.windBearingIcon.image = UIImage(named: "south.png")
+            case 181...224:
+                cell.windBearingIcon.image = UIImage(named: "southwest.png")
+            case 225:
+                cell.windBearingIcon.image = UIImage(named: "west.png")
+            case 226...359:
+                cell.windBearingIcon.image = UIImage(named: "northwest.png")
+            case 360:
+                cell.windBearingIcon.image = UIImage(named: "north.png")
+            default:
+                cell.windBearingIcon.image = UIImage(named: "north.png")
+            }
+        }
+        
         if let windData = dataPoint?.hourly?.data?[indexPath.row].windSpeed {
             cell.hourlyWindLabel.text = String(format: "%.1f", windData)
         }

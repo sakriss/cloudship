@@ -464,9 +464,16 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" alpha="0.75" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0i2-VH-E34">
+                                                    <rect key="frame" x="345" y="28" width="25" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="25" id="m9U-DL-ArT"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="5Wi-t6-RvF" firstAttribute="top" secondItem="lp3-Tg-8Hh" secondAttribute="top" id="68Q-jd-jr7"/>
+                                                <constraint firstItem="0i2-VH-E34" firstAttribute="top" secondItem="5Wi-t6-RvF" secondAttribute="bottom" constant="2" id="Apl-Ny-D3a"/>
                                                 <constraint firstItem="4Ox-9g-jS5" firstAttribute="leading" secondItem="SYL-Wp-pxj" secondAttribute="trailing" constant="31" id="JhG-aq-gOO"/>
                                                 <constraint firstItem="zfs-5T-NSG" firstAttribute="leading" secondItem="lp3-Tg-8Hh" secondAttribute="leading" constant="15" id="UgS-FB-lfd"/>
                                                 <constraint firstAttribute="bottom" secondItem="SYL-Wp-pxj" secondAttribute="bottom" constant="9.5" id="ZbK-3C-4HM"/>
@@ -478,9 +485,11 @@
                                                 <constraint firstItem="1WD-qA-m29" firstAttribute="leading" secondItem="zfs-5T-NSG" secondAttribute="trailing" constant="25" id="id4-fw-2Oy"/>
                                                 <constraint firstItem="SYL-Wp-pxj" firstAttribute="leading" secondItem="1Vh-wk-axc" secondAttribute="trailing" constant="26" id="kUV-KA-bT2"/>
                                                 <constraint firstItem="1Vh-wk-axc" firstAttribute="leading" secondItem="1WD-qA-m29" secondAttribute="trailing" constant="32" id="klu-DK-kyD"/>
+                                                <constraint firstItem="0i2-VH-E34" firstAttribute="leading" secondItem="4Ox-9g-jS5" secondAttribute="trailing" constant="-1" id="o5y-ti-RO0"/>
                                                 <constraint firstItem="1WD-qA-m29" firstAttribute="top" secondItem="5Wi-t6-RvF" secondAttribute="bottom" constant="8" id="obH-L9-i6P"/>
                                                 <constraint firstAttribute="bottom" secondItem="zfs-5T-NSG" secondAttribute="bottom" constant="9.5" id="qpO-Kn-fD4"/>
                                                 <constraint firstItem="zfs-5T-NSG" firstAttribute="top" secondItem="5Wi-t6-RvF" secondAttribute="bottom" constant="8" id="xEY-yU-7Cv"/>
+                                                <constraint firstAttribute="bottom" secondItem="0i2-VH-E34" secondAttribute="bottom" constant="6.5" id="yiV-rX-WIk"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
@@ -490,6 +499,7 @@
                                             <outlet property="hourlyPrecipLabel" destination="SYL-Wp-pxj" id="G09-On-KXR"/>
                                             <outlet property="hourlyTempLabel" destination="1Vh-wk-axc" id="FtR-Yt-b8S"/>
                                             <outlet property="hourlyWindLabel" destination="4Ox-9g-jS5" id="4j5-NH-o2i"/>
+                                            <outlet property="windBearingIcon" destination="0i2-VH-E34" id="r68-Ea-ePT"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
