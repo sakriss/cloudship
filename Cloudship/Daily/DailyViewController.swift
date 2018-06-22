@@ -41,8 +41,10 @@ extension DailyViewController: UITableViewDataSource {
         df1.locale = Locale(identifier: "en_US_POSIX")
         df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
         if let date = df1.date(from: dateString) {
+            let format = "EEEE, MMMM d"
             let df2 = DateFormatter()
-            df2.dateStyle = .full
+            df2.dateFormat = format
+            //df2.dateStyle = .full
             let string = df2.string(from: date)
             DispatchQueue.main.async {
                 cell.dayOfWeekLabel.text = string

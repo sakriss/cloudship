@@ -115,7 +115,7 @@ extension HourlyViewController: UITableViewDataSource {
         }
         
         if let windData = dataPoint?.hourly?.data?[indexPath.row].windSpeed {
-                cell.hourlyWindLabel.text = String(windData)
+            cell.hourlyWindLabel.text = String(format: "%.1f", windData)
         }
         
         return cell
