@@ -220,7 +220,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="7pi-FY-C29">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="84.5" width="375" height="582.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DailyTableViewCell" rowHeight="110" id="WEq-h6-62m" customClass="DailyTableViewCell" customModule="Cloudship" customModuleProvider="target">
@@ -300,19 +300,30 @@
                                     <outlet property="delegate" destination="wsF-52-z12" id="RFC-PD-HLE"/>
                                 </connections>
                             </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kbn-EN-IQp">
+                                <rect key="frame" x="15" y="64" width="345" height="60"/>
+                                <color key="backgroundColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                         <constraints>
+                            <constraint firstItem="kbn-EN-IQp" firstAttribute="trailing" secondItem="Xgc-EC-DwH" secondAttribute="trailing" constant="-15" id="BLH-KB-0XU"/>
+                            <constraint firstItem="kbn-EN-IQp" firstAttribute="leading" secondItem="Xgc-EC-DwH" secondAttribute="leading" constant="15" id="Oms-Ef-f3O"/>
                             <constraint firstAttribute="bottom" secondItem="7pi-FY-C29" secondAttribute="bottom" id="Zu3-rP-JCV"/>
                             <constraint firstItem="7pi-FY-C29" firstAttribute="leading" secondItem="Xgc-EC-DwH" secondAttribute="leading" id="c3R-MV-ctd"/>
                             <constraint firstItem="Xgc-EC-DwH" firstAttribute="trailing" secondItem="7pi-FY-C29" secondAttribute="trailing" id="hUb-7G-Uft"/>
-                            <constraint firstItem="7pi-FY-C29" firstAttribute="top" secondItem="Xgc-EC-DwH" secondAttribute="top" id="iOh-g0-iOO"/>
                             <constraint firstAttribute="bottom" secondItem="7pi-FY-C29" secondAttribute="bottom" id="mxC-SS-NFe"/>
+                            <constraint firstItem="kbn-EN-IQp" firstAttribute="top" secondItem="Xgc-EC-DwH" secondAttribute="top" id="qAC-90-WkN"/>
+                            <constraint firstItem="7pi-FY-C29" firstAttribute="top" secondItem="kbn-EN-IQp" secondAttribute="bottom" id="tFu-TT-7J3"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Xgc-EC-DwH"/>
                     </view>
                     <connections>
                         <outlet property="dailyForcastTableView" destination="7pi-FY-C29" id="da5-Js-auj"/>
+                        <outlet property="dailySummaryLabel" destination="kbn-EN-IQp" id="j9v-Y0-8tV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JRa-LK-GqJ" userLabel="First Responder" sceneMemberID="firstResponder"/>

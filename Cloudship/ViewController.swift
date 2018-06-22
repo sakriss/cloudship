@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var currentlyTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
+    var nearestStorm = 0.0
     
     private let refreshControl = UIRefreshControl()
     
@@ -37,16 +38,12 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
-//        alertViewContainer.isHidden = true
         
         refreshControl.tintColor = UIColor.black
         refreshControl.backgroundColor = UIColor.lightGray
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...")
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
-        
-//        let barButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon25pt.png"), style: .plain, target: self, action: nil)
-//        self.navigationItem.rightBarButtonItem  = barButtonItem
         
     }
     
@@ -66,6 +63,9 @@ class ViewController: UIViewController {
             self.currentlyTableView.reloadData()
 
             self.refreshControl.endRefreshing()
+        }
+        if let nearestStormDistance = WeatherController.shared.weather?.currently?.nearestStormDistance {
+            nearestStorm = nearestStormDistance
         }
     }
     
@@ -104,8 +104,6 @@ extension ViewController: CLLocationManagerDelegate {
                         addressString.append(placemark.locality ?? "")
                         addressString.append(", ")
                         addressString.append(placemark.administrativeArea ?? "")
-                        //                        addressString.append(" ")
-                        //                        addressString.append(placemark.postalCode ?? "")
                         
                         self.navigationItem.title = addressString
                     }
