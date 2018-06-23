@@ -10,6 +10,8 @@ import UIKit
 
 class DailyViewController: UIViewController {
     
+    var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
+    
     @IBOutlet weak var dailyForcastTableView: UITableView!
     @IBOutlet weak var dailySummaryLabel: UILabel!
     
@@ -22,6 +24,22 @@ class DailyViewController: UIViewController {
         self.dailyForcastTableView.estimatedRowHeight = 120
     }
     
+}
+
+extension DailyViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedRowIndex = indexPath as NSIndexPath
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == selectedRowIndex.row {
+            return 200
+        }
+        return 120
+    }
 }
 
 extension DailyViewController: UITableViewDataSource {

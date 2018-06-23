@@ -243,25 +243,25 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Hi/Low:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2cS-7r-CIQ">
-                                                    <rect key="frame" x="15" y="74" width="57" height="25"/>
+                                                    <rect key="frame" x="15" y="74" width="57" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rain Chance:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7js-Lq-y2I">
-                                                    <rect key="frame" x="195" y="74" width="101" height="25"/>
+                                                    <rect key="frame" x="195" y="74" width="101" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BEG-tW-xKh">
-                                                    <rect key="frame" x="76" y="74" width="42" height="25"/>
+                                                    <rect key="frame" x="76" y="74" width="42" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jmc-bY-NCi">
-                                                    <rect key="frame" x="300" y="74" width="42" height="25"/>
+                                                    <rect key="frame" x="300" y="74" width="42" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -276,12 +276,8 @@
                                                 <constraint firstItem="2cS-7r-CIQ" firstAttribute="leading" secondItem="yQ9-To-jcn" secondAttribute="leadingMargin" id="P0I-lN-9u2"/>
                                                 <constraint firstItem="d3a-fB-wSS" firstAttribute="trailing" secondItem="yQ9-To-jcn" secondAttribute="trailingMargin" id="Qaa-ql-gpy"/>
                                                 <constraint firstItem="d3a-fB-wSS" firstAttribute="leading" secondItem="yQ9-To-jcn" secondAttribute="leadingMargin" id="R7o-eg-iYl"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="7js-Lq-y2I" secondAttribute="bottom" id="RK2-qe-DYc"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="Jmc-bY-NCi" secondAttribute="bottom" id="TsT-lp-MKV"/>
                                                 <constraint firstItem="HKW-Oh-tMv" firstAttribute="leading" secondItem="yQ9-To-jcn" secondAttribute="leading" constant="15" id="a89-0K-j0j"/>
                                                 <constraint firstItem="2cS-7r-CIQ" firstAttribute="top" secondItem="d3a-fB-wSS" secondAttribute="bottom" constant="5" id="c6X-V5-EHk"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="BEG-tW-xKh" secondAttribute="bottom" id="f1l-BI-xGR"/>
-                                                <constraint firstAttribute="bottom" secondItem="2cS-7r-CIQ" secondAttribute="bottom" constant="10.5" id="gCY-ah-TZs"/>
                                                 <constraint firstItem="BEG-tW-xKh" firstAttribute="leading" secondItem="2cS-7r-CIQ" secondAttribute="trailing" constant="4" id="vcC-2N-eV0"/>
                                                 <constraint firstItem="7js-Lq-y2I" firstAttribute="leading" secondItem="BEG-tW-xKh" secondAttribute="trailing" constant="77" id="vvr-RT-mNd"/>
                                                 <constraint firstItem="7js-Lq-y2I" firstAttribute="top" secondItem="d3a-fB-wSS" secondAttribute="bottom" constant="5" id="xxO-cr-UQl"/>
