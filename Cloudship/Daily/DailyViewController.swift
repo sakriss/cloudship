@@ -21,7 +21,7 @@ class DailyViewController: UIViewController {
         dailySummaryLabel.text = WeatherController.shared.weather?.daily?.summary
         
         self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
-        self.dailyForcastTableView.estimatedRowHeight = 120
+        self.dailyForcastTableView.estimatedRowHeight = 110
     }
     
 }
@@ -35,10 +35,15 @@ extension DailyViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let row = tableView.cellForRow(at: indexPath)
+        let cellHeight = row?.bounds.height
+        
         if indexPath.row == selectedRowIndex.row {
-            return 200
+            if cellHeight == 110 {
+                return 180
+            }
         }
-        return 120
+        return 110
     }
 }
 
