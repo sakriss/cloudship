@@ -21,4 +21,5 @@ class CurrentlyTableViewCell: UITableViewCell {
     @IBAction func alertActiveButton(_ sender: Any) {
         print("Alert button pressed")
     }
+    @IBOutlet weak var lookingAheadCollectionView: UICollectionView!
 }

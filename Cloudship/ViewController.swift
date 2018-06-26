@@ -11,6 +11,7 @@ import CoreLocation
 
 class ViewController: UIViewController {
  
+//    @IBOutlet weak var lookingAheadCollectionView: UICollectionView!
     @IBOutlet weak var currentlyTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
@@ -140,49 +141,125 @@ extension ViewController: UITableViewDataSource {
         if let currentTemp = dataPoint?.currently?.temperature {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
                 cell.currentTempLabel.text = newCurrentTemp
-            
         }
         
         if let currentCondition = dataPoint?.currently?.summary {
                 cell.currentConditionLabel.text = currentCondition
-            
         }
         
         if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
             let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
-            
         }
         
         if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
             let newLowTemp = String(format: "%.0f", lowTemp)
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
-            
         }
         
         if let currentSummary = dataPoint?.daily?.data?[0].summary {
                 cell.currentSummaryLabel.text = String(currentSummary)
-            
         }
         
         if let lookingAhead = dataPoint?.minutely?.summary {
                 cell.minutelyLookingAheadLabel.text = lookingAhead
-            
         }
 
         if let alertsActive = dataPoint?.alerts?[0] {
             print(alertsActive)
-
                 cell.alertViewContainer.isHidden = false
-            
         }
         
         //load animated gif
         //TODO: load animation based on current weather conditions
         cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
     
+        cell.lookingAheadCollectionView.reloadData()
+        
+        return cell
+    }
+}
+
+extension ViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 6
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let dataPoint = WeatherController.shared.weather
+        
+//        let hourlyTime = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.item].time)!)
+//        let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+//        let df3 = DateFormatter()
+//        df3.locale = Locale(identifier: "en_US")
+//        df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+//        if let hour = df3.date(from: dailyHourString) {
+//            let format = "ha"
+//            let df4 = DateFormatter()
+//            df4.dateFormat = format
+//            df4.amSymbol = "AM"
+//            df4.pmSymbol = "PM"
+//            let string = df4.string(from: hour)
+//            cell.lookingAheadHourLabel.text = string
+//        } else {
+//            print("Unable to parse date string")
+//        }
+        
+        if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.item].temperature {
+            let newHighTemp = String(format: "%.0f", hourlyTemp)
+            cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
+        }
+        
+        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        switch conditionIcon {
+        case "partly-cloudy-day":
+            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
+            
+        case "partly-cloudy-night":
+            cell.lookingAheadConditionImage.image = UIImage(named: "cloudynight.png")
+            
+        case "cloudy":
+            cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
+            
+        case "clear-day":
+            cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
+            
+        case "clear-night":
+            cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
+            
+        case "rain":
+            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+            
+        case "snow":
+            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+            
+        case "sleet":
+            cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
+            
+        case "wind":
+            cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
+            
+        case "fog":
+            cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
+            
+        default:
+            cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
+            
+        }
+        
+        let percentFormatter = NumberFormatter()
+        percentFormatter.numberStyle = .percent
+        
+        if let precipChance = dataPoint?.hourly?.data?[indexPath.item].precipProbability {
+            cell.lookingAheadPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
+        }
+        
         return cell
     }
     
-
+    
 }

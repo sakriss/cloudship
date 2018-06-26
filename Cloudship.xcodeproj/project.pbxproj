@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */; };
 		1620610020AF61BE004E00BD /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162060FF20AF61BE004E00BD /* Weather.swift */; };
 		1620610220AF63EE004E00BD /* Hourly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1620610120AF63EE004E00BD /* Hourly.swift */; };
 		1620610420AF6462004E00BD /* HourlyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1620610320AF6462004E00BD /* HourlyData.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingAheadCollectionViewCell.swift; sourceTree = "<group>"; };
 		162060FF20AF61BE004E00BD /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		1620610120AF63EE004E00BD /* Hourly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hourly.swift; sourceTree = "<group>"; };
 		1620610320AF6462004E00BD /* HourlyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyData.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				162DC6042020FAAB00C19DCE /* AppDelegate.swift */,
 				162DC6062020FAAB00C19DCE /* ViewController.swift */,
 				16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */,
+				161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */,
 				162DC6082020FAAB00C19DCE /* Main.storyboard */,
 				162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
 				162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
@@ -275,6 +278,7 @@
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
 				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
+				161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */,
 				1620610020AF61BE004E00BD /* Weather.swift in Sources */,
 				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
 				1620611A20B5C781004E00BD /* DailyTableViewCell.swift in Sources */,

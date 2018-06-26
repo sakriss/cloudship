@@ -130,13 +130,72 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Mah-pD-5Hm">
+                                                    <rect key="frame" x="15" y="259" width="345" height="138"/>
+                                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.32071382705479451" colorSpace="custom" customColorSpace="displayP3"/>
+                                                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="t6c-fh-GXG">
+                                                        <size key="itemSize" width="70" height="138"/>
+                                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                    </collectionViewFlowLayout>
+                                                    <cells>
+                                                        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="LookingAheadCollectionViewCell" id="57f-6x-8Nv" customClass="LookingAheadCollectionViewCell" customModule="Cloudship" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="70" height="138"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                                                <rect key="frame" x="0.0" y="0.0" width="70" height="138"/>
+                                                                <autoresizingMask key="autoresizingMask"/>
+                                                                <subviews>
+                                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uC0-HK-69n">
+                                                                        <rect key="frame" x="14" y="117" width="42" height="21"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <nil key="textColor"/>
+                                                                        <nil key="highlightedColor"/>
+                                                                    </label>
+                                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="1pm" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YMW-FK-cgm">
+                                                                        <rect key="frame" x="18" y="0.0" width="35" height="30"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <nil key="textColor"/>
+                                                                        <nil key="highlightedColor"/>
+                                                                    </label>
+                                                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4bH-u6-Zuh">
+                                                                        <rect key="frame" x="20" y="54" width="30" height="30"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                    </imageView>
+                                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="60" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Dc-fd-tuK">
+                                                                        <rect key="frame" x="20" y="84" width="30" height="21"/>
+                                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                        <nil key="textColor"/>
+                                                                        <nil key="highlightedColor"/>
+                                                                    </label>
+                                                                </subviews>
+                                                            </view>
+                                                            <connections>
+                                                                <outlet property="lookingAheadConditionImage" destination="4bH-u6-Zuh" id="ZPZ-sR-mRA"/>
+                                                                <outlet property="lookingAheadHourLabel" destination="YMW-FK-cgm" id="dM4-ch-DlZ"/>
+                                                                <outlet property="lookingAheadPrecipLabel" destination="uC0-HK-69n" id="XMy-G5-FoI"/>
+                                                                <outlet property="lookingAheadTempLabel" destination="4Dc-fd-tuK" id="puE-e1-Sdq"/>
+                                                            </connections>
+                                                        </collectionViewCell>
+                                                    </cells>
+                                                    <connections>
+                                                        <outlet property="dataSource" destination="BYZ-38-t0r" id="NrV-qQ-06k"/>
+                                                        <outlet property="delegate" destination="BYZ-38-t0r" id="mUq-to-4db"/>
+                                                    </connections>
+                                                </collectionView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="6Py-FL-SAU" secondAttribute="trailing" id="0se-7v-DJg"/>
                                                 <constraint firstItem="Xvb-FG-bFe" firstAttribute="top" secondItem="hqs-Ws-Wy3" secondAttribute="bottom" constant="-1" id="4YP-aY-zdr"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="9ef-Pe-bge" secondAttribute="trailing" constant="1" id="59e-Rm-77T"/>
+                                                <constraint firstItem="Mah-pD-5Hm" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" id="5tP-1r-ifM"/>
                                                 <constraint firstItem="Xvb-FG-bFe" firstAttribute="leading" secondItem="EIg-nJ-eZF" secondAttribute="trailing" constant="11" id="5ut-bc-wQm"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="EBM-zb-2To" secondAttribute="trailing" constant="117" id="65E-q7-2Gb"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Mah-pD-5Hm" secondAttribute="trailing" id="8Kx-Gn-E1N"/>
                                                 <constraint firstAttribute="trailing" secondItem="1w0-v6-eMH" secondAttribute="trailing" constant="99" id="B6K-G0-dvf"/>
                                                 <constraint firstItem="87w-t3-JIJ" firstAttribute="top" secondItem="EIg-nJ-eZF" secondAttribute="bottom" constant="-6" id="BeA-cN-5vh"/>
                                                 <constraint firstItem="06k-yg-Rb7" firstAttribute="top" secondItem="hqs-Ws-Wy3" secondAttribute="bottom" constant="-1" id="Bsq-Bl-YTg"/>
@@ -148,8 +207,10 @@
                                                 <constraint firstAttribute="trailingMargin" secondItem="13q-KG-CpP" secondAttribute="trailing" constant="1" id="NFy-Rm-3cK"/>
                                                 <constraint firstAttribute="bottom" secondItem="1w0-v6-eMH" secondAttribute="bottom" id="NcM-5D-151"/>
                                                 <constraint firstItem="iHQ-yS-fh4" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="OYc-Qk-Q4i"/>
+                                                <constraint firstItem="Mah-pD-5Hm" firstAttribute="top" secondItem="9ef-Pe-bge" secondAttribute="bottom" constant="8" id="QwT-KV-rIn"/>
                                                 <constraint firstAttribute="trailing" secondItem="iHQ-yS-fh4" secondAttribute="trailing" constant="16" id="R1n-EM-dz7"/>
                                                 <constraint firstItem="87w-t3-JIJ" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="104" id="RtK-hS-Xxh"/>
+                                                <constraint firstItem="1w0-v6-eMH" firstAttribute="top" secondItem="Mah-pD-5Hm" secondAttribute="bottom" constant="8" id="SOP-Tt-3zj"/>
                                                 <constraint firstItem="Jly-ve-yUo" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leading" constant="16" id="UMW-xy-dWA"/>
                                                 <constraint firstItem="6Py-FL-SAU" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leading" id="ZW5-iv-PbK"/>
                                                 <constraint firstItem="6Py-FL-SAU" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="aUI-TB-kbt"/>
@@ -179,6 +240,7 @@
                                             <outlet property="currentSummaryLabel" destination="13q-KG-CpP" id="hJu-SX-Aum"/>
                                             <outlet property="currentTempLabel" destination="Xvb-FG-bFe" id="4lh-uW-I9D"/>
                                             <outlet property="highTempLabel" destination="06k-yg-Rb7" id="Oep-0L-qFd"/>
+                                            <outlet property="lookingAheadCollectionView" destination="Mah-pD-5Hm" id="Cae-V2-zS8"/>
                                             <outlet property="lowTempLabel" destination="EIg-nJ-eZF" id="42v-tz-2Ir"/>
                                             <outlet property="minutelyLookingAheadLabel" destination="9ef-Pe-bge" id="3Xf-g2-IVL"/>
                                         </connections>
