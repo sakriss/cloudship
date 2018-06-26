@@ -118,21 +118,21 @@ extension HourlyViewController: UITableViewDataSource {
             
             switch windBearingIcon {
             case 0:
-                cell.windBearingIcon.image = UIImage(named: "north.png")
-            case 1...89:
-                cell.windBearingIcon.image = UIImage(named: "northeast.png")
-            case 90:
-                cell.windBearingIcon.image = UIImage(named: "east.png")
-            case 91...179:
-                cell.windBearingIcon.image = UIImage(named: "southeast.png")
-            case 180:
                 cell.windBearingIcon.image = UIImage(named: "south.png")
-            case 181...224:
+            case 1...89:
                 cell.windBearingIcon.image = UIImage(named: "southwest.png")
-            case 225:
+            case 90:
                 cell.windBearingIcon.image = UIImage(named: "west.png")
-            case 226...359:
+            case 91...179:
                 cell.windBearingIcon.image = UIImage(named: "northwest.png")
+            case 180:
+                cell.windBearingIcon.image = UIImage(named: "north.png")
+            case 181...224:
+                cell.windBearingIcon.image = UIImage(named: "northeast.png")
+            case 225:
+                cell.windBearingIcon.image = UIImage(named: "east.png")
+            case 226...359:
+                cell.windBearingIcon.image = UIImage(named: "southeast.png")
             case 360:
                 cell.windBearingIcon.image = UIImage(named: "north.png")
             default:
