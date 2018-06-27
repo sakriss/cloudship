@@ -189,6 +189,10 @@ extension ViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
             return UICollectionViewCell()
         }
+        cell.layer.borderColor = UIColor.white.cgColor
+        cell.layer.cornerRadius = 5.0
+        cell.layer.borderWidth = 0.5
+        
         let dataPoint = WeatherController.shared.weather
         
         if let hourTime = dataPoint?.hourly?.data?[indexPath.item].time {
