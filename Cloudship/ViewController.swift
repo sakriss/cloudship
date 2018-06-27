@@ -179,11 +179,24 @@ extension ViewController: UITableViewDataSource {
             cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
         case "partly-cloudy-day":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "clear":
+        case "partly-cloudy-night":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "clear-day":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "clear-night":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "rain":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "snow":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "sleet":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "wind":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "fog":
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-            
         }
     
         cell.lookingAheadCollectionView.reloadData()
