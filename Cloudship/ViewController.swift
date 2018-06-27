@@ -189,25 +189,27 @@ extension ViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
             return UICollectionViewCell()
         }
-        
         let dataPoint = WeatherController.shared.weather
         
-//        let hourlyTime = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.item].time)!)
-//        let dailyHourString = "\(hourlyTime)" // the date string to be parsed
-//        let df3 = DateFormatter()
-//        df3.locale = Locale(identifier: "en_US")
-//        df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-//        if let hour = df3.date(from: dailyHourString) {
-//            let format = "ha"
-//            let df4 = DateFormatter()
-//            df4.dateFormat = format
-//            df4.amSymbol = "AM"
-//            df4.pmSymbol = "PM"
-//            let string = df4.string(from: hour)
-//            cell.lookingAheadHourLabel.text = string
-//        } else {
-//            print("Unable to parse date string")
-//        }
+        if let hourTime = dataPoint?.hourly?.data?[indexPath.item].time {
+            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
+            
+            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+            let df3 = DateFormatter()
+            df3.locale = Locale(identifier: "en_US")
+            df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+            if let hour = df3.date(from: dailyHourString) {
+                let format = "ha"
+                let df4 = DateFormatter()
+                df4.dateFormat = format
+                df4.amSymbol = "AM"
+                df4.pmSymbol = "PM"
+                let string = df4.string(from: hour)
+                cell.lookingAheadHourLabel.text = string
+            } else {
+                print("Unable to parse date string")
+            }
+        }
         
         if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.item].temperature {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
