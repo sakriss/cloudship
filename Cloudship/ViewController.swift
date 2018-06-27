@@ -172,7 +172,19 @@ extension ViewController: UITableViewDataSource {
         
         //load animated gif
         //TODO: load animation based on current weather conditions
-        cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
+        //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
+        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        switch conditionIcon {
+        case "cloudy":
+            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
+        case "partly-cloudy-day":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
+        case "clear":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        default:
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            
+        }
     
         cell.lookingAheadCollectionView.reloadData()
         
