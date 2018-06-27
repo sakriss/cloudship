@@ -90,12 +90,6 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Looking ahead" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EBM-zb-2To">
-                                                    <rect key="frame" x="131" y="218" width="112" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ef-Pe-bge">
                                                     <rect key="frame" x="16" y="259" width="343" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -103,7 +97,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1w0-v6-eMH">
-                                                    <rect key="frame" x="98" y="405" width="178" height="94.5"/>
+                                                    <rect key="frame" x="98" y="397" width="178" height="102.5"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tiI-jI-KAK">
                                                             <rect key="frame" x="13" y="29" width="153" height="30"/>
@@ -131,7 +125,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Mah-pD-5Hm">
-                                                    <rect key="frame" x="15" y="259" width="345" height="138"/>
+                                                    <rect key="frame" x="15" y="251" width="345" height="138"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="5" minimumInteritemSpacing="5" id="t6c-fh-GXG">
                                                         <size key="itemSize" width="70" height="138"/>
@@ -188,6 +182,12 @@
                                                         <outlet property="delegate" destination="BYZ-38-t0r" id="mUq-to-4db"/>
                                                     </connections>
                                                 </collectionView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Quick look ahead" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EBM-zb-2To">
+                                                    <rect key="frame" x="119" y="217" width="136" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="6Py-FL-SAU" secondAttribute="trailing" id="0se-7v-DJg"/>
@@ -195,7 +195,7 @@
                                                 <constraint firstAttribute="trailingMargin" secondItem="9ef-Pe-bge" secondAttribute="trailing" constant="1" id="59e-Rm-77T"/>
                                                 <constraint firstItem="Mah-pD-5Hm" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" id="5tP-1r-ifM"/>
                                                 <constraint firstItem="Xvb-FG-bFe" firstAttribute="leading" secondItem="EIg-nJ-eZF" secondAttribute="trailing" constant="11" id="5ut-bc-wQm"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="EBM-zb-2To" secondAttribute="trailing" constant="117" id="65E-q7-2Gb"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="EBM-zb-2To" secondAttribute="trailing" id="65E-q7-2Gb"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="Mah-pD-5Hm" secondAttribute="trailing" id="8Kx-Gn-E1N"/>
                                                 <constraint firstAttribute="trailing" secondItem="1w0-v6-eMH" secondAttribute="trailing" constant="99" id="B6K-G0-dvf"/>
                                                 <constraint firstItem="87w-t3-JIJ" firstAttribute="top" secondItem="EIg-nJ-eZF" secondAttribute="bottom" constant="-6" id="BeA-cN-5vh"/>
@@ -217,7 +217,7 @@
                                                 <constraint firstItem="6Py-FL-SAU" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="aUI-TB-kbt"/>
                                                 <constraint firstItem="hqs-Ws-Wy3" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="fYn-b8-Qkx"/>
                                                 <constraint firstItem="Xvb-FG-bFe" firstAttribute="leading" secondItem="87w-t3-JIJ" secondAttribute="trailing" constant="11" id="gsL-nJ-ztK"/>
-                                                <constraint firstItem="EBM-zb-2To" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="116" id="iBt-ak-NwV"/>
+                                                <constraint firstItem="EBM-zb-2To" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" id="iBt-ak-NwV"/>
                                                 <constraint firstItem="13q-KG-CpP" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="jn3-wN-weB"/>
                                                 <constraint firstItem="5O0-Ep-bDj" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="k7u-B2-btn"/>
                                                 <constraint firstItem="9ef-Pe-bge" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="lW7-X9-gGg"/>
@@ -228,7 +228,7 @@
                                                 <constraint firstItem="4Jm-Hd-pxv" firstAttribute="leading" secondItem="Xvb-FG-bFe" secondAttribute="trailing" constant="15" id="nYo-QN-bqF"/>
                                                 <constraint firstItem="EIg-nJ-eZF" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="104" id="orv-ai-0Sw"/>
                                                 <constraint firstItem="5O0-Ep-bDj" firstAttribute="leading" secondItem="Jly-ve-yUo" secondAttribute="trailing" constant="115" id="pq2-NW-hMZ"/>
-                                                <constraint firstItem="9ef-Pe-bge" firstAttribute="top" secondItem="EBM-zb-2To" secondAttribute="bottom" constant="12" id="sSl-6z-LIZ"/>
+                                                <constraint firstItem="9ef-Pe-bge" firstAttribute="top" secondItem="EBM-zb-2To" secondAttribute="bottom" constant="4" id="sSl-6z-LIZ"/>
                                                 <constraint firstItem="iHQ-yS-fh4" firstAttribute="leading" secondItem="5O0-Ep-bDj" secondAttribute="trailing" constant="108" id="tPb-VF-RWp"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="hqs-Ws-Wy3" secondAttribute="trailing" constant="5" id="ve5-Am-dk3"/>
                                                 <constraint firstItem="4Jm-Hd-pxv" firstAttribute="top" secondItem="06k-yg-Rb7" secondAttribute="bottom" constant="-6" id="wDL-2o-2S9"/>

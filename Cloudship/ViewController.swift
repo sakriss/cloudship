@@ -158,11 +158,11 @@ extension ViewController: UITableViewDataSource {
         }
         
         if let currentSummary = dataPoint?.daily?.data?[0].summary {
-                cell.currentSummaryLabel.text = String(currentSummary)
+                cell.minutelyLookingAheadLabel.text = String(currentSummary)
         }
         
         if let lookingAhead = dataPoint?.minutely?.summary {
-                cell.minutelyLookingAheadLabel.text = lookingAhead
+                cell.currentSummaryLabel.text = lookingAhead
         }
 
         if let alertsActive = dataPoint?.alerts?[0] {
@@ -182,7 +182,7 @@ extension ViewController: UITableViewDataSource {
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return 7
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
