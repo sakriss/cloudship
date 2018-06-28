@@ -180,21 +180,21 @@ extension ViewController: UITableViewDataSource {
         case "partly-cloudy-day":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
         case "partly-cloudy-night":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
         case "clear-day":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
         case "clear-night":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
         case "rain":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
         case "snow":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
         case "sleet":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
         case "wind":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
         case "fog":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         }
