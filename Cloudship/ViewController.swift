@@ -182,7 +182,7 @@ extension ViewController: UITableViewDataSource {
         case "partly-cloudy-night":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
         case "clear-day":
-            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         case "clear-night":
             cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
         case "rain":
