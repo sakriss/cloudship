@@ -121,7 +121,7 @@ extension ViewController: CLLocationManagerDelegate {
 
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return currentlyTableView.bounds.size.height
+        return currentlyTableView.bounds.size.height - 60
     }
 }
 

@@ -53,7 +53,6 @@ extension AlertsViewController: UITableViewDataSource {
         if let alertsDescription = dataPoint?.alerts?[0].description {
                 cell.alertDescriptionLabel.text = String(alertsDescription)
         }
-        cell.backgroundColor = UIColor.lightGray
 
         return cell
     }

@@ -17,6 +17,7 @@ class CurrentlyTableViewCell: UITableViewCell {
     @IBOutlet weak var currentSummaryLabel: UILabel!
     @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
     
+    @IBOutlet weak var currentConditionsContainerView: UIView!
     @IBOutlet weak var alertViewContainer: UIView!
     @IBAction func alertActiveButton(_ sender: Any) {
         print("Alert button pressed")
