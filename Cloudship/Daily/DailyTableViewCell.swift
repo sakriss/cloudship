@@ -15,4 +15,12 @@ class DailyTableViewCell: UITableViewCell {
     @IBOutlet weak var dailyHighTempLabel: UILabel!
     @IBOutlet weak var dailyPercipPercent: UILabel!
     
+    @IBOutlet weak var dailyWindLabel: UILabel!
+    @IBOutlet weak var dailyWindSpeedLabel: UILabel!
+    @IBOutlet weak var dailyHumidityLabel: UILabel!
+    @IBOutlet weak var dailySunriseLabel: UILabel!
+    @IBOutlet weak var dailySunsetLabel: UILabel!
+    @IBOutlet weak var dailyCloudCoverLabel: UILabel!
+    
+    
 }

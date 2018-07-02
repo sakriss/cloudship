@@ -18,7 +18,9 @@ class AlertsViewController: UIViewController {
         self.alertsTableView.rowHeight = UITableViewAutomaticDimension
         self.alertsTableView.estimatedRowHeight = 150
         
+        
     }
+    
 
 }
 

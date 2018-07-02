@@ -12,8 +12,8 @@ class DailyData: Codable {
     private(set) var time: Double?
     private(set) var summary: String?
     private(set) var icon: String?
-    private(set) var sunriseTime: Date?
-    private(set) var sunsetTime: Date?
+    private(set) var sunriseTime: Double?
+    private(set) var sunsetTime: Double?
     private(set) var moonPhase: Double?
     private(set) var precipIntensity: Double?
     private(set) var precipIntensityMax: Double?

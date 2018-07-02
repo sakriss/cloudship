@@ -13,4 +13,5 @@ class AlertsTableViewCell: UITableViewCell {
     @IBOutlet weak var alertDescriptionLabel: UILabel!
     @IBOutlet weak var alertSeverityLabel: UILabel!
 
+    @IBOutlet weak var alertDescriptionTextView: UITextView!
 }

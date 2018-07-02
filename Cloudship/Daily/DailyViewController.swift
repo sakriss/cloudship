@@ -21,7 +21,7 @@ class DailyViewController: UIViewController {
         dailySummaryLabel.text = WeatherController.shared.weather?.daily?.summary
         
         self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
-        self.dailyForcastTableView.estimatedRowHeight = 110
+        self.dailyForcastTableView.estimatedRowHeight = 115
     }
     
 }
@@ -39,11 +39,11 @@ extension DailyViewController: UITableViewDelegate {
         let cellHeight = row?.bounds.height
         
         if indexPath.row == selectedRowIndex.row {
-            if cellHeight == 110 {
+            if cellHeight == 115 {
                 return 180
             }
         }
-        return 110
+        return 115
     }
 }
 
@@ -98,8 +98,83 @@ extension DailyViewController: UITableViewDataSource {
         if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
                 cell.dailyPercipPercent.text = percentFormatter.string(from: precipChance as NSNumber)
         }
+        
+        if let dailyHumidity = dataPoint?.daily?.data?[indexPath.row].humidity {
+            cell.dailyHumidityLabel.text = percentFormatter.string(from: dailyHumidity as NSNumber)
+        }
+        
+        if let dailyWindSpeed = dataPoint?.daily?.data?[indexPath.row].windSpeed {
+            let newDailyWindSpeed = String(format: "%.0f", dailyWindSpeed)
+            cell.dailyWindSpeedLabel.text = newDailyWindSpeed + " MPH"
+        }
+        
+        if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {
+            
+            switch windBearingIcon {
+            case 0:
+                cell.dailyWindLabel.text = "South"
+            case 1...89:
+                cell.dailyWindLabel.text = "Southwest"
+            case 90:
+                cell.dailyWindLabel.text = "West"
+            case 91...179:
+                cell.dailyWindLabel.text = "Northwest"
+            case 180:
+                cell.dailyWindLabel.text = "North"
+            case 181...224:
+                cell.dailyWindLabel.text = "Northeast"
+            case 225:
+                cell.dailyWindLabel.text = "East"
+            case 226...359:
+                cell.dailyWindLabel.text = "Southeast"
+            case 360:
+                cell.dailyWindLabel.text = "North"
+            default:
+                cell.dailyWindLabel.text = "N/A"
+            }
+        }
+        
+        let dailySunriseTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunriseTime)!)
+            
+            let dailySunriseString = "\(dailySunriseTime)" // the date string to be parsed
+            let df3 = DateFormatter()
+            df3.locale = Locale(identifier: "en_US")
+            df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+            if let hour = df3.date(from: dailySunriseString) {
+                let format = "h:mma"
+                let df4 = DateFormatter()
+                df4.dateFormat = format
+                df4.amSymbol = "am"
+                df4.pmSymbol = "pm"
+                let string = df4.string(from: hour)
+                cell.dailySunriseLabel.text = string
+            } else {
+                print("Unable to parse date string")
+            }
+            
+        let dailySunsetTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunsetTime)!)
+        
+        let dailySunsetString = "\(dailySunsetTime)" // the date string to be parsed
+        let df5 = DateFormatter()
+        df5.locale = Locale(identifier: "en_US")
+        df5.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        if let hour = df5.date(from: dailySunsetString) {
+            let format = "h:mma"
+            let df6 = DateFormatter()
+            df6.dateFormat = format
+            df6.amSymbol = "AM"
+            df6.pmSymbol = "PM"
+            let string = df6.string(from: hour)
+            cell.dailySunsetLabel.text = string
+        } else {
+            print("Unable to parse date string")
+        }
+        
+        if let dailyCloudCover = dataPoint?.daily?.data?[indexPath.row].cloudCover {
+            cell.dailyCloudCoverLabel.text = percentFormatter.string(from: dailyCloudCover as NSNumber)
+        }
+        
         return cell
     }
-    
     
 }

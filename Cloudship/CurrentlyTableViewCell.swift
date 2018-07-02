@@ -17,6 +17,9 @@ class CurrentlyTableViewCell: UITableViewCell {
     @IBOutlet weak var currentSummaryLabel: UILabel!
     @IBOutlet weak var minutelyLookingAheadLabel: UILabel!
     
+    @IBOutlet weak var dailyButton: UIButton!
+    @IBOutlet weak var hourlyButton: UIButton!
+    
     @IBOutlet weak var currentConditionsContainerView: UIView!
     @IBOutlet weak var alertViewContainer: UIView!
     @IBAction func alertActiveButton(_ sender: Any) {
