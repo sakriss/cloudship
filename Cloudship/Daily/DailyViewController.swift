@@ -144,8 +144,8 @@ extension DailyViewController: UITableViewDataSource {
                 let format = "h:mma"
                 let df4 = DateFormatter()
                 df4.dateFormat = format
-                df4.amSymbol = "am"
-                df4.pmSymbol = "pm"
+                df4.amSymbol = "AM"
+                df4.pmSymbol = "PM"
                 let string = df4.string(from: hour)
                 cell.dailySunriseLabel.text = string
             } else {
@@ -162,8 +162,8 @@ extension DailyViewController: UITableViewDataSource {
             let format = "h:mma"
             let df6 = DateFormatter()
             df6.dateFormat = format
-            df6.amSymbol = "am"
-            df6.pmSymbol = "pm"
+            df6.amSymbol = "AM"
+            df6.pmSymbol = "PM"
             let string = df6.string(from: hour)
             cell.dailySunsetLabel.text = string
         } else {
