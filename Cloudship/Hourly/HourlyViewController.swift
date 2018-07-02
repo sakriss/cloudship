@@ -30,6 +30,14 @@ extension HourlyViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "HourlyTableViewCell", for: indexPath) as? HourlyTableViewCell else {
             return UITableViewCell()
         }
+        
+        if indexPath.row % 2 == 0 {
+            cell.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+            
+        } else {
+            cell.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+        }
+        
         let dataPoint = WeatherController.shared.weather
         
         let time = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
