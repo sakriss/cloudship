@@ -42,9 +42,10 @@ class ViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
         
-        refreshControl.tintColor = UIColor.black
-        refreshControl.backgroundColor = UIColor.lightGray
-        refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...")
+        let attributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
+        refreshControl.tintColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
+        refreshControl.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+        refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...", attributes: attributes)
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
         
