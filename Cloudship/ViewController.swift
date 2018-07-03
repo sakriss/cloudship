@@ -27,12 +27,20 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(activityIndicator)
-        // Set up its size (the super view bounds usually)
-        activityIndicator.frame = view.bounds
+        let alert = UIAlertController(title: nil, message: "Fetching weather...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        loadingIndicator.startAnimating();
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
         
-        // Start the loading animation
-        activityIndicator.startAnimating()
+//        view.addSubview(activityIndicator)
+//        // Set up its size (the super view bounds usually)
+//        activityIndicator.frame = view.bounds
+//
+//        // Start the loading animation
+//        activityIndicator.startAnimating()
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -61,7 +69,8 @@ class ViewController: UIViewController {
         
         //now that data is parsed, we can display it
         DispatchQueue.main.async {
-            self.activityIndicator.removeFromSuperview()
+            self.dismiss(animated: false, completion: nil)
+//            self.activityIndicator.removeFromSuperview()
             self.currentlyTableView.reloadData()
 
             self.refreshControl.endRefreshing()
