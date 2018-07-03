@@ -27,8 +27,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        self.navigationController?.navigationBar.tintColor = UIColor.white
-        
         view.addSubview(activityIndicator)
         // Set up its size (the super view bounds usually)
         activityIndicator.frame = view.bounds
