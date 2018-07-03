@@ -217,7 +217,7 @@ extension ViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
             return UICollectionViewCell()
         }
-        
+        cell.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.35)
         cell.layer.borderColor = UIColor.white.cgColor
         cell.layer.cornerRadius = 5.0
         cell.layer.borderWidth = 0.5
