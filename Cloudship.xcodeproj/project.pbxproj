@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16148A6F20EC2F3500452F5D /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16148A6E20EC2F3400452F5D /* InfoViewController.swift */; };
 		161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */; };
 		1620610020AF61BE004E00BD /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162060FF20AF61BE004E00BD /* Weather.swift */; };
 		1620610220AF63EE004E00BD /* Hourly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1620610120AF63EE004E00BD /* Hourly.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		16148A6E20EC2F3400452F5D /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 		161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookingAheadCollectionViewCell.swift; sourceTree = "<group>"; };
 		162060FF20AF61BE004E00BD /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 		1620610120AF63EE004E00BD /* Hourly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hourly.swift; sourceTree = "<group>"; };
@@ -83,9 +85,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		16148A6D20EC2EFC00452F5D /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				16148A6E20EC2F3400452F5D /* InfoViewController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		162DC5F82020FAAB00C19DCE = {
 			isa = PBXGroup;
 			children = (
+				16148A6D20EC2EFC00452F5D /* Settings */,
 				1646BDAC20BF5555006FF7F5 /* Gif.swift */,
 				162DC6032020FAAB00C19DCE /* Cloudship */,
 				162DC6022020FAAB00C19DCE /* Products */,
@@ -269,6 +280,7 @@
 				1620610820AF6582004E00BD /* DailyData.swift in Sources */,
 				1620611620AF6FAC004E00BD /* WeatherInfo.swift in Sources */,
 				1620610E20AF66FE004E00BD /* Currently.swift in Sources */,
+				16148A6F20EC2F3500452F5D /* InfoViewController.swift in Sources */,
 				16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */,
 				1620611820B31F4A004E00BD /* MinutelyViewController.swift in Sources */,
 				1620610220AF63EE004E00BD /* Hourly.swift in Sources */,

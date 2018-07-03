@@ -291,7 +291,11 @@
                     </view>
                     <navigationItem key="navigationItem" id="vWb-Mk-ded">
                         <barButtonItem key="backBarButtonItem" title="Back" id="RHy-e9-D5h"/>
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="settingsicon6pt" style="plain" id="H6w-FV-hYc"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="settingsicon6pt" style="plain" id="H6w-FV-hYc">
+                            <connections>
+                                <segue destination="IpP-rb-Eiy" kind="show" id="lbF-uT-55w"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="currentlyTableView" destination="KPi-hx-XPu" id="Uxi-Sx-2YU"/>
@@ -300,6 +304,36 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="84" y="42.728635682158924"/>
+        </scene>
+        <!--Info View Controller-->
+        <scene sceneID="dOf-gs-1at">
+            <objects>
+                <viewController id="IpP-rb-Eiy" customClass="InfoViewController" customModule="Cloudship" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Z2y-DW-Nek">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UyA-l2-oDo">
+                                <rect key="frame" x="116.5" y="637" width="142" height="30"/>
+                                <state key="normal" title="Powered by DarkSky">
+                                    <color key="titleColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                </state>
+                                <connections>
+                                    <action selector="poweredByDarkSkyLinkButton:" destination="IpP-rb-Eiy" eventType="touchUpInside" id="we6-AX-7rc"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="UyA-l2-oDo" firstAttribute="bottom" secondItem="628-nP-lK2" secondAttribute="bottom" id="GUb-UP-YvJ"/>
+                            <constraint firstItem="UyA-l2-oDo" firstAttribute="centerX" secondItem="Z2y-DW-Nek" secondAttribute="centerX" id="qcI-hZ-jDy"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="628-nP-lK2"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="WEU-RZ-Pwh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="80.799999999999997" y="-631.0344827586207"/>
         </scene>
         <!--Daily Forcast-->
         <scene sceneID="MbB-ej-PYS">
