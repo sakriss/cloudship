@@ -295,7 +295,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="vWb-Mk-ded">
                         <barButtonItem key="backBarButtonItem" title="Back" id="RHy-e9-D5h"/>
-                        <barButtonItem key="leftBarButtonItem" systemItem="search" id="d4B-Md-5xA"/>
+                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="search" id="d4B-Md-5xA"/>
                         <barButtonItem key="rightBarButtonItem" title="Item" image="settingsicon6pt" style="plain" id="H6w-FV-hYc">
                             <connections>
                                 <segue destination="IpP-rb-Eiy" kind="show" id="lbF-uT-55w"/>
@@ -309,7 +309,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="ZnZ-4v-I1l">
                     <connections>
-                        <action selector="didTapCurrentlyContainer:" destination="BYZ-38-t0r" id="oAl-OE-hFU"/>
+                        <action selector="didTapCurrentlyContainer:" destination="BYZ-38-t0r" id="DoR-xc-dYN"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>

@@ -11,7 +11,10 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
-    //    @IBOutlet weak var lookingAheadCollectionView: UICollectionView!
+    @IBAction func didTapCurrentlyContainer(_ sender: UITapGestureRecognizer) {
+        print("tapped current condition view")
+        
+    }
     @IBOutlet weak var currentlyTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
@@ -139,6 +142,7 @@ extension ViewController: CLLocationManagerDelegate {
 //                        addressString.append(placemark.administrativeArea ?? "")
                         
                         self.navigationItem.title = addressString
+
                     }
                 }
             }
@@ -324,6 +328,4 @@ extension ViewController: UICollectionViewDataSource {
         
         return cell
     }
-    
-    
 }
