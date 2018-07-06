@@ -19,6 +19,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wrS-Wf-jxf">
+                                <rect key="frame" x="15" y="60" width="345" height="128"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <segue destination="TlO-WO-fm2" kind="embed" id="cF2-77-TUj"/>
+                                </connections>
+                            </containerView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="KPi-hx-XPu">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -145,7 +152,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="13q-KG-CpP">
-                                                            <rect key="frame" x="172.5" y="62" width="0.0" height="0.0"/>
+                                                            <rect key="frame" x="0.0" y="62" width="345" height="0.0"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <color key="textColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -165,6 +172,7 @@
                                                         <constraint firstAttribute="height" constant="100" id="DhL-4g-TLs"/>
                                                         <constraint firstItem="13q-KG-CpP" firstAttribute="top" secondItem="Xvb-FG-bFe" secondAttribute="bottom" constant="1" id="MrR-uo-ko5"/>
                                                         <constraint firstItem="06k-yg-Rb7" firstAttribute="top" secondItem="4Jm-Hd-pxv" secondAttribute="bottom" constant="-4" id="OH7-8c-hRh"/>
+                                                        <constraint firstItem="13q-KG-CpP" firstAttribute="leading" secondItem="wOe-SM-AYQ" secondAttribute="leading" id="PNb-34-XE3"/>
                                                         <constraint firstItem="87w-t3-JIJ" firstAttribute="top" secondItem="hqs-Ws-Wy3" secondAttribute="bottom" constant="8" id="RM6-oJ-sSA"/>
                                                         <constraint firstItem="13q-KG-CpP" firstAttribute="centerX" secondItem="wOe-SM-AYQ" secondAttribute="centerX" id="Uz8-uf-Cdo"/>
                                                         <constraint firstItem="EIg-nJ-eZF" firstAttribute="top" secondItem="87w-t3-JIJ" secondAttribute="bottom" constant="-4" id="Wf9-Gl-d4x"/>
@@ -175,6 +183,7 @@
                                                         <constraint firstItem="hqs-Ws-Wy3" firstAttribute="top" secondItem="wOe-SM-AYQ" secondAttribute="top" constant="-3" id="oDD-XB-sJM"/>
                                                         <constraint firstItem="Xvb-FG-bFe" firstAttribute="leading" secondItem="EIg-nJ-eZF" secondAttribute="trailing" constant="2" id="rgA-EL-1s2"/>
                                                         <constraint firstItem="Xvb-FG-bFe" firstAttribute="leading" secondItem="87w-t3-JIJ" secondAttribute="trailing" constant="2" id="utc-C6-tjw"/>
+                                                        <constraint firstAttribute="trailing" secondItem="13q-KG-CpP" secondAttribute="trailing" id="yOr-aD-q1z"/>
                                                     </constraints>
                                                     <connections>
                                                         <outletCollection property="gestureRecognizers" destination="ZnZ-4v-I1l" appends="YES" id="8Sm-Je-2Zl"/>
@@ -295,7 +304,11 @@
                     </view>
                     <navigationItem key="navigationItem" id="vWb-Mk-ded">
                         <barButtonItem key="backBarButtonItem" title="Back" id="RHy-e9-D5h"/>
-                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="search" id="d4B-Md-5xA"/>
+                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="search" id="d4B-Md-5xA">
+                            <connections>
+                                <segue destination="TlO-WO-fm2" kind="show" id="Eq6-rh-y2G"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Item" image="settingsicon6pt" style="plain" id="H6w-FV-hYc">
                             <connections>
                                 <segue destination="IpP-rb-Eiy" kind="show" id="lbF-uT-55w"/>
@@ -304,6 +317,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="currentlyTableView" destination="KPi-hx-XPu" id="Uxi-Sx-2YU"/>
+                        <outlet property="searchView" destination="wrS-Wf-jxf" id="d9O-jW-JvS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -829,8 +843,59 @@
             </objects>
             <point key="canvasLocation" x="-764" y="43"/>
         </scene>
+        <!--Location Search Table-->
+        <scene sceneID="vyd-yu-6EW">
+            <objects>
+                <viewController storyboardIdentifier="LocationSearchTable" id="TlO-WO-fm2" customClass="LocationSearchTable" customModule="Cloudship" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="MaS-Ib-558">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Search for a City" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BlW-6p-I5h">
+                                <rect key="frame" x="16" y="64" width="127" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j7g-Th-MaP">
+                                <rect key="frame" x="16" y="245" width="48" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Search"/>
+                            </button>
+                            <searchBar userInteractionEnabled="NO" contentMode="redraw" fixedFrame="YES" placeholder="Search for a city" translatesAutoresizingMaskIntoConstraints="NO" id="JgH-33-JxB">
+                                <rect key="frame" x="0.0" y="85" width="375" height="56"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <textInputTraits key="textInputTraits" textContentType="location"/>
+                                <connections>
+                                    <outlet property="delegate" destination="TlO-WO-fm2" id="ddb-S7-BBo"/>
+                                </connections>
+                            </searchBar>
+                        </subviews>
+                        <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
+                    </view>
+                    <connections>
+                        <outlet property="searchDisplayController" destination="XGG-6e-8qh" id="XgY-j6-Vt7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="YPr-gM-hEK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="XGG-6e-8qh">
+                    <connections>
+                        <outlet property="delegate" destination="TlO-WO-fm2" id="Lrg-79-5yP"/>
+                        <outlet property="searchBar" destination="JgH-33-JxB" id="KCQ-fR-hGJ"/>
+                        <outlet property="searchContentsController" destination="TlO-WO-fm2" id="RMl-ZC-XN9"/>
+                        <outlet property="searchResultsDataSource" destination="TlO-WO-fm2" id="TSF-l3-kE9"/>
+                        <outlet property="searchResultsDelegate" destination="TlO-WO-fm2" id="mfO-k5-tnv"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="56.799999999999997" y="892.80359820089961"/>
+        </scene>
     </scenes>
     <resources>
         <image name="settingsicon6pt" width="25" height="25"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="Eq6-rh-y2G"/>
+    </inferredMetricsTieBreakers>
 </document>

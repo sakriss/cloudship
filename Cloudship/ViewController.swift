@@ -15,6 +15,9 @@ class ViewController: UIViewController {
         print("tapped current condition view")
         
     }
+    
+    
+    @IBOutlet weak var searchView: UIView!
     @IBOutlet weak var currentlyTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
