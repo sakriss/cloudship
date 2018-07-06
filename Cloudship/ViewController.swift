@@ -10,8 +10,8 @@ import UIKit
 import CoreLocation
 
 class ViewController: UIViewController {
- 
-//    @IBOutlet weak var lookingAheadCollectionView: UICollectionView!
+    
+    //    @IBOutlet weak var lookingAheadCollectionView: UICollectionView!
     @IBOutlet weak var currentlyTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
@@ -27,28 +27,32 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
+//        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
+//        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+//        blurEffectView.frame = view.bounds
+//        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//
+//        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+//        activityIndicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+//        activityIndicator.startAnimating()
+//
+//        blurEffectView.contentView.addSubview(activityIndicator)
+//        activityIndicator.center = blurEffectView.contentView.center
+//
+//        view.addSubview(blurEffectView)
+        
+        //small alert on load with blur background
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
-        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-        activityIndicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-        activityIndicator.startAnimating()
-        
-        blurEffectView.contentView.addSubview(activityIndicator)
-        activityIndicator.center = blurEffectView.contentView.center
-        
+        let alert = UIAlertController(title: nil, message: "Fetching weather...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        loadingIndicator.startAnimating()
         view.addSubview(blurEffectView)
-        
-        
-//        let alert = UIAlertController(title: nil, message: "Fetching weather...", preferredStyle: .alert)
-//        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-//        loadingIndicator.hidesWhenStopped = true
-//        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
-//        loadingIndicator.startAnimating();
-//        alert.view.addSubview(loadingIndicator)
-//        present(alert, animated: true, completion: nil)
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
         
 //        view.addSubview(activityIndicator)
 //        // Set up its size (the super view bounds usually)
@@ -129,10 +133,10 @@ extension ViewController: CLLocationManagerDelegate {
                         var addressString = placemark.subThoroughfare ?? ""
                         addressString.append(" ")
                         addressString.append(placemark.thoroughfare ?? "")
-                        addressString.append(" ")
-                        addressString.append(placemark.locality ?? "")
                         addressString.append(", ")
-                        addressString.append(placemark.administrativeArea ?? "")
+                        addressString.append(placemark.locality ?? "")
+//                        addressString.append(", ")
+//                        addressString.append(placemark.administrativeArea ?? "")
                         
                         self.navigationItem.title = addressString
                     }
