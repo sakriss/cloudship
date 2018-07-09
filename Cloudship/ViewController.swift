@@ -8,11 +8,55 @@
 
 import UIKit
 import CoreLocation
+import MapKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UISearchBarDelegate {
     
     @IBAction func didTapCurrentlyContainer(_ sender: UITapGestureRecognizer) {
         print("tapped current condition view")
+        
+    }
+    
+    @IBAction func searchForLocationButton(_ sender: Any) {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.delegate = self
+        present(searchController, animated: true, completion: nil)
+        
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let searchRequest = MKLocalSearchRequest()
+        searchRequest.naturalLanguageQuery = searchBar.text
+        
+        let activeSearch = MKLocalSearch(request: searchRequest)
+        activeSearch.start { (response, error) in
+            if response == nil {
+                print("Error gathering new location")
+            }else {
+                let latitude = response?.boundingRegion.center.latitude
+                let longitude = response?.boundingRegion.center.longitude
+                
+                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+                //self.navigationItem.title = searchBar.text
+                
+                let geoCoder = CLGeocoder()
+                let location = CLLocation(latitude: latitude!, longitude: longitude!)
+                geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+                    
+                    if let placemarks = placemarks {
+                        for placemark in placemarks {
+                            var addressString = placemark.locality ?? ""
+                            addressString.append(", ")
+                            addressString.append(placemark.administrativeArea ?? "")
+                            
+                            self.navigationItem.title = addressString
+                            
+                        }
+                    }
+                })
+            }
+        }
         
     }
     
@@ -33,6 +77,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
 //        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
 //        let blurEffectView = UIVisualEffectView(effect: blurEffect)
 //        blurEffectView.frame = view.bounds
@@ -47,7 +92,7 @@ class ViewController: UIViewController {
 //
 //        view.addSubview(blurEffectView)
         
-        //small alert on load with blur background
+        //*** small alert on load with blur background ***/
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = view.bounds
