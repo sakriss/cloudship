@@ -219,6 +219,7 @@ extension ViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
             return UITableViewCell()
         }
+        cell.alertViewContainer.isHidden = true
         
         let dataPoint = WeatherController.shared.weather
         
