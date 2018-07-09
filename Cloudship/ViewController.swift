@@ -20,6 +20,10 @@ class ViewController: UIViewController, UISearchBarDelegate {
     @IBAction func searchForLocationButton(_ sender: Any) {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
+        searchController.searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+        searchController.searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
+        searchController.searchBar.tintColor = UIColor.white
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
         present(searchController, animated: true, completion: nil)
         
     }
@@ -27,7 +31,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let searchRequest = MKLocalSearchRequest()
         searchRequest.naturalLanguageQuery = searchBar.text
-        
+
         let activeSearch = MKLocalSearch(request: searchRequest)
         activeSearch.start { (response, error) in
             if response == nil {
@@ -35,23 +39,23 @@ class ViewController: UIViewController, UISearchBarDelegate {
             }else {
                 let latitude = response?.boundingRegion.center.latitude
                 let longitude = response?.boundingRegion.center.longitude
-                
+
                 let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
                 WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
                 //self.navigationItem.title = searchBar.text
-                
+
                 let geoCoder = CLGeocoder()
                 let location = CLLocation(latitude: latitude!, longitude: longitude!)
                 geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
-                    
+
                     if let placemarks = placemarks {
                         for placemark in placemarks {
                             var addressString = placemark.locality ?? ""
                             addressString.append(", ")
                             addressString.append(placemark.administrativeArea ?? "")
-                            
+
                             self.navigationItem.title = addressString
-                            
+
                         }
                     }
                 })
@@ -76,7 +80,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
 //        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
 //        let blurEffectView = UIVisualEffectView(effect: blurEffect)
@@ -376,5 +379,11 @@ extension ViewController: UICollectionViewDataSource {
         }
         
         return cell
+    }
+}
+
+extension UISearchBar {
+    func defaultSearchBar() {
+
     }
 }
