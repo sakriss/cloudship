@@ -335,8 +335,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UyA-l2-oDo">
-                                <rect key="frame" x="116.66666666666669" y="748" width="142" height="30"/>
-                                <state key="normal" title="Powered by DarkSky">
+                                <rect key="frame" x="114.66666666666669" y="748" width="146" height="30"/>
+                                <state key="normal" title="Powered by Dark Sky">
                                     <color key="titleColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
@@ -886,7 +886,7 @@
                     </connections>
                 </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="56.799999999999997" y="892.80359820089961"/>
+            <point key="canvasLocation" x="84" y="705"/>
         </scene>
     </scenes>
     <resources>

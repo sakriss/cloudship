@@ -18,55 +18,22 @@ class ViewController: UIViewController, UISearchBarDelegate {
     }
     
     @IBAction func searchForLocationButton(_ sender: Any) {
-        let searchController = UISearchController(searchResultsController: nil)
+        var searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
         searchController.searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
         searchController.searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
         searchController.searchBar.tintColor = UIColor.white
+        searchController.dimsBackgroundDuringPresentation = true
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
         present(searchController, animated: true, completion: nil)
         
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let searchRequest = MKLocalSearchRequest()
-        searchRequest.naturalLanguageQuery = searchBar.text
-
-        let activeSearch = MKLocalSearch(request: searchRequest)
-        activeSearch.start { (response, error) in
-            if response == nil {
-                print("Error gathering new location")
-            }else {
-                let latitude = response?.boundingRegion.center.latitude
-                let longitude = response?.boundingRegion.center.longitude
-
-                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
-                //self.navigationItem.title = searchBar.text
-
-                let geoCoder = CLGeocoder()
-                let location = CLLocation(latitude: latitude!, longitude: longitude!)
-                geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
-
-                    if let placemarks = placemarks {
-                        for placemark in placemarks {
-                            var addressString = placemark.locality ?? ""
-                            addressString.append(", ")
-                            addressString.append(placemark.administrativeArea ?? "")
-
-                            self.navigationItem.title = addressString
-
-                        }
-                    }
-                })
-            }
-        }
         
+
     }
-    
     
     @IBOutlet weak var searchView: UIView!
     @IBOutlet weak var currentlyTableView: UITableView!
+    @IBOutlet weak var searchTableView: UITableView!
     
     var lastLocation: CLLocation? = nil
     var nearestStorm = 0.0
@@ -127,6 +94,43 @@ class ViewController: UIViewController, UISearchBarDelegate {
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...", attributes: attributes)
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
+        
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let searchRequest = MKLocalSearchRequest()
+        searchRequest.naturalLanguageQuery = searchBar.text
+        
+        let activeSearch = MKLocalSearch(request: searchRequest)
+        activeSearch.start { (response, error) in
+            if response == nil {
+                print("Error gathering new location")
+            }else {
+                let latitude = response?.boundingRegion.center.latitude
+                let longitude = response?.boundingRegion.center.longitude
+                
+                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+                //self.navigationItem.title = searchBar.text
+                
+                let geoCoder = CLGeocoder()
+                let location = CLLocation(latitude: latitude!, longitude: longitude!)
+                geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+                    
+                    if let placemarks = placemarks {
+                        for placemark in placemarks {
+                            var addressString = placemark.locality ?? ""
+                            addressString.append(", ")
+                            addressString.append(placemark.administrativeArea ?? "")
+                            
+                            self.navigationItem.title = addressString
+                            
+                        }
+                    }
+                })
+            }
+        }
         
     }
     
@@ -379,11 +383,5 @@ extension ViewController: UICollectionViewDataSource {
         }
         
         return cell
-    }
-}
-
-extension UISearchBar {
-    func defaultSearchBar() {
-
     }
 }
