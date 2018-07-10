@@ -26,14 +26,14 @@ class ViewController: UIViewController, UISearchBarDelegate {
         searchController.dimsBackgroundDuringPresentation = true
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
         present(searchController, animated: true, completion: nil)
-        
-        
+        searchTableView.isHidden = false
 
     }
     
     @IBOutlet weak var searchView: UIView!
     @IBOutlet weak var currentlyTableView: UITableView!
     @IBOutlet weak var searchTableView: UITableView!
+    var matchingItems:[MKMapItem] = []
     
     var lastLocation: CLLocation? = nil
     var nearestStorm = 0.0
@@ -47,20 +47,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
-//        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-//        blurEffectView.frame = view.bounds
-//        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//
-//        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-//        activityIndicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-//        activityIndicator.startAnimating()
-//
-//        blurEffectView.contentView.addSubview(activityIndicator)
-//        activityIndicator.center = blurEffectView.contentView.center
-//
-//        view.addSubview(blurEffectView)
+        searchTableView.isHidden = true
         
         //*** small alert on load with blur background ***/
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
@@ -74,13 +61,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
         view.addSubview(blurEffectView)
         alert.view.addSubview(loadingIndicator)
         present(alert, animated: true, completion: nil)
-        
-//        view.addSubview(activityIndicator)
-//        // Set up its size (the super view bounds usually)
-//        activityIndicator.frame = view.bounds
-//
-//        // Start the loading animation
-//        activityIndicator.startAnimating()
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -97,12 +77,17 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchTableView.isHidden = true
+    }
+    
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let searchRequest = MKLocalSearchRequest()
         searchRequest.naturalLanguageQuery = searchBar.text
         
         let activeSearch = MKLocalSearch(request: searchRequest)
+        
         activeSearch.start { (response, error) in
             if response == nil {
                 print("Error gathering new location")
@@ -111,7 +96,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let longitude = response?.boundingRegion.center.longitude
                 
                 let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+//                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
                 //self.navigationItem.title = searchBar.text
                 
                 let geoCoder = CLGeocoder()
@@ -129,6 +114,49 @@ class ViewController: UIViewController, UISearchBarDelegate {
                         }
                     }
                 })
+                
+                self.matchingItems = (response?.mapItems)!
+                self.searchTableView.reloadData()
+            }
+        }
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchTableView.isHidden = true
+        let searchRequest = MKLocalSearchRequest()
+        searchRequest.naturalLanguageQuery = searchBar.text
+        
+        let activeSearch = MKLocalSearch(request: searchRequest)
+        
+        activeSearch.start { (response, error) in
+            if response == nil {
+                print("Error gathering new location")
+            }else {
+                let latitude = response?.boundingRegion.center.latitude
+                let longitude = response?.boundingRegion.center.longitude
+
+                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+                //self.navigationItem.title = searchBar.text
+
+                let geoCoder = CLGeocoder()
+                let location = CLLocation(latitude: latitude!, longitude: longitude!)
+                geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+
+                    if let placemarks = placemarks {
+                        for placemark in placemarks {
+                            var addressString = placemark.locality ?? ""
+                            addressString.append(", ")
+                            addressString.append(placemark.administrativeArea ?? "")
+
+                            self.navigationItem.title = addressString
+
+                        }
+                    }
+                })
+
+                self.matchingItems = (response?.mapItems)!
+                self.searchTableView.reloadData()
             }
         }
         
@@ -212,17 +240,31 @@ extension ViewController: CLLocationManagerDelegate {
 
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return currentlyTableView.bounds.size.height - 60
+        if currentlyTableView == tableView {
+            return currentlyTableView.bounds.size.height - 60
+        }
+        if searchTableView == tableView {
+            return 40
+        }
+        return 0
     }
 }
 
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if tableView == currentlyTableView {
+            return 1
+        }
+        if tableView == searchTableView {
+            return matchingItems.count
+        }
         return 1
-        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var returnedCell = UITableViewCell()
+        
+        if tableView == currentlyTableView {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
             return UITableViewCell()
         }
@@ -292,9 +334,20 @@ extension ViewController: UITableViewDataSource {
         }
     
         cell.lookingAheadCollectionView.reloadData()
-        
-        return cell
+            
+        returnedCell = cell
+        }else if tableView == searchTableView {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "SearchTableViewCell", for: indexPath) as? SearchTableViewCell else {
+                return UITableViewCell()
+            }
+            let selectedItem = matchingItems[indexPath.row].placemark
+            cell.searchTitleLabel?.text = selectedItem.name
+            cell.searchDetailsLabel?.text = selectedItem.title
+            returnedCell = cell
+        }
+        return returnedCell
     }
+    
 }
 
 extension ViewController: UICollectionViewDataSource {

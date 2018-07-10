@@ -289,6 +289,50 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="RCz-rV-er1"/>
                                 </connections>
                             </tableView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="3bc-og-6Yo">
+                                <rect key="frame" x="35" y="75" width="300" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SearchTableViewCell" id="C8C-N7-ILM" customClass="SearchTableViewCell" customModule="Cloudship" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="300" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="C8C-N7-ILM" id="d01-dm-lb6">
+                                            <rect key="frame" x="0.0" y="0.0" width="300" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="obr-oN-PMT">
+                                                    <rect key="frame" x="15" y="0.0" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ohq-Zv-R46">
+                                                    <rect key="frame" x="15" y="22" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="ohq-Zv-R46" firstAttribute="top" secondItem="obr-oN-PMT" secondAttribute="bottom" constant="1" id="6Se-Ev-Thf"/>
+                                                <constraint firstItem="obr-oN-PMT" firstAttribute="leading" secondItem="d01-dm-lb6" secondAttribute="leading" constant="15" id="Fsq-Qi-w8R"/>
+                                                <constraint firstItem="ohq-Zv-R46" firstAttribute="leading" secondItem="d01-dm-lb6" secondAttribute="leading" constant="15" id="fQ0-Ee-RnU"/>
+                                                <constraint firstAttribute="bottom" secondItem="ohq-Zv-R46" secondAttribute="bottom" id="hEN-IE-ZQN"/>
+                                                <constraint firstItem="obr-oN-PMT" firstAttribute="top" secondItem="d01-dm-lb6" secondAttribute="top" id="yLt-QP-2lk"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="searchDetailsLabel" destination="ohq-Zv-R46" id="cBi-Ln-ZCe"/>
+                                            <outlet property="searchTitleLabel" destination="obr-oN-PMT" id="wsY-fP-I6v"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="QOl-x1-bDT"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Hgs-ue-UJz"/>
+                                </connections>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -314,6 +358,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="currentlyTableView" destination="KPi-hx-XPu" id="Uxi-Sx-2YU"/>
+                        <outlet property="searchTableView" destination="3bc-og-6Yo" id="ptn-ff-gZE"/>
                         <outlet property="searchView" destination="wrS-Wf-jxf" id="d9O-jW-JvS"/>
                     </connections>
                 </viewController>
