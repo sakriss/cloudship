@@ -25,13 +25,14 @@ class ViewController: UIViewController, UISearchBarDelegate {
 //        searchController.searchBar.sizeToFit()
 //
 //        searchController.searchBar.delegate = self
-//        searchController.searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
-//        searchController.searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
+//        searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+//        searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
 //        searchController.searchBar.tintColor = UIColor.white
 //        searchController.dimsBackgroundDuringPresentation = true
 //        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
 //        present(searchController, animated: true, completion: nil)
-        
+//        searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+//        searchBar.tintColor = UIColor.white
         searchBar.isHidden = false
     }
     var searchActive : Bool = false
@@ -87,6 +88,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchTableView.isHidden = true
         searchBar.isHidden = true
+        UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
     
@@ -167,6 +169,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
 //                self.searchTableView.reloadData()
             }
             self.searchBar.isHidden = true
+            UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
         }
         
     }
