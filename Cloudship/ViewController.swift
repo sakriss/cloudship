@@ -12,25 +12,30 @@ import MapKit
 
 class ViewController: UIViewController, UISearchBarDelegate {
     
+    
     @IBAction func didTapCurrentlyContainer(_ sender: UITapGestureRecognizer) {
         print("tapped current condition view")
         
     }
     
     @IBAction func searchForLocationButton(_ sender: Any) {
-        var searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.delegate = self
-        searchController.searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
-        searchController.searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
-        searchController.searchBar.tintColor = UIColor.white
-        searchController.dimsBackgroundDuringPresentation = true
-        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
-        present(searchController, animated: true, completion: nil)
         searchTableView.isHidden = false
 
+//        let searchController = UISearchController(searchResultsController: nil)
+//        searchController.searchBar.sizeToFit()
+//
+//        searchController.searchBar.delegate = self
+//        searchController.searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+//        searchController.searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
+//        searchController.searchBar.tintColor = UIColor.white
+//        searchController.dimsBackgroundDuringPresentation = true
+//        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
+//        present(searchController, animated: true, completion: nil)
+        
+        searchBar.isHidden = false
     }
-    
-    @IBOutlet weak var searchView: UIView!
+    var searchActive : Bool = false
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var currentlyTableView: UITableView!
     @IBOutlet weak var searchTableView: UITableView!
     var matchingItems:[MKMapItem] = []
@@ -48,6 +53,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         searchTableView.isHidden = true
+        searchBar.delegate = self
+        searchBar.isHidden = true
         
         //*** small alert on load with blur background ***/
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
@@ -79,6 +86,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchTableView.isHidden = true
+        searchBar.isHidden = true
     }
     
     
@@ -95,7 +103,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let latitude = response?.boundingRegion.center.latitude
                 let longitude = response?.boundingRegion.center.longitude
                 
-                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+//                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
 //                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
                 //self.navigationItem.title = searchBar.text
                 
@@ -109,7 +117,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                             addressString.append(", ")
                             addressString.append(placemark.administrativeArea ?? "")
                             
-                            self.navigationItem.title = addressString
+//                            self.navigationItem.title = addressString
                             
                         }
                     }
@@ -135,7 +143,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let latitude = response?.boundingRegion.center.latitude
                 let longitude = response?.boundingRegion.center.longitude
 
-                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+//                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
                 WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
                 //self.navigationItem.title = searchBar.text
 
@@ -154,10 +162,11 @@ class ViewController: UIViewController, UISearchBarDelegate {
                         }
                     }
                 })
-
-                self.matchingItems = (response?.mapItems)!
-                self.searchTableView.reloadData()
+                
+//                self.matchingItems = (response?.mapItems)!
+//                self.searchTableView.reloadData()
             }
+            self.searchBar.isHidden = true
         }
         
     }
