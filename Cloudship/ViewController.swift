@@ -19,20 +19,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     }
     
     @IBAction func searchForLocationButton(_ sender: Any) {
+        navigationController?.isNavigationBarHidden = true
         searchTableView.isHidden = false
-
-//        let searchController = UISearchController(searchResultsController: nil)
-//        searchController.searchBar.sizeToFit()
-//
-//        searchController.searchBar.delegate = self
-//        searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
-//        searchBar.backgroundColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
-//        searchController.searchBar.tintColor = UIColor.white
-//        searchController.dimsBackgroundDuringPresentation = true
-//        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).attributedPlaceholder = NSAttributedString(string: "Type a city, zipcode or POI", attributes: [NSAttributedStringKey.foregroundColor: UIColor.lightGray])
-//        present(searchController, animated: true, completion: nil)
-//        searchBar.barTintColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
-//        searchBar.tintColor = UIColor.white
         searchBar.isHidden = false
     }
     var searchActive : Bool = false
@@ -89,6 +77,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         searchTableView.isHidden = true
         searchBar.isHidden = true
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+        navigationController?.isNavigationBarHidden = false
     }
     
     
@@ -170,6 +159,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
             }
             self.searchBar.isHidden = true
             UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+            self.navigationController?.isNavigationBarHidden = false
         }
         
     }
@@ -259,6 +249,36 @@ extension ViewController: UITableViewDelegate {
             return 40
         }
         return 0
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if searchTableView == tableView {
+            let selectedSearchItem = matchingItems[indexPath.row].placemark
+            let latitude = selectedSearchItem.coordinate.latitude
+            let longitude = selectedSearchItem.coordinate.longitude
+            
+            WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude)
+            
+            let geoCoder = CLGeocoder()
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
+                
+                if let placemarks = placemarks {
+                    for placemark in placemarks {
+                        var addressString = placemark.locality ?? ""
+                        addressString.append(", ")
+                        addressString.append(placemark.administrativeArea ?? "")
+                        
+                        self.navigationItem.title = addressString
+                        
+                    }
+                }
+            })
+            self.searchBar.isHidden = true
+            UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+            navigationController?.isNavigationBarHidden = false
+            searchTableView.isHidden = true
+        }
     }
 }
 
