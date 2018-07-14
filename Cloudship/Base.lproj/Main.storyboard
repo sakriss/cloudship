@@ -441,10 +441,9 @@
                                 <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nKQ-87-mM8">
-                                <rect key="frame" x="16" y="93" width="216" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Questions, Feedback? Email Us">
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nKQ-87-mM8">
+                                <rect key="frame" x="16" y="93" width="241" height="30"/>
+                                <state key="normal" title="Questions, Feedback? Email Us!">
                                     <color key="titleColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
@@ -454,9 +453,11 @@
                         </subviews>
                         <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="nKQ-87-mM8" firstAttribute="top" secondItem="vEH-5d-V0Y" secondAttribute="bottom" constant="8" id="C3v-86-JDh"/>
                             <constraint firstItem="628-nP-lK2" firstAttribute="trailing" secondItem="vEH-5d-V0Y" secondAttribute="trailing" constant="16" id="CPe-xJ-mRf"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="bottom" secondItem="628-nP-lK2" secondAttribute="bottom" id="GUb-UP-YvJ"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="top" secondItem="dGd-7n-7lX" secondAttribute="bottom" constant="8" id="N97-XR-T6L"/>
+                            <constraint firstItem="nKQ-87-mM8" firstAttribute="leading" secondItem="628-nP-lK2" secondAttribute="leading" constant="16" id="PZf-HD-zWp"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="top" secondItem="u2h-Gt-FLW" secondAttribute="bottom" constant="8" id="bzm-2n-wc1"/>
                             <constraint firstItem="oTb-Ed-ytt" firstAttribute="centerX" secondItem="Z2y-DW-Nek" secondAttribute="centerX" id="cWL-eM-j6R"/>
                             <constraint firstItem="vEH-5d-V0Y" firstAttribute="leading" secondItem="628-nP-lK2" secondAttribute="leading" constant="16" id="dDm-HW-VZn"/>
