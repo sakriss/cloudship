@@ -94,10 +94,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let latitude = response?.boundingRegion.center.latitude
                 let longitude = response?.boundingRegion.center.longitude
                 
-//                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-//                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
-                //self.navigationItem.title = searchBar.text
-                
                 let geoCoder = CLGeocoder()
                 let location = CLLocation(latitude: latitude!, longitude: longitude!)
                 geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
@@ -107,8 +103,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
                             var addressString = placemark.locality ?? ""
                             addressString.append(", ")
                             addressString.append(placemark.administrativeArea ?? "")
-                            
-//                            self.navigationItem.title = addressString
                             
                         }
                     }
@@ -154,8 +148,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     }
                 })
                 
-//                self.matchingItems = (response?.mapItems)!
-//                self.searchTableView.reloadData()
             }
             self.searchBar.isHidden = true
             UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
