@@ -41,6 +41,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        searchTableView.tableFooterView = UIView()
         searchTableView.isHidden = true
         searchBar.delegate = self
         searchBar.isHidden = true
