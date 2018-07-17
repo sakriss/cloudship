@@ -98,7 +98,7 @@ extension DailyViewController: UITableViewDataSource {
             let newHighTemp = String(format: "%.0f", highTemp)
             let newLowTemp = String(format: "%.0f", lowTemp)
                 //cell.dailyHighTempLabel.text = String(format: "%.0f", highTemp)
-                cell.dailyHighTempLabel.text = newHighTemp + "\u{00B0}/" + newLowTemp + "\u{00B0}"
+                cell.dailyHighTempLabel.text = newLowTemp + "\u{00B0}/" + newHighTemp + "\u{00B0}"
         }
         
         let percentFormatter = NumberFormatter()
