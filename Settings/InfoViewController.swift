@@ -32,7 +32,10 @@ class InfoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appVersionLabel.text = "App version 1.0"
+        
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            self.appVersionLabel.text = "App Version " + version
+        }
         
 
         // Do any additional setup after loading the view.

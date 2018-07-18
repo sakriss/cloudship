@@ -19,7 +19,9 @@ class DailyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        dailySummaryLabel.text = WeatherController.shared.weather?.daily?.summary
+        if let dailySummary = WeatherController.shared.weather?.daily?.summary {
+            dailySummaryLabel.text = dailySummary
+        }
         
         self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
         self.dailyForcastTableView.estimatedRowHeight = 115

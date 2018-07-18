@@ -649,6 +649,7 @@
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
+                                <sections/>
                                 <connections>
                                     <outlet property="dataSource" destination="wsF-52-z12" id="AG5-Jg-Kb8"/>
                                     <outlet property="delegate" destination="wsF-52-z12" id="RFC-PD-HLE"/>
