@@ -100,11 +100,11 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         if selectedRow == [0] {
             print("Selected row 0 - US")
             defaults.set("units=us", forKey: "Units")
-            unitsLabel.text = "USA (Fahenheit, miles, mph)"
+            unitsLabel.text = "   Units \n   USA (Fahenheit, miles, mph)"
         } else{
             print("Selected row 1 - SI")
             defaults.set("units=si", forKey: "Units")
-            unitsLabel.text = "SI (Celsius, km, m/s)"
+            unitsLabel.text = "   Units \n   SI (Celsius, km, m/s)"
         }
 
     }
