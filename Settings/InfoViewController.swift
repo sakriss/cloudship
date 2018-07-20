@@ -47,7 +47,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         picker.delegate = self
         
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            self.appVersionLabel.text = "App Version " + version
+            self.appVersionLabel.text = "   App Version \n   " + version
         }
         
         picker.isHidden = true
@@ -63,11 +63,11 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         print(UserDefaults.standard.string(forKey: "Units")!)
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
             if userDef == "units=us" {
-                unitsSelected = "USA (Fahenheit, miles, mph)"
+                unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
             }
             
             if userDef == "units=si" {
-                unitsSelected = "SI (Celsius, km, m/s)"
+                unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
             }
         }
         

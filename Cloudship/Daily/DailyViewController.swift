@@ -19,7 +19,7 @@ class DailyViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if let dailySummary = WeatherController.shared.weather?.daily?.summary {
             dailySummaryLabel.text = dailySummary
         }
@@ -61,6 +61,15 @@ extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "DailyTableViewCell", for: indexPath) as? DailyTableViewCell else {
             return UITableViewCell()
+        }
+        var units = ""
+        if let unitsSaved = UserDefaults.standard.string(forKey: "Units") {
+            if unitsSaved == "units=us" {
+                units = " mph"
+            }
+            if unitsSaved == "units=si" {
+                units = " m/s"
+            }
         }
 
         if indexPath.row % 2 == 0 {
@@ -118,7 +127,7 @@ extension DailyViewController: UITableViewDataSource {
         
         if let dailyWindSpeed = dataPoint?.daily?.data?[indexPath.row].windSpeed {
             let newDailyWindSpeed = String(format: "%.0f", dailyWindSpeed)
-            cell.dailyWindSpeedLabel.text = newDailyWindSpeed + " MPH"
+            cell.dailyWindSpeedLabel.text = newDailyWindSpeed + units
         }
         
         if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {

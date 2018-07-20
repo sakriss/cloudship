@@ -13,10 +13,7 @@ import MapKit
 class ViewController: UIViewController, UISearchBarDelegate {
     let defaults = UserDefaults.standard
     
-    @IBAction func didTapCurrentlyContainer(_ sender: UITapGestureRecognizer) {
-        print("tapped current condition view")
-        
-    }
+    @IBOutlet var currentTempContainerTapRec: UITapGestureRecognizer!
     
     @IBAction func searchForLocationButton(_ sender: Any) {
         navigationController?.isNavigationBarHidden = true
@@ -41,6 +38,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
         var units = defaults.string(forKey: "Units")
         
         searchTableView.tableFooterView = UIView()
@@ -277,6 +275,8 @@ extension ViewController: UITableViewDelegate {
             searchTableView.isHidden = true
         }
     }
+    
+
 }
 
 extension ViewController: UITableViewDataSource {
@@ -368,7 +368,7 @@ extension ViewController: UITableViewDataSource {
         }else if tableView == searchTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "SearchTableViewCell", for: indexPath) as? SearchTableViewCell else {
                 return UITableViewCell()
-            }
+            } 
             let selectedItem = matchingItems[indexPath.row].placemark
             cell.searchTitleLabel?.text = selectedItem.name
             cell.searchDetailsLabel?.text = selectedItem.title
@@ -376,6 +376,7 @@ extension ViewController: UITableViewDataSource {
         }
         return returnedCell
     }
+
     
 }
 
