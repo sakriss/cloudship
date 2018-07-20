@@ -8,8 +8,16 @@
 
 import UIKit
 
-class InfoViewController: UIViewController {
+class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     @IBOutlet weak var appVersionLabel: UILabel!
+    @IBOutlet weak var picker: UIPickerView!
+    @IBOutlet weak var unitsLabel: UILabel!
+    @IBOutlet var unitsTapRec: UITapGestureRecognizer!
+    
+    let units = ["USA (Fahenheit, miles, mph)", "SI (Celsius, km, m/s)"]
+    let defaults = UserDefaults.standard
+    var unitsSelected: String = ""
+    
     
     @IBAction func emailUsButton(_ sender: UIButton) {
         
@@ -32,29 +40,73 @@ class InfoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        unitsToDisplay()
+        unitsLabel.text = unitsSelected
+        
+        picker.dataSource = self
+        picker.delegate = self
         
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             self.appVersionLabel.text = "App Version " + version
         }
         
+        picker.isHidden = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(InfoViewController.tapFunction))
+        unitsLabel.addGestureRecognizer(tap)
+        unitsLabel.isUserInteractionEnabled = true
+        
 
         // Do any additional setup after loading the view.
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func unitsToDisplay() {
+        print(UserDefaults.standard.string(forKey: "Units")!)
+        if let userDef = UserDefaults.standard.string(forKey: "Units") {
+            if userDef == "units=us" {
+                unitsSelected = "USA (Fahenheit, miles, mph)"
+            }
+            
+            if userDef == "units=si" {
+                unitsSelected = "SI (Celsius, km, m/s)"
+            }
+        }
+        
+        
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @objc func tapFunction() {
+        picker.isHidden = false
+        view.addSubview(picker)
+        unitsLabel.isUserInteractionEnabled = true
     }
-    */
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return 2
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        
+        return units[row]
+        
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let selectedRow = [row]
+        
+        if selectedRow == [0] {
+            print("Selected row 0 - US")
+            defaults.set("units=us", forKey: "Units")
+            unitsLabel.text = "USA (Fahenheit, miles, mph)"
+        } else{
+            print("Selected row 1 - SI")
+            defaults.set("units=si", forKey: "Units")
+            unitsLabel.text = "SI (Celsius, km, m/s)"
+        }
+
+    }
 
 }

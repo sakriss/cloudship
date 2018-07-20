@@ -39,6 +39,7 @@
 		168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168C8CF820C255A800D0413C /* AlertsViewController.swift */; };
 		168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */; };
 		16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */; };
+		16F5BD832100010600A93A03 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16F5BD822100010600A93A03 /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +77,7 @@
 		168C8CF820C255A800D0413C /* AlertsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsViewController.swift; sourceTree = "<group>"; };
 		168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsTableViewCell.swift; sourceTree = "<group>"; };
 		16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyTableViewCell.swift; sourceTree = "<group>"; };
+		16F5BD822100010600A93A03 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 		162DC5F82020FAAB00C19DCE = {
 			isa = PBXGroup;
 			children = (
+				16F5BD822100010600A93A03 /* Settings.bundle */,
 				16148A7420F52AEF00452F5D /* SearchTableViewCell.swift */,
 				16148A7220F3B0AD00452F5D /* SearchSearchTableView.swift */,
 				16148A6D20EC2EFC00452F5D /* Settings */,
@@ -260,6 +263,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16F5BD832100010600A93A03 /* Settings.bundle in Resources */,
 				162DC60F2020FAAB00C19DCE /* LaunchScreen.storyboard in Resources */,
 				162DC60C2020FAAB00C19DCE /* Assets.xcassets in Resources */,
 				162DC60A2020FAAB00C19DCE /* Main.storyboard in Resources */,

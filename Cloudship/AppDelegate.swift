@@ -15,7 +15,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+//        let launchedBefore = UserDefaults.standard.bool(forKey: "Units")
+//        if launchedBefore
+//        {
+//            print("Not first launch.")
+//        }
+//        else
+//        {
+//            print("First launch")
+//            UserDefaults.standard.set("units=us", forKey: "Units")
+//        }
+        
+        
+                if UserDefaults.standard.string(forKey: "Units") != nil {
+                    print("already have a default")
+                } else {
+                    UserDefaults.standard.set("units=us", forKey: "Units")
+                }
+
+        
+        
         return true
     }
 

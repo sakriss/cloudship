@@ -21,6 +21,7 @@ class SearchSearchTableView: UITableViewController {
 
 extension SearchSearchTableView : UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
+        
         let searchRequest = MKLocalSearchRequest()
         //searchRequest.naturalLanguageQuery = searchBar.text
         
@@ -33,7 +34,7 @@ extension SearchSearchTableView : UISearchResultsUpdating {
                 let longitude = response?.boundingRegion.center.longitude
                 
                 let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+//                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
                 //self.navigationItem.title = searchBar.text
                 
                 let geoCoder = CLGeocoder()

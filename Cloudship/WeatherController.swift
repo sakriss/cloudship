@@ -25,11 +25,12 @@ class WeatherController: Codable {
 //        return []
 //    }
     
-    func fetchWeatherInfo(latitude: Double, longitude: Double) {
+    func fetchWeatherInfo(latitude: Double, longitude: Double, units: String) {
+        //let units = "units=us"
         let baseURL = "https://api.darksky.net/forecast/f7bc7a2bca5a3df8d3492ec37f730f60/"
         
         //URLSession.shared.dataTask(with: URL(string: "https://api.darksky.net/forecast/f7bc7a2bca5a3df8d3492ec37f730f60/47.197882,-122.170778")!) { (data:Data?, response:URLResponse?, error:Error?) in
-        URLSession.shared.dataTask(with: URL(string: baseURL + ("\(latitude),\(longitude)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
+        URLSession.shared.dataTask(with: URL(string: baseURL + ("\(latitude),\(longitude)?\(units)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
             print(baseURL + ("\(latitude),\(longitude)"))
             if let data = data {
                 self.weather = ( try? JSONDecoder().decode(Weather.self, from: data)) 

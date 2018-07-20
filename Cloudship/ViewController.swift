@@ -11,7 +11,7 @@ import CoreLocation
 import MapKit
 
 class ViewController: UIViewController, UISearchBarDelegate {
-    
+    let defaults = UserDefaults.standard
     
     @IBAction func didTapCurrentlyContainer(_ sender: UITapGestureRecognizer) {
         print("tapped current condition view")
@@ -41,6 +41,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        var units = defaults.string(forKey: "Units")
+        
         searchTableView.tableFooterView = UIView()
         searchTableView.isHidden = true
         searchBar.delegate = self
@@ -117,6 +119,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchTableView.isHidden = true
+        var units = defaults.string(forKey: "Units")
         let searchRequest = MKLocalSearchRequest()
         searchRequest.naturalLanguageQuery = searchBar.text
         
@@ -130,7 +133,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let longitude = response?.boundingRegion.center.longitude
 
 //                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!)
+                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!, units: units!)
                 //self.navigationItem.title = searchBar.text
 
                 let geoCoder = CLGeocoder()
@@ -196,12 +199,12 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
+        var units = defaults.string(forKey: "Units")
         for location in locations {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
             
             lastLocation = location
-            WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude)
+            WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude, units: units!)
             
             let geocoder = CLGeocoder()
             geocoder.reverseGeocodeLocation(location) { (placemarks:[CLPlacemark]?, error: Error?) in
@@ -246,11 +249,12 @@ extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if searchTableView == tableView {
+            var units = defaults.string(forKey: "Units")
             let selectedSearchItem = matchingItems[indexPath.row].placemark
             let latitude = selectedSearchItem.coordinate.latitude
             let longitude = selectedSearchItem.coordinate.longitude
             
-            WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude)
+            WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude, units: units!)
             
             let geoCoder = CLGeocoder()
             let location = CLLocation(latitude: latitude, longitude: longitude)

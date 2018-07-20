@@ -13,6 +13,7 @@ class DailyViewController: UIViewController {
     
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     
+
     @IBOutlet weak var dailyForcastTableView: UITableView!
     @IBOutlet weak var dailySummaryLabel: UILabel!
     
@@ -43,8 +44,9 @@ extension DailyViewController: UITableViewDelegate {
         
         if indexPath.row == selectedRowIndex.row {
             if cellHeight == 115 {
-                return 180
+                return 185
             }
+            
         }
         return 115
     }
