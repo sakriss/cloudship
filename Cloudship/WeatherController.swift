@@ -18,13 +18,6 @@ class WeatherController: Codable {
     
     var weather: Weather?
     
-//    var weatherArray: [Weather] {
-//        if let theArray = weather {
-//            return [theArray]
-//        }
-//        return []
-//    }
-    
     func fetchWeatherInfo(latitude: Double, longitude: Double, units: String) {
         //let units = "units=us"
         let baseURL = "https://api.darksky.net/forecast/f7bc7a2bca5a3df8d3492ec37f730f60/"

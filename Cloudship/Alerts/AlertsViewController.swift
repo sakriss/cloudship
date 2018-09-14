@@ -43,16 +43,16 @@ extension AlertsViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
-        if let alertsTitle = dataPoint?.alerts?[0].title {
+        if let alertsTitle = dataPoint?.alerts?[indexPath.row].title {
             cell.alertTitleLabel.text = ("\u{26A0} ") + String(alertsTitle.uppercased()) + (" \u{26A0}")
 
         }
         
-        if let alertsSeverity = dataPoint?.alerts?[0].severity {
+        if let alertsSeverity = dataPoint?.alerts?[indexPath.row].severity {
                 cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
         }
         
-        if let alertsDescription = dataPoint?.alerts?[0].description {
+        if let alertsDescription = dataPoint?.alerts?[indexPath.row].description {
                 cell.alertDescriptionLabel.text = String(alertsDescription)
         }
 

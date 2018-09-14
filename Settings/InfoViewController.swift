@@ -46,8 +46,15 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         picker.dataSource = self
         picker.delegate = self
         
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            self.appVersionLabel.text = "   App Version \n   " + version
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+            var buildString = "   "
+//            self.appVersionLabel.text = "   App Version \n   " + version
+            buildString.append(version)
+            buildString.append(" (")
+            buildString.append(build)
+            buildString.append(")")
+            self.appVersionLabel.text = buildString
+            
         }
         
         picker.isHidden = true

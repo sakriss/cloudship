@@ -310,17 +310,17 @@ extension ViewController: UITableViewDataSource {
                 cell.currentConditionLabel.text = currentCondition
         }
         
-        if let highTemp = dataPoint?.daily?.data?[0].temperatureMax {
+        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax {
             let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        if let lowTemp = dataPoint?.daily?.data?[0].temperatureLow {
+        if let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
             let newLowTemp = String(format: "%.0f", lowTemp)
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
         }
         
-        if let currentSummary = dataPoint?.daily?.data?[0].summary {
+        if let currentSummary = dataPoint?.daily?.data?[indexPath.row].summary {
                 cell.minutelyLookingAheadLabel.text = String(currentSummary)
         }
         
@@ -328,7 +328,7 @@ extension ViewController: UITableViewDataSource {
                 cell.currentSummaryLabel.text = lookingAhead
         }
 
-        if let alertsActive = dataPoint?.alerts?[0] {
+        if let alertsActive = dataPoint?.alerts?[indexPath.row] {
             print(alertsActive)
                 cell.alertViewContainer.isHidden = false
         }
