@@ -82,23 +82,21 @@ extension DailyViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
-        let dailyTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
+        let dailyTime = Date(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
         
         let dateString = "\(dailyTime)" // the date string to be parsed
-        let df1 = DateFormatter()
-        df1.locale = Locale(identifier: "en_US_POSIX")
-        df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-        if let date = df1.date(from: dateString) {
-            let format = "EEEE, MMMM d"
-            let df2 = DateFormatter()
-            df2.dateFormat = format
-            //df2.dateStyle = .full
-            let string = df2.string(from: date)
-            DispatchQueue.main.async {
-                cell.dayOfWeekLabel.text = string
-            }
-        } else {
-            print("Unable to parse date string")
+        let dateFormatterGet = DateFormatter()
+        dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss +zzzz"
+
+        let dateFormatterPrint = DateFormatter()
+        dateFormatterPrint.dateFormat = "EEEE, MMMM d"
+        dateFormatterPrint.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatterPrint.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
+        
+        let date: Date? = dateFormatterGet.date(from: dateString)
+        print(dateFormatterPrint.string(from: date!))
+        DispatchQueue.main.async {
+            cell.dayOfWeekLabel.text = dateFormatterPrint.string(from: date!)
         }
         
         if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {

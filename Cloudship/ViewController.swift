@@ -30,6 +30,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     var nearestStorm = 0.0
     
     private let refreshControl = UIRefreshControl()
+    private let sharedDefaults = UserDefaults(suiteName: "group.happygiraffe.Cloudship-test")
     
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
@@ -179,6 +180,55 @@ class ViewController: UIViewController, UISearchBarDelegate {
 
             self.refreshControl.endRefreshing()
         }
+        
+        let dataPoint = WeatherController.shared.weather
+        
+        if let currentTemp = dataPoint?.currently?.temperature {
+            let formattedTemp = String(format: "%.0f", currentTemp)
+            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
+        }
+        
+        if let currentSummary = dataPoint?.minutely?.summary {
+            sharedDefaults?.set(currentSummary, forKey: "currentSummary")
+        }
+        
+        let conditionIcon = dataPoint?.currently?.icon
+        switch conditionIcon {
+        case "partly-cloudy-day":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "partly-cloudy-night":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "cloudy":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "clear-day":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "clear-night":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "rain":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "snow":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "sleet":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "wind":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        case "fog":
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+            
+        default:
+            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        }
+            
+        
         if let nearestStormDistance = WeatherController.shared.weather?.currently?.nearestStormDistance {
             nearestStorm = nearestStormDistance
         }
