@@ -47,9 +47,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         picker.delegate = self
         
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-            var buildString = "   "
+            var buildString = "   Application version\n"
 //            self.appVersionLabel.text = "   App Version \n   " + version
-            buildString.append(version)
+            buildString.append("   " + version)
             buildString.append(" (")
             buildString.append(build)
             buildString.append(")")
