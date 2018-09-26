@@ -10,8 +10,14 @@ import UIKit
 
 class MinutelyViewController: UIViewController {
     
+    //--------------------------------------------------------------------------
+    // MARK: - Outlets
+    //--------------------------------------------------------------------------
     @IBOutlet weak var minutelyTableView: UITableView!
     
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -22,6 +28,9 @@ class MinutelyViewController: UIViewController {
 
 }
 
+//--------------------------------------------------------------------------
+// MARK: - TableView Data Source
+//--------------------------------------------------------------------------
 extension MinutelyViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

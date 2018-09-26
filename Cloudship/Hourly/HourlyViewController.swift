@@ -9,9 +9,15 @@
 import UIKit
 
 class HourlyViewController: UIViewController {
-
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Outlets
+    //--------------------------------------------------------------------------
     @IBOutlet weak var hourlyTableView: UITableView!
     
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,6 +26,10 @@ class HourlyViewController: UIViewController {
     }
 
 }
+
+//--------------------------------------------------------------------------
+// MARK: - TableView Datasource
+//--------------------------------------------------------------------------
 
 extension HourlyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

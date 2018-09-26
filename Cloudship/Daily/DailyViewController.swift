@@ -11,12 +11,22 @@ import UIKit
 class DailyViewController: UIViewController {
 
     
-    var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     
-
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Outlets
+    //--------------------------------------------------------------------------
     @IBOutlet weak var dailyForcastTableView: UITableView!
     @IBOutlet weak var dailySummaryLabel: UILabel!
     
+    //--------------------------------------------------------------------------
+    // MARK: - Variables
+    //--------------------------------------------------------------------------
+    var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
+    
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -29,6 +39,10 @@ class DailyViewController: UIViewController {
     }
     
 }
+
+//--------------------------------------------------------------------------
+// MARK: - Tableview Delegate
+//--------------------------------------------------------------------------
 
 extension DailyViewController: UITableViewDelegate {
     
@@ -51,6 +65,10 @@ extension DailyViewController: UITableViewDelegate {
         return 115
     }
 }
+
+//--------------------------------------------------------------------------
+// MARK: - TableView Data Source
+//--------------------------------------------------------------------------
 
 extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

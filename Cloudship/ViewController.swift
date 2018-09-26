@@ -11,21 +11,33 @@ import CoreLocation
 import MapKit
 
 class ViewController: UIViewController, UISearchBarDelegate {
-    let defaults = UserDefaults.standard
+    
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Outlets
+    //--------------------------------------------------------------------------
     
     @IBOutlet var currentTempContainerTapRec: UITapGestureRecognizer!
+    @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var currentlyTableView: UITableView!
+    @IBOutlet weak var searchTableView: UITableView!
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Actions
+    //--------------------------------------------------------------------------
     
     @IBAction func searchForLocationButton(_ sender: Any) {
         navigationController?.isNavigationBarHidden = true
         searchTableView.isHidden = false
         searchBar.isHidden = false
     }
-    var searchActive : Bool = false
-    @IBOutlet weak var searchBar: UISearchBar!
-    @IBOutlet weak var currentlyTableView: UITableView!
-    @IBOutlet weak var searchTableView: UITableView!
-    var matchingItems:[MKMapItem] = []
     
+    //--------------------------------------------------------------------------
+    // MARK: - Variables
+    //--------------------------------------------------------------------------
+    let defaults = UserDefaults.standard
+    var searchActive : Bool = false
+    var matchingItems:[MKMapItem] = []
     var lastLocation: CLLocation? = nil
     var nearestStorm = 0.0
     
@@ -37,6 +49,9 @@ class ViewController: UIViewController, UISearchBarDelegate {
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
     
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -75,6 +90,9 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
     }
     
+    //--------------------------------------------------------------------------
+    // MARK: - Functions
+    //--------------------------------------------------------------------------
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchTableView.isHidden = true
         searchBar.isHidden = true
@@ -236,6 +254,9 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
 }
 
+//--------------------------------------------------------------------------
+// MARK: - Location Manager Delegate
+//--------------------------------------------------------------------------
 extension ViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -284,6 +305,10 @@ extension ViewController: CLLocationManagerDelegate {
     }
 }
 
+//--------------------------------------------------------------------------
+// MARK: - TableView Delegate
+//--------------------------------------------------------------------------
+
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if currentlyTableView == tableView {
@@ -328,6 +353,10 @@ extension ViewController: UITableViewDelegate {
     
 
 }
+
+//--------------------------------------------------------------------------
+// MARK: - TableView Data Source
+//--------------------------------------------------------------------------
 
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -430,6 +459,9 @@ extension ViewController: UITableViewDataSource {
     
 }
 
+//--------------------------------------------------------------------------
+// MARK: - Collection View Data Source
+//--------------------------------------------------------------------------
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 7

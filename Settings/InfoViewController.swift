@@ -7,21 +7,39 @@
 //
 
 import UIKit
+import MessageUI
 
-class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, MFMailComposeViewControllerDelegate {
+
+    //--------------------------------------------------------------------------
+    // MARK: - Outlets
+    //--------------------------------------------------------------------------
     @IBOutlet weak var appVersionLabel: UILabel!
     @IBOutlet weak var picker: UIPickerView!
     @IBOutlet weak var unitsLabel: UILabel!
     @IBOutlet var unitsTapRec: UITapGestureRecognizer!
     
+    //--------------------------------------------------------------------------
+    // MARK: - Variables
+    //--------------------------------------------------------------------------
+    
     let units = ["USA (Fahenheit, miles, mph)", "SI (Celsius, km, m/s)"]
     let defaults = UserDefaults.standard
     var unitsSelected: String = ""
     
-    
-    @IBAction func emailUsButton(_ sender: UIButton) {
-        
+    //--------------------------------------------------------------------------
+    // MARK: - Actions
+    //--------------------------------------------------------------------------
+    @IBAction func emailButton(_ sender: UIButton) {
+        if MFMailComposeViewController.canSendMail() {
+            print("Should send email")
+            sendEmail()
+        } else {
+            showSendMailErrorAlert()
+            print("Mail services are not available")
+        }
     }
+    
     @IBAction func poweredByDarkSkyLinkButton(_ sender: UIButton) {
         if let url = NSURL(string: "https://darksky.net/poweredby/"){
             UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
@@ -37,6 +55,10 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     
     @IBAction func termsOfServiceButton(_ sender: UIButton) {
     }
+    
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +88,48 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         // Do any additional setup after loading the view.
     }
     
+    //--------------------------------------------------------------------------
+    // MARK: - Functions
+    //--------------------------------------------------------------------------
+    
+    func sendEmail () {
+        let mailComposerVC = MFMailComposeViewController()
+        mailComposerVC.mailComposeDelegate = self
+        
+        mailComposerVC.setToRecipients(["scottkriss@gmail.com"])
+        mailComposerVC.setSubject("Cloudship feedback")
+        mailComposerVC.setMessageBody("Feedback here please", isHTML: false)
+        
+        present(mailComposerVC, animated: true)
+        
+    }
+    
+    func showSendMailErrorAlert() {
+        let sendEmailErrorAlert = UIAlertController(title: "Could not send the Email", message: "Email is not set up on your device", preferredStyle: UIAlertControllerStyle.alert)
+        sendEmailErrorAlert.addAction(UIAlertAction(title: "DISMISS", style: UIAlertActionStyle.default, handler: nil))
+        UIApplication.shared.keyWindow?.rootViewController?.present(sendEmailErrorAlert, animated: true, completion: nil)
+    }
+    
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        switch result.rawValue {
+        case MFMailComposeResult.cancelled.rawValue:
+            print("Mail cancelled")
+        case MFMailComposeResult.saved.rawValue:
+            print("Mail saved")
+        case MFMailComposeResult.sent.rawValue:
+            print("Mail sent")
+        case MFMailComposeResult.failed.rawValue:
+            print("Mail sent failure: %@", [error?.localizedDescription])
+            showSendMailErrorAlert()
+        default:
+            break
+        }
+        self.dismiss(animated: true, completion: nil)
+//        controller.dismiss(animated: true, completion: nil)
+
+    }
+    
     func unitsToDisplay() {
         print(UserDefaults.standard.string(forKey: "Units")!)
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
@@ -80,6 +144,10 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         
         
     }
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Picker Setup
+    //--------------------------------------------------------------------------
     
     @objc func tapFunction() {
         picker.isHidden = false
