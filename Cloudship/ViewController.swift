@@ -65,7 +65,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = view.bounds
-        let alert = UIAlertController(title: nil, message: "Fetching weather...", preferredStyle: .alert)
+        let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
@@ -83,7 +83,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         let attributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
         refreshControl.tintColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
         refreshControl.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
-        refreshControl.attributedTitle = NSAttributedString(string: "Fetching New Weather Data...", attributes: attributes)
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh weather info...", attributes: attributes)
         refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
         

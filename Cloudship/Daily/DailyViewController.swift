@@ -10,9 +10,6 @@ import UIKit
 
 class DailyViewController: UIViewController {
 
-    
-    
-    
     //--------------------------------------------------------------------------
     // MARK: - Outlets
     //--------------------------------------------------------------------------
@@ -23,6 +20,7 @@ class DailyViewController: UIViewController {
     // MARK: - Variables
     //--------------------------------------------------------------------------
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
+    let dataPoint = WeatherController.shared.weather?.daily
     
     //--------------------------------------------------------------------------
     // MARK: - View Lifecycle
@@ -30,7 +28,7 @@ class DailyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let dailySummary = WeatherController.shared.weather?.daily?.summary {
+        if let dailySummary = dataPoint?.summary {
             dailySummaryLabel.text = dailySummary
         }
         
@@ -72,7 +70,7 @@ extension DailyViewController: UITableViewDelegate {
 
 extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (WeatherController.shared.weather?.daily?.data?.count)!
+        return (dataPoint?.data?.count)!
         
     }
     
