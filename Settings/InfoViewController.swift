@@ -26,6 +26,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     let units = ["USA (Fahenheit, miles, mph)", "SI (Celsius, km, m/s)"]
     let defaults = UserDefaults.standard
     var unitsSelected: String = ""
+    let appVersion:String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+    let appBuild:String = Bundle.main.infoDictionary?["CFBundleVersion"] as! String
+    var systemVersion = UIDevice.current.systemVersion
     
     //--------------------------------------------------------------------------
     // MARK: - Actions
@@ -94,11 +97,20 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     
     func sendEmail () {
         let mailComposerVC = MFMailComposeViewController()
+        var mailBodyFooter = ""
+        
+        mailBodyFooter.append("\n\n\n")
+        mailBodyFooter.append("Version: " + appVersion)
+        mailBodyFooter.append("\n")
+        mailBodyFooter.append("Build #: " + appBuild)
+        mailBodyFooter.append("\n")
+        mailBodyFooter.append("System Version: " + systemVersion)
+        
         mailComposerVC.mailComposeDelegate = self
         
         mailComposerVC.setToRecipients(["scottkriss@gmail.com"])
         mailComposerVC.setSubject("Cloudship feedback")
-        mailComposerVC.setMessageBody("Feedback here please", isHTML: false)
+        mailComposerVC.setMessageBody(mailBodyFooter, isHTML: false)
         
         present(mailComposerVC, animated: true)
         

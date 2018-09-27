@@ -12,7 +12,6 @@ import MapKit
 
 class ViewController: UIViewController, UISearchBarDelegate {
     
-    
     //--------------------------------------------------------------------------
     // MARK: - Outlets
     //--------------------------------------------------------------------------
