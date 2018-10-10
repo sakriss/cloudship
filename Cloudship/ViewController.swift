@@ -77,6 +77,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
+        locationManager.requestAlwaysAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
         
@@ -251,6 +252,14 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "currentlyToRadarSegue", let vc = segue.destination as? RadarViewController {
+            if let userLoc = lastLocation {
+                vc.userLocation = userLoc
+            }
+        }
+    }
+    
 }
 
 //--------------------------------------------------------------------------
@@ -260,7 +269,7 @@ extension ViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.locationAuthStatus = status
-        if status == .authorizedWhenInUse {
+        if status == .authorizedAlways {
             print("We can now get your location")
             manager.requestLocation()
         }

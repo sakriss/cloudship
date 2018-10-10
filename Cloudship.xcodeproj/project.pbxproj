@@ -36,6 +36,7 @@
 		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
 		1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAC20BF5555006FF7F5 /* Gif.swift */; };
 		1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */; };
+		16695922215EAF60002BC386 /* RadarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16695921215EAF60002BC386 /* RadarViewController.swift */; };
 		167E38222151F799000ADA23 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16C52241214C4C9D007F9935 /* MainInterface.storyboard */; };
 		167E38232151F89B000ADA23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 162DC60B2020FAAB00C19DCE /* Assets.xcassets */; };
 		168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168C8CF820C255A800D0413C /* AlertsViewController.swift */; };
@@ -104,6 +105,7 @@
 		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
 		1646BDAC20BF5555006FF7F5 /* Gif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gif.swift; sourceTree = "<group>"; };
 		1646BDAE20BF7A28006FF7F5 /* MinutelyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutelyTableViewCell.swift; sourceTree = "<group>"; };
+		16695921215EAF60002BC386 /* RadarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarViewController.swift; sourceTree = "<group>"; };
 		167E3821215008EF000ADA23 /* TodayExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TodayExtension.entitlements; sourceTree = "<group>"; };
 		168C8CF820C255A800D0413C /* AlertsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsViewController.swift; sourceTree = "<group>"; };
 		168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsTableViewCell.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				162DC6062020FAAB00C19DCE /* ViewController.swift */,
 				16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */,
 				161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */,
+				16695921215EAF60002BC386 /* RadarViewController.swift */,
 				162DC6082020FAAB00C19DCE /* Main.storyboard */,
 				162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
 				162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
@@ -412,6 +415,7 @@
 				1620610C20AF66B1004E00BD /* MinutelyData.swift in Sources */,
 				162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */,
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
+				16695922215EAF60002BC386 /* RadarViewController.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
 				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
 				161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */,
