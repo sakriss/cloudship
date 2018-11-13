@@ -62,13 +62,19 @@ extension SearchSearchTableView : UISearchResultsUpdating {
 
 extension SearchSearchTableView {
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return matchingItems.count
+        return matchingItems.count + 1
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
         let selectedItem = matchingItems[indexPath.row].placemark
-        cell.textLabel?.text = selectedItem.name
+        
+        if indexPath.row < matchingItems.count {
+            cell.textLabel?.text = selectedItem.name
+        } else {
+            cell.textLabel?.text = "Home"
+        }
+        
 //        cell.detailTextLabel?.text = parseAddress(selectedItem)
         return cell
     }
