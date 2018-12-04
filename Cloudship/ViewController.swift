@@ -29,6 +29,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         navigationController?.isNavigationBarHidden = true
         searchTableView.isHidden = false
         searchBar.isHidden = false
+        searchTableView.reloadData()
     }
     
     //--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     var searchActive : Bool = false
     var matchingItems:[MKMapItem] = []
     var lastLocation: CLLocation? = nil
+    var lastLocationString: String = ""
     var nearestStorm = 0.0
     
     private let refreshControl = UIRefreshControl()
@@ -47,6 +49,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
+    
+    var homeLocationTitle = NSMutableAttributedString(string: "---Current Location---")
     
     //--------------------------------------------------------------------------
     // MARK: - View Lifecycle
@@ -269,7 +273,7 @@ extension ViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.locationAuthStatus = status
-        if status == .authorizedAlways {
+        if status == .authorizedWhenInUse {
             print("We can now get your location")
             manager.requestLocation()
         }
@@ -300,6 +304,7 @@ extension ViewController: CLLocationManagerDelegate {
 //                        addressString.append(placemark.administrativeArea ?? "")
                         
                         self.navigationItem.title = addressString
+                        self.lastLocationString = addressString
 
                     }
                 }
@@ -331,9 +336,19 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if searchTableView == tableView {
             var units = defaults.string(forKey: "Units")
-            let selectedSearchItem = matchingItems[indexPath.row].placemark
-            let latitude = selectedSearchItem.coordinate.latitude
-            let longitude = selectedSearchItem.coordinate.longitude
+            
+            let latitude: Double
+            let longitude: Double
+            
+            if indexPath.row < matchingItems.count {
+                let selectedSearchItem = matchingItems[indexPath.row].placemark
+                latitude = selectedSearchItem.coordinate.latitude
+                longitude = selectedSearchItem.coordinate.longitude
+            }else {
+
+                latitude = (lastLocation?.coordinate.latitude)!
+                longitude = (lastLocation?.coordinate.longitude)!
+            }
             
             WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude, units: units!)
             
@@ -372,7 +387,7 @@ extension ViewController: UITableViewDataSource {
             return 1
         }
         if tableView == searchTableView {
-            return matchingItems.count
+            return matchingItems.count + 1
         }
         return 1
     }
@@ -455,10 +470,16 @@ extension ViewController: UITableViewDataSource {
         }else if tableView == searchTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "SearchTableViewCell", for: indexPath) as? SearchTableViewCell else {
                 return UITableViewCell()
-            } 
-            let selectedItem = matchingItems[indexPath.row].placemark
-            cell.searchTitleLabel?.text = selectedItem.name
-            cell.searchDetailsLabel?.text = selectedItem.title
+            }
+            if indexPath.row < matchingItems.count {
+                let selectedItem = matchingItems[indexPath.row].placemark
+                cell.searchTitleLabel?.text = selectedItem.name
+                cell.searchDetailsLabel?.text = selectedItem.title
+            }else {
+                cell.searchTitleLabel.attributedText = homeLocationTitle
+                cell.searchDetailsLabel.text = lastLocationString
+                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
+            }
             returnedCell = cell
         }
         return returnedCell
