@@ -98,10 +98,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     // MARK: - Functions
     //--------------------------------------------------------------------------
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchTableView.isHidden = true
-        searchBar.isHidden = true
-        UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-        navigationController?.isNavigationBarHidden = false
+        clearSearchResults()
     }
     
     
@@ -174,9 +171,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 })
                 
             }
-            self.searchBar.isHidden = true
-            UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-            self.navigationController?.isNavigationBarHidden = false
+            self.clearSearchResults()
         }
         
     }
@@ -264,6 +259,22 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
     }
     
+    @objc func handleTap(gestureRecognizer: UIGestureRecognizer)
+    {
+        
+        print("Tapped")
+    }
+    func clearSearchResults(){
+        
+        self.matchingItems.removeAll()
+        self.searchTableView.reloadData()
+        self.searchBar.text = ""
+        self.searchBar.isHidden = true
+        UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+        navigationController?.isNavigationBarHidden = false
+        searchTableView.isHidden = true
+
+    }
 }
 
 //--------------------------------------------------------------------------
@@ -367,12 +378,19 @@ extension ViewController: UITableViewDelegate {
                     }
                 }
             })
-            self.searchBar.isHidden = true
-            UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-            navigationController?.isNavigationBarHidden = false
-            searchTableView.isHidden = true
+            clearSearchResults()
+            
         }
     }
+    
+//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        if searchTableView == tableView {
+//            return "Last Location " + lastLocationString
+//        }
+//        else{
+//            return nil
+//        }
+//    }
     
 
 }
