@@ -101,6 +101,11 @@ class ViewController: UIViewController, UISearchBarDelegate {
         clearSearchResults()
     }
     
+//    func handleTap(gestureRecognizer: UIGestureRecognizer) {
+//        let alertController = UIAlertController(title: nil, message: "You tapped at \(gestureRecognizer.location(in: self.view))", preferredStyle: .alert)
+//        alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { _ in }))
+//        self.present(alertController, animated: true, completion: nil)
+//    }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let searchRequest = MKLocalSearchRequest()
@@ -264,6 +269,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
         print("Tapped")
     }
+    
     func clearSearchResults(){
         
         self.matchingItems.removeAll()
@@ -481,7 +487,19 @@ extension ViewController: UITableViewDataSource {
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         }
-    
+            
+            cell.dailyButton.layer.cornerRadius = 7
+            cell.dailyButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
+            cell.dailyButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
+            
+            cell.hourlyButton.layer.cornerRadius = 7
+            cell.hourlyButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
+            cell.hourlyButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
+            
+            cell.radarButton.layer.cornerRadius = 7
+            cell.radarButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
+            cell.radarButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
+            
         cell.lookingAheadCollectionView.reloadData()
             
         returnedCell = cell

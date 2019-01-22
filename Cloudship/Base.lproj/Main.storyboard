@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="g6E-bh-wj0">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="g6E-bh-wj0">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -113,7 +113,7 @@
                                                     </connections>
                                                 </collectionView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jly-ve-yUo">
-                                                    <rect key="frame" x="16" y="0.0" width="35" height="30"/>
+                                                    <rect key="frame" x="16" y="10" width="35" height="30"/>
                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                                     <state key="normal" title="Daily">
                                                         <color key="titleColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -123,7 +123,7 @@
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iHQ-yS-fh4">
-                                                    <rect key="frame" x="317" y="0.0" width="42" height="30"/>
+                                                    <rect key="frame" x="317" y="10" width="42" height="30"/>
                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                                     <state key="normal" title="Radar">
                                                         <color key="titleColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -219,7 +219,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1w0-v6-eMH">
-                                                    <rect key="frame" x="98" y="423.5" width="178" height="55"/>
+                                                    <rect key="frame" x="98" y="429" width="178" height="55"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tiI-jI-KAK">
                                                             <rect key="frame" x="12.5" y="25" width="153" height="30"/>
@@ -247,7 +247,7 @@
                                                     </constraints>
                                                 </view>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5O0-Ep-bDj">
-                                                    <rect key="frame" x="164" y="0.0" width="47" height="30"/>
+                                                    <rect key="frame" x="164" y="10" width="47" height="30"/>
                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                                     <state key="normal" title="Hourly">
                                                         <color key="titleColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -265,12 +265,11 @@
                                                 <constraint firstAttribute="trailingMargin" secondItem="Mah-pD-5Hm" secondAttribute="trailing" id="8Kx-Gn-E1N"/>
                                                 <constraint firstItem="wOe-SM-AYQ" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" id="AGb-4f-EbF"/>
                                                 <constraint firstAttribute="trailing" secondItem="1w0-v6-eMH" secondAttribute="trailing" constant="99" id="B6K-G0-dvf"/>
-                                                <constraint firstItem="Jly-ve-yUo" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="CB7-ms-dN0"/>
+                                                <constraint firstItem="Jly-ve-yUo" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" constant="10" id="CB7-ms-dN0"/>
                                                 <constraint firstItem="wOe-SM-AYQ" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" constant="42" id="DeI-99-sGe"/>
                                                 <constraint firstItem="1w0-v6-eMH" firstAttribute="centerX" secondItem="GEe-6U-ovR" secondAttribute="centerX" id="Ksr-Uj-PiG"/>
                                                 <constraint firstItem="1w0-v6-eMH" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leading" constant="98" id="M2R-tE-ndK"/>
-                                                <constraint firstAttribute="bottom" secondItem="1w0-v6-eMH" secondAttribute="bottom" constant="21" id="NcM-5D-151"/>
-                                                <constraint firstItem="iHQ-yS-fh4" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="OYc-Qk-Q4i"/>
+                                                <constraint firstItem="iHQ-yS-fh4" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" constant="10" id="OYc-Qk-Q4i"/>
                                                 <constraint firstItem="Mah-pD-5Hm" firstAttribute="top" secondItem="9ef-Pe-bge" secondAttribute="bottom" constant="8" id="QwT-KV-rIn"/>
                                                 <constraint firstAttribute="trailing" secondItem="iHQ-yS-fh4" secondAttribute="trailing" constant="16" id="R1n-EM-dz7"/>
                                                 <constraint firstItem="Jly-ve-yUo" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leading" constant="16" id="UMW-xy-dWA"/>
@@ -279,11 +278,12 @@
                                                 <constraint firstItem="6Py-FL-SAU" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="aUI-TB-kbt"/>
                                                 <constraint firstItem="5O0-Ep-bDj" firstAttribute="centerX" secondItem="GEe-6U-ovR" secondAttribute="centerX" id="gUV-MN-fXO"/>
                                                 <constraint firstItem="EBM-zb-2To" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" id="iBt-ak-NwV"/>
-                                                <constraint firstItem="5O0-Ep-bDj" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" id="k7u-B2-btn"/>
+                                                <constraint firstItem="5O0-Ep-bDj" firstAttribute="top" secondItem="GEe-6U-ovR" secondAttribute="top" constant="10" id="k7u-B2-btn"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="wOe-SM-AYQ" secondAttribute="trailing" id="kmc-Ck-tNg"/>
                                                 <constraint firstItem="9ef-Pe-bge" firstAttribute="leading" secondItem="GEe-6U-ovR" secondAttribute="leadingMargin" constant="1" id="lW7-X9-gGg"/>
                                                 <constraint firstItem="EBM-zb-2To" firstAttribute="top" secondItem="wOe-SM-AYQ" secondAttribute="bottom" constant="100" id="lvW-6n-Wdz"/>
                                                 <constraint firstAttribute="bottom" secondItem="6Py-FL-SAU" secondAttribute="bottom" id="nU8-9O-zJR"/>
+                                                <constraint firstItem="1w0-v6-eMH" firstAttribute="top" secondItem="Mah-pD-5Hm" secondAttribute="bottom" constant="16" id="s8n-1o-7DD"/>
                                                 <constraint firstItem="9ef-Pe-bge" firstAttribute="top" secondItem="EBM-zb-2To" secondAttribute="bottom" constant="4" id="sSl-6z-LIZ"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -319,8 +319,8 @@
                                     <string>Title</string>
                                 </scopeButtonTitles>
                             </searchBar>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="3bc-og-6Yo">
-                                <rect key="frame" x="0.0" y="120" width="375" height="547"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="3bc-og-6Yo">
+                                <rect key="frame" x="0.0" y="120" width="375" height="102"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SearchTableViewCell" id="C8C-N7-ILM" customClass="SearchTableViewCell" customModule="Cloudship" customModuleProvider="target">
