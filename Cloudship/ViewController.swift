@@ -50,7 +50,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
     
-    var homeLocationTitle = NSMutableAttributedString(string: "---Current Location---")
+    var homeLocationTitle = NSMutableAttributedString(string: "---Last Location---")
     
     //--------------------------------------------------------------------------
     // MARK: - View Lifecycle
@@ -84,6 +84,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         locationManager.requestAlwaysAuthorization()
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFailed) , name: WeatherController.weatherDataParseFailed, object: nil)
         
         let attributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
         refreshControl.tintColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
@@ -253,6 +254,50 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
         if let nearestStormDistance = WeatherController.shared.weather?.currently?.nearestStormDistance {
             nearestStorm = nearestStormDistance
+        }
+    }
+    
+    @objc func weatherDataFailed () {
+        //now that data is parsed, we can display it
+        DispatchQueue.main.async {
+            self.dismiss(animated: false, completion: nil)
+            let alert = UIAlertController(title: "Error getting weather", message: "Please make sure you're connected to the internet and tap Try Again", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Try Again", style: .default, handler: { action in
+                switch action.style{
+                case .default:
+                    self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
+                        $0.removeFromSuperview()
+                    }
+                    self.refreshData(sender: AnyObject.self as AnyObject)
+                    let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
+                    let blurEffectView = UIVisualEffectView(effect: blurEffect)
+                    blurEffectView.frame = self.view.bounds
+                    let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
+                    let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+                    loadingIndicator.hidesWhenStopped = true
+                    loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+                    loadingIndicator.startAnimating()
+                    self.view.addSubview(blurEffectView)
+                    alert.view.addSubview(loadingIndicator)
+                    self.present(alert, animated: true, completion: nil)
+                    print("default")
+                    
+                case .cancel:
+                    print("cancel")
+                    
+                case .destructive:
+                    print("destructive")
+                    
+                    
+                }}))
+            self.present(alert, animated: true, completion: nil)
+//            self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
+//                $0.removeFromSuperview()
+//            }
+
+            self.currentlyTableView.reloadData()
+            
+            self.refreshControl.endRefreshing()
         }
     }
     
@@ -514,7 +559,7 @@ extension ViewController: UITableViewDataSource {
             }else {
                 cell.searchTitleLabel.attributedText = homeLocationTitle
                 cell.searchDetailsLabel.text = lastLocationString
-                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
+//                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
             }
             returnedCell = cell
         }

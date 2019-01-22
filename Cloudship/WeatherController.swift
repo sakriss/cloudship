@@ -15,6 +15,7 @@ class WeatherController: Codable {
     static let shared = WeatherController()
     
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
+    static let weatherDataParseFailed = Notification.Name("weatherDataParseFaild")
     
     var weather: Weather?
     
@@ -28,6 +29,9 @@ class WeatherController: Codable {
             if let data = data {
                 self.weather = ( try? JSONDecoder().decode(Weather.self, from: data)) 
                 NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
+            }else {
+                print("ERROR: \(error!)")
+                NotificationCenter.default.post(name: WeatherController.weatherDataParseFailed, object: nil)
             }
         }.resume()
     }
