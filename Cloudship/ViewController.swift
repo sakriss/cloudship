@@ -258,17 +258,25 @@ class ViewController: UIViewController, UISearchBarDelegate {
     }
     
     @objc func weatherDataFailed () {
-        //now that data is parsed, we can display it
+        //now that data fetch failed, do something about it
         DispatchQueue.main.async {
+            //dismiss the alert
             self.dismiss(animated: false, completion: nil)
-            let alert = UIAlertController(title: "Error getting weather", message: "Please make sure you're connected to the internet and tap Try Again", preferredStyle: .alert)
+            
+            //display the alert
+            let alert = UIAlertController(title: "Error gathering weather", message: "Please make sure you're connected to the internet and tap Try Again", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Try Again", style: .default, handler: { action in
                 switch action.style{
                 case .default:
+                    //remove the UIViews
                     self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
                         $0.removeFromSuperview()
                     }
+                    
+                    //initiate the refreshdata call
                     self.refreshData(sender: AnyObject.self as AnyObject)
+                    
+                    //blur the screen as fetch occurs
                     let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
                     let blurEffectView = UIVisualEffectView(effect: blurEffect)
                     blurEffectView.frame = self.view.bounds
