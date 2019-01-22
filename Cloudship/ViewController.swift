@@ -65,18 +65,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         searchBar.isHidden = true
         
-        //*** small alert on load with blur background ***/
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = view.bounds
-        let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
-        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-        loadingIndicator.hidesWhenStopped = true
-        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
-        loadingIndicator.startAnimating()
-        view.addSubview(blurEffectView)
-        alert.view.addSubview(loadingIndicator)
-        present(alert, animated: true, completion: nil)
+        loadingDataAnimation()
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -182,6 +171,23 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
     }
     
+    func loadingDataAnimation() {
+        
+        //*** small alert on load with blur background ***/
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = view.bounds
+        let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        loadingIndicator.startAnimating()
+        view.addSubview(blurEffectView)
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
+        
+    }
+    
     @objc func refreshData(sender:AnyObject) {
         DispatchQueue.main.async {
             self.refreshControl.beginRefreshing()
@@ -268,26 +274,16 @@ class ViewController: UIViewController, UISearchBarDelegate {
             alert.addAction(UIAlertAction(title: "Try Again", style: .default, handler: { action in
                 switch action.style{
                 case .default:
+                    
                     //remove the UIViews
                     self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
                         $0.removeFromSuperview()
                     }
-                    
-                    //initiate the refreshdata call
+
+                    //initiate the refreshdata call and start the animation
                     self.refreshData(sender: AnyObject.self as AnyObject)
-                    
-                    //blur the screen as fetch occurs
-                    let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
-                    let blurEffectView = UIVisualEffectView(effect: blurEffect)
-                    blurEffectView.frame = self.view.bounds
-                    let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
-                    let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-                    loadingIndicator.hidesWhenStopped = true
-                    loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
-                    loadingIndicator.startAnimating()
-                    self.view.addSubview(blurEffectView)
-                    alert.view.addSubview(loadingIndicator)
-                    self.present(alert, animated: true, completion: nil)
+                    self.loadingDataAnimation()
+
                     print("default")
                     
                 case .cancel:
