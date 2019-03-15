@@ -25,18 +25,16 @@ class AlertsViewController: UIViewController {
         self.alertsTableView.estimatedRowHeight = 150
         
     }
-    
-
 }
 
 //--------------------------------------------------------------------------
 // MARK: - TableView Delegate
 //--------------------------------------------------------------------------
-extension AlertsViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return alertsTableView.bounds.size.height
-    }
-}
+//extension AlertsViewController: UITableViewDelegate {
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return alertsTableView.bounds.size.height
+//    }
+//}
 
 //--------------------------------------------------------------------------
 // MARK: - TableView Data Source

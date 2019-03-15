@@ -2035,9 +2035,12 @@ Cg
                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="248" horizontalCompressionResistancePriority="749" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QQM-FU-tM1">
-                                                    <rect key="frame" x="15" y="56" width="345" height="19.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QQM-FU-tM1">
+                                                    <rect key="frame" x="15" y="56" width="345" height="67"/>
                                                     <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" id="0WN-qk-qIW"/>
+                                                    </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                     <nil key="highlightedColor"/>
@@ -2046,6 +2049,7 @@ Cg
                                             <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
                                                 <constraint firstItem="14V-of-rqQ" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leading" constant="15" id="52b-ia-BAR"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="QQM-FU-tM1" secondAttribute="bottom" constant="16" id="93u-uD-Gd4"/>
                                                 <constraint firstItem="LKi-ga-jxi" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leading" constant="15" id="9WD-Cr-TNo"/>
                                                 <constraint firstItem="LKi-ga-jxi" firstAttribute="top" secondItem="YCh-2P-vE3" secondAttribute="top" id="9dl-34-fXo"/>
                                                 <constraint firstAttribute="trailing" secondItem="LKi-ga-jxi" secondAttribute="trailing" constant="15" id="G3X-yH-wV6"/>
