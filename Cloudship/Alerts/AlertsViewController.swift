@@ -58,11 +58,12 @@ extension AlertsViewController: UITableViewDataSource {
         }
         
         if let alertsSeverity = dataPoint?.alerts?[indexPath.row].severity {
-                cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
+            cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
         }
         
         if let alertsDescription = dataPoint?.alerts?[indexPath.row].description {
-                cell.alertDescriptionLabel.text = String(alertsDescription)
+            let formattedDescription = alertsDescription.replacingOccurrences(of: "*", with: "\n\n*")
+            cell.alertDescriptionLabel.text = String(formattedDescription)
         }
 
         return cell
