@@ -17,6 +17,7 @@ class RadarViewController: UIViewController {
     var userLocation = CLLocation()
     let radarAPIKey = "028172b81ffd68d6beb18b4ccf434ad4"
     let radarBaseURL = "https://tile.openweathermap.org/map/precipitation_new/3/"
+    var fullRadarURLString = ""
     var tileConvertX = 0
     var tileConvertY = 0
 
@@ -38,6 +39,12 @@ class RadarViewController: UIViewController {
         let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
         
         mapView.setRegion(MKCoordinateRegion(center: center, span: span), animated: false)
+        let imageV = UIImageView(frame: CGRect(x: 90, y: 200, width: 200, height: 200))
+        imageV.layer.borderWidth = 5
+        imageV.layer.borderColor = UIColor.red.cgColor
+        imageV.dowloadFromServer(link: fullRadarURLString, contentMode: .scaleAspectFill)
+//        self.view.addSubview(imageV)
+        mapView.add(imageV)
         
         view.addSubview(mapView)
         
@@ -47,6 +54,10 @@ class RadarViewController: UIViewController {
         mapView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor).isActive = true
         mapView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor).isActive = true
         mapView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor).isActive = true
+    }
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        return tileRenderer
     }
     
     func buildRadarURL(radarBaseURL: String,radarAPIKey: String,userLocation: CLLocation) -> String {
@@ -63,13 +74,7 @@ class RadarViewController: UIViewController {
         radarURLString.append("?appid=")
         radarURLString.append(radarAPIKey)
         print(radarURLString)
-        
-        let imageV = UIImageView(frame: CGRect(x: 90, y: 200, width: 200, height: 200))
-        imageV.layer.borderWidth = 5
-        imageV.layer.borderColor = UIColor.red.cgColor
-        imageV.dowloadFromServer(link: radarURLString, contentMode: .scaleAspectFill)
-        self.view.addSubview(imageV)
-        
+        fullRadarURLString = radarURLString
         return radarURLString
     }
     
