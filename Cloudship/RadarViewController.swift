@@ -15,8 +15,10 @@ class RadarViewController: UIViewController {
     let mapView = MKMapView()
     let locationManager = CLLocationManager()
     var userLocation = CLLocation()
-    let radarAPIKey = "17e182c3ab5751f199d94e19c685ca11"
-    let radarBaseURL = "https://tile.openweathermap.org/map/precipitation/10/"
+    let radarAPIKey = "028172b81ffd68d6beb18b4ccf434ad4"
+    let radarBaseURL = "https://tile.openweathermap.org/map/precipitation_new/3/"
+    var tileConvertX = 0
+    var tileConvertY = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +53,9 @@ class RadarViewController: UIViewController {
         var radarURLString: String = ""
         let userLat = userLocation.coordinate.latitude
         let userLong = userLocation.coordinate.longitude
-        let userCoords = ("\(userLat)/\(userLong)")
+        
+        transformCoordinate(userLat, userLong, withZoom: 3)
+        let userCoords = ("\(tileConvertX)/\(tileConvertY)")
         
         radarURLString.append(radarBaseURL)
         radarURLString.append(userCoords)
@@ -59,10 +63,49 @@ class RadarViewController: UIViewController {
         radarURLString.append("?appid=")
         radarURLString.append(radarAPIKey)
         print(radarURLString)
+        
+        let imageV = UIImageView(frame: CGRect(x: 90, y: 200, width: 200, height: 200))
+        imageV.layer.borderWidth = 5
+        imageV.layer.borderColor = UIColor.red.cgColor
+        imageV.dowloadFromServer(link: radarURLString, contentMode: .scaleAspectFill)
+        self.view.addSubview(imageV)
+        
         return radarURLString
+    }
+    
+    func transformCoordinate(_ latitude: Double, _ longitude: Double, withZoom zoom: Int) -> (x: Int, y: Int) {
+        let tileX = Int(floor((longitude + 180) / 360.0 * pow(2.0, Double(zoom))))
+        let tileY = Int(floor((1 - log( tan( latitude * Double.pi / 180.0 ) + 1 / cos( latitude * Double.pi / 180.0 )) / Double.pi ) / 2 * pow(2.0, Double(zoom))))
+        
+        tileConvertX = tileX
+        tileConvertY = tileY
+        
+        return (tileX, tileY)
     }
 
 }
+
+extension UIImageView {
+    func dowloadFromServer(url: URL, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+        contentMode = mode
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard
+                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                let data = data, error == nil,
+                let image = UIImage(data: data)
+                else { return }
+            DispatchQueue.main.async() {
+                self.image = image
+            }
+            }.resume()
+    }
+    func dowloadFromServer(link: String, contentMode mode: UIViewContentMode = .scaleAspectFit) {
+        guard let url = URL(string: link) else { return }
+        dowloadFromServer(url: url, contentMode: mode)
+    }
+}
+
 
 extension RadarViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
