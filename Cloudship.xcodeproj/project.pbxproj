@@ -47,6 +47,7 @@
 		16C52247214C4C9D007F9935 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16C5223A214C4C9C007F9935 /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */; };
 		16F5BD832100010600A93A03 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16F5BD822100010600A93A03 /* Settings.bundle */; };
+		37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +118,9 @@
 		16C5224C214C566D007F9935 /* Cloudship.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Cloudship.entitlements; sourceTree = "<group>"; };
 		16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyTableViewCell.swift; sourceTree = "<group>"; };
 		16F5BD822100010600A93A03 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.debug.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.debug.xcconfig"; sourceTree = "<group>"; };
+		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +163,7 @@
 				16C5223E214C4C9D007F9935 /* TodayExtension */,
 				16C5223B214C4C9D007F9935 /* Frameworks */,
 				162DC6022020FAAB00C19DCE /* Products */,
+				248F29917683ABA8929D7DD8 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -260,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				16C5223C214C4C9D007F9935 /* NotificationCenter.framework */,
+				DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -275,6 +282,15 @@
 			path = TodayExtension;
 			sourceTree = "<group>";
 		};
+		248F29917683ABA8929D7DD8 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */,
+				EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -282,10 +298,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 162DC6132020FAAB00C19DCE /* Build configuration list for PBXNativeTarget "Cloudship" */;
 			buildPhases = (
+				E040A744487574F147EC7BAC /* [CP] Check Pods Manifest.lock */,
 				162DC5FD2020FAAB00C19DCE /* Sources */,
 				162DC5FE2020FAAB00C19DCE /* Frameworks */,
 				162DC5FF2020FAAB00C19DCE /* Resources */,
 				16C5224B214C4C9D007F9935 /* Embed App Extensions */,
+				B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */,
+				1665E0912243F59900CD9632 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -386,6 +405,84 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1665E0912243F59900CD9632 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "Shell /bin/sh\n\nbash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisCore.framework/strip-frameworks.sh\"\n\n";
+		};
+		B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Cloudship/Pods-Cloudship-frameworks.sh",
+				"${PODS_ROOT}/AerisWeather/lib/AerisCore.framework",
+				"${PODS_ROOT}/AerisWeather/lib/AerisCore.framework.dSYM",
+				"${PODS_ROOT}/AerisWeather/lib/AerisCoreUI.framework",
+				"${PODS_ROOT}/AerisWeather/lib/AerisCoreUI.framework.dSYM",
+				"${PODS_ROOT}/AerisWeather/lib/AerisWeatherKit.framework",
+				"${PODS_ROOT}/AerisWeather/lib/AerisWeatherKit.framework.dSYM",
+				"${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework",
+				"${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework.dSYM",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisCore.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/AerisCore.framework.dSYM",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisCoreUI.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/AerisCoreUI.framework.dSYM",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisWeatherKit.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/AerisWeatherKit.framework.dSYM",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisMapKit.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/AerisMapKit.framework.dSYM",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cloudship/Pods-Cloudship-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E040A744487574F147EC7BAC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Cloudship-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		162DC5FD2020FAAB00C19DCE /* Sources */ = {
@@ -580,6 +677,7 @@
 		};
 		162DC6142020FAAB00C19DCE /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -597,6 +695,7 @@
 		};
 		162DC6152020FAAB00C19DCE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

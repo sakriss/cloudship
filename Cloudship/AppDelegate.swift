@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AerisMapKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,6 +26,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            print("First launch")
 //            UserDefaults.standard.set("units=us", forKey: "Units")
 //        }
+        AerisWeather.start(withApiKey: "V76MVdozyJuAsvAg1Ogmf", secret: "aKDurkVGGnltWLVvniCSBSD9cFWIxlyaCD03YC0i")
+        
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//        window?.backgroundColor = UIColor.white
+//        window?.makeKeyAndVisible()
         
         
                 if UserDefaults.standard.string(forKey: "Units") != nil {
