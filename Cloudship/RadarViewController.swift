@@ -13,17 +13,25 @@ import AerisMapKit
 
 class RadarViewController: UIViewController {
     
+    //--------------------------------------------------------------------------
+    // MARK: - Variables
+    //--------------------------------------------------------------------------
     var weatherMap: AWFWeatherMap!
+    var mapView = MKMapView()
     var legendView: AWFLegendView!
     var timelineView: AWFTimelineView!
     let layer = AWFRasterMapLayer(layerType: .radar)
+    let config = AWFWeatherMapConfig()
     var userLocation = CLLocation()
+    let locationManager = CLLocationManager()
     
+    //--------------------------------------------------------------------------
+    // MARK: - View Lifecycle
+    //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // setup the weather map config
-        let config = AWFWeatherMapConfig()
+        locationManager.startUpdatingLocation()
+
         // make any changes to your configuration before creating the weather map instance...
         
         // create the weather map instance
@@ -31,18 +39,32 @@ class RadarViewController: UIViewController {
         weatherMap.addSource(forLayerType: .radar)
         weatherMap.delegate = self
         
-        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
-        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-//        weatherMap.setRegion(MKCoordinateRegion(center: center, span: span), animated: false)
-//        weatherMap
+        if let mapView = weatherMap.mapView as? MKMapView {
+            let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+            let span = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+            mapView.setRegion(MKCoordinateRegion(center: center, span: span), animated: false)
+            mapView.showsUserLocation = true
+        }
+        
+//        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+////        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//        let zoom: UInt = (weatherMap.weatherMapType == AWFWeatherMapType.apple) ? 8 : 7
+//        weatherMap.strategy.setCenter(center, zoomLevel: zoom, animated: true)
+//        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+//        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//
+//        mapView.setRegion(MKCoordinateRegion(center: center, span: span), animated: false)
+        
         view.addSubview(weatherMap.weatherMapView)
         
+        // Loading the legend in the map view
         legendView = AWFLegendView(frame: CGRect(x: 0, y: (self.navigationController?.navigationBar.frame.size.height)! + 10, width: view.frame.width, height: 80))
         legendView.addLegend(forLayerType: .radar)
         legendView.showsCloseIndicator = false
         legendView.delegate = self as? AWFLegendViewDelegate
         view.addSubview(legendView)
         
+        // Loading the timeline in the map view
         timelineView = AWFTimelineView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50.0))
         timelineView.delegate = self
         timelineView.startDate = weatherMap.timeline.fromTime
@@ -73,8 +95,9 @@ class RadarViewController: UIViewController {
         weatherMap.go(toTime: Date())
     }
     
+    //--------------------------------------------------------------------------
     // MARK: Control Handlers
-    
+    //--------------------------------------------------------------------------
     @objc func toggleAnimation(sender: Any) {
         if let btn = sender as? UIButton {
             if weatherMap.isAnimating || weatherMap.isLoadingAnimation {
@@ -85,6 +108,27 @@ class RadarViewController: UIViewController {
                 weatherMap.startAnimating()
             }
         }
+    }
+}
+
+extension RadarViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
+            manager.requestLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//        weatherMap.showsUserLocation = true
+
+        for location in locations {
+            print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
+            userLocation = location
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
     }
 }
 
@@ -160,6 +204,14 @@ extension RadarViewController: AWFWeatherMapDelegate {
 
         legendView.addLegend(forLayerType: .radar)
     }
+    
+//    func weatherMap(_ weatherMap: AWFWeatherMap, didChangeTo bounds: AWFMapCoordinateBounds) {
+//        AWFMapZoomLevelFromZoomScale(3)
+//        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+//        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//        MKCoordinateRegion(center: center, span: span)
+//
+//    }
     
     func weatherMap(_ weatherMap: AWFWeatherMap, didRemoveLayerForType layerType: AWFMapLayer) {
         legendView.removeLegend(forLayerType: .radar)
