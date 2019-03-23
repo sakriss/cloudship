@@ -39,6 +39,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     var searchActive : Bool = false
     var matchingItems:[MKMapItem] = []
     var lastLocation: CLLocation? = nil
+    var chosenLocation: CLLocation? = nil
     var lastLocationString: String = ""
     var nearestStorm = 0.0
     
@@ -307,7 +308,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "currentlyToRadarSegue", let vc = segue.destination as? RadarViewController {
-            if let userLoc = lastLocation {
+            if let userLoc = chosenLocation {
                 vc.userLocation = userLoc
             }
         }
@@ -351,6 +352,7 @@ extension ViewController: CLLocationManagerDelegate {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
             
             lastLocation = location
+            chosenLocation = location
             WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude, units: units!)
             
             let geocoder = CLGeocoder()
@@ -410,10 +412,14 @@ extension ViewController: UITableViewDelegate {
                 let selectedSearchItem = matchingItems[indexPath.row].placemark
                 latitude = selectedSearchItem.coordinate.latitude
                 longitude = selectedSearchItem.coordinate.longitude
+                let lastLoc = CLLocation(latitude: latitude, longitude: longitude)
+                chosenLocation = lastLoc
             }else {
 
                 latitude = (lastLocation?.coordinate.latitude)!
                 longitude = (lastLocation?.coordinate.longitude)!
+                let lastLoc = CLLocation(latitude: latitude, longitude: longitude)
+                chosenLocation = lastLoc
             }
             
             WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude, units: units!)
