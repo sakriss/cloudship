@@ -441,6 +441,8 @@
 				"${PODS_ROOT}/AerisWeather/lib/AerisWeatherKit.framework.dSYM",
 				"${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework",
 				"${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework.dSYM",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
@@ -454,6 +456,8 @@
 				"${DWARF_DSYM_FOLDER_PATH}/AerisWeatherKit.framework.dSYM",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AerisMapKit.framework",
 				"${DWARF_DSYM_FOLDER_PATH}/AerisMapKit.framework.dSYM",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

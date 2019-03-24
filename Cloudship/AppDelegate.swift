@@ -8,6 +8,7 @@
 
 import UIKit
 import AerisMapKit
+import GoogleMobileAds
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        window?.backgroundColor = UIColor.white
 //        window?.makeKeyAndVisible()
         
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         
                 if UserDefaults.standard.string(forKey: "Units") != nil {
                     print("already have a default")
