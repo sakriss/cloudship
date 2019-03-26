@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageUI
+import UserNotifications
 
 class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, MFMailComposeViewControllerDelegate {
 
@@ -29,6 +30,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     let appVersion:String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
     let appBuild:String = Bundle.main.infoDictionary?["CFBundleVersion"] as! String
     var systemVersion = UIDevice.current.systemVersion
+    var notificationGranted = false
     
     //--------------------------------------------------------------------------
     // MARK: - Actions
@@ -86,14 +88,51 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         let tap = UITapGestureRecognizer(target: self, action: #selector(InfoViewController.tapFunction))
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
-        
 
-        // Do any additional setup after loading the view.
+        registerLocal()
+        scheduleLocal()
     }
     
     //--------------------------------------------------------------------------
     // MARK: - Functions
     //--------------------------------------------------------------------------
+    @objc func registerLocal() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            if granted {
+                print("Yay!")
+            } else {
+                print("D'oh")
+            }
+        }
+    }
+    
+    func scheduleLocal() {
+        let center = UNUserNotificationCenter.current()
+        
+        let content = UNMutableNotificationContent()
+        let dataPoint = WeatherController.shared.weather
+        let dailyTemp = String(format: "%.0f", (dataPoint?.daily?.data?[0].temperatureMax)!)
+        let currentTemp = String(format: "%.0f", (dataPoint?.currently?.temperature)!)
+        
+        content.title = "Daily Forcast"
+        content.body = "Currently: " + String(currentTemp) + ". High Temp: " + String(dailyTemp)
+        content.categoryIdentifier = "DailyAlert"
+        content.sound = UNNotificationSound.default()
+        
+        
+        var dateComponents = DateComponents()
+//        dateComponents.calendar = Calendar.current
+        dateComponents.hour = 21
+        dateComponents.minute = 32
+        print(dateComponents)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
+        
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        center.add(request)
+    }
     
     func sendEmail () {
         let mailComposerVC = MFMailComposeViewController()

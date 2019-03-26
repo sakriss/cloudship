@@ -21,6 +21,7 @@ class RadarViewController: UIViewController {
     var legendView: AWFLegendView!
     var timelineView: AWFTimelineView!
     let layer = AWFRasterMapLayer(layerType: .radar)
+    var legendStyle = AWFLegendStyle()
     let config = AWFWeatherMapConfig()
     var userLocation = CLLocation()
     let locationManager = CLLocationManager()
@@ -47,7 +48,7 @@ class RadarViewController: UIViewController {
         }
         
 //        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
-////        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//        let span = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
 //        let zoom: UInt = (weatherMap.weatherMapType == AWFWeatherMapType.apple) ? 8 : 7
 //        weatherMap.strategy.setCenter(center, zoomLevel: zoom, animated: true)
 //        let center = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
