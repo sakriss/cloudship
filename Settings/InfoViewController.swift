@@ -22,7 +22,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
 //    @IBOutlet weak var alertTimePicker: UIDatePicker!
     @IBOutlet var alertTapRec: UITapGestureRecognizer!
     @IBOutlet weak var alertsLabel: UILabel!
-
+    @IBOutlet weak var alertsSwitch: UISwitch!
     @IBOutlet weak var pickerDoneTextView: UITextField!
     
     //--------------------------------------------------------------------------
@@ -36,6 +36,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     let appBuild:String = Bundle.main.infoDictionary?["CFBundleVersion"] as! String
     var systemVersion = UIDevice.current.systemVersion
     var notificationGranted = false
+    let center = UNUserNotificationCenter.current()
     let alertTimePicker = UIDatePicker()
     var alertHour = 0
     var alertMin = 0
@@ -69,6 +70,22 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     @IBAction func termsOfServiceButton(_ sender: UIButton) {
     }
     
+    @IBAction func alertsSwitch(_ sender: UISwitch) {
+        if alertsSwitch.isOn {
+            alertsSwitch.isOn = true
+            UserDefaults.standard.set(true, forKey: "switchState")
+            setUpAlertPicker()
+//            scheduleLocal()
+        } else {
+            alertsSwitch.isOn = false
+            UserDefaults.standard.set(false, forKey: "switchState")
+            center.removeAllPendingNotificationRequests()
+            alertsLabel.text = "   --"
+            defaults.set("   --", forKey: "alertStringDefault")
+        }
+    }
+    
+    
     //--------------------------------------------------------------------------
     // MARK: - View Lifecycle
     //--------------------------------------------------------------------------
@@ -77,6 +94,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         super.viewDidLoad()
         let alertString = UserDefaults.standard.string(forKey: "alertStringDefault")
         alertsLabel.text = alertString
+        
+        alertsSwitch.isOn = UserDefaults.standard.bool(forKey: "switchState")
         
         unitsToDisplay()
         unitsLabel.text = unitsSelected
@@ -101,10 +120,6 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.isUserInteractionEnabled = true
         
         setUpAlertPicker()
-//        alertTimePicker.isHidden = true
-//        let alertTap = UITapGestureRecognizer(target: self, action: #selector(InfoViewController.alertTapFunction))
-//        alertsLabel.addGestureRecognizer(alertTap)
-
         registerLocal()
     }
     
@@ -124,7 +139,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     }
     
     func setUpAlertPicker(){
-    //ToolBar
+        //ToolBar
         let toolbar = UIToolbar();
         toolbar.sizeToFit()
         //done button
@@ -173,7 +188,6 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
 
     
     func scheduleLocal() {
-        let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
         let content = UNMutableNotificationContent()
         let dataPoint = WeatherController.shared.weather
@@ -191,14 +205,12 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         content.body = forcastString
         content.categoryIdentifier = "DailyAlert"
         content.sound = UNNotificationSound.default()
-        
-        
+
         var dateComponents = DateComponents()
-//        dateComponents.calendar = Calendar.current
         dateComponents.hour = alertHour
         dateComponents.minute = alertMin
         print(dateComponents)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
 //        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
         
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
@@ -277,12 +289,12 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.isUserInteractionEnabled = true
     }
     
-    @objc func alertTapFunction() {
-        print("Alerts Lable Tapped")
-        alertTimePicker.isHidden = false
-        view.addSubview(alertTimePicker)
-        alertsLabel.isUserInteractionEnabled = true
-    }
+//    @objc func alertTapFunction() {
+//        print("Alerts Lable Tapped")
+//        alertTimePicker.isHidden = false
+//        view.addSubview(alertTimePicker)
+//        alertsLabel.isUserInteractionEnabled = true
+//    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1

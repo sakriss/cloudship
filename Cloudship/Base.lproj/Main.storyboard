@@ -1725,7 +1725,7 @@ Cg
                                 <rect key="frame" x="0.0" y="129" width="375" height="70"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="   Tap to set Daily Weather Alerts" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="d6F-Wb-dJS">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="21"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="318" height="21"/>
                                         <color key="backgroundColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <color key="textColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -1741,15 +1741,23 @@ Cg
                                             <outletCollection property="gestureRecognizers" destination="lqA-Ql-bI7" appends="YES" id="V92-5i-Fzw"/>
                                         </connections>
                                     </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6o5-br-rnc">
+                                        <rect key="frame" x="326" y="0.0" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="alertsSwitch:" destination="IpP-rb-Eiy" eventType="valueChanged" id="yke-8w-lWX"/>
+                                        </connections>
+                                    </switch>
                                 </subviews>
                                 <color key="backgroundColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
+                                    <constraint firstItem="6o5-br-rnc" firstAttribute="leading" secondItem="d6F-Wb-dJS" secondAttribute="trailing" constant="8" id="0xC-rk-ckW"/>
                                     <constraint firstAttribute="trailing" secondItem="QJU-l0-vX9" secondAttribute="trailing" id="4UO-Yj-myc"/>
                                     <constraint firstItem="QJU-l0-vX9" firstAttribute="leading" secondItem="FgE-ql-5zA" secondAttribute="leading" id="FkP-qb-f0D"/>
+                                    <constraint firstItem="6o5-br-rnc" firstAttribute="top" secondItem="FgE-ql-5zA" secondAttribute="top" id="QqL-Ie-A8f"/>
                                     <constraint firstItem="d6F-Wb-dJS" firstAttribute="top" secondItem="FgE-ql-5zA" secondAttribute="top" id="UQ8-VR-Q0n"/>
                                     <constraint firstItem="QJU-l0-vX9" firstAttribute="top" secondItem="d6F-Wb-dJS" secondAttribute="bottom" constant="8" id="XVd-Z1-8Kw"/>
                                     <constraint firstAttribute="height" constant="70" id="Z5l-3k-STt"/>
-                                    <constraint firstAttribute="trailing" secondItem="d6F-Wb-dJS" secondAttribute="trailing" id="Zk7-su-Tnz"/>
+                                    <constraint firstAttribute="trailing" secondItem="6o5-br-rnc" secondAttribute="trailing" id="c4M-xh-KZP"/>
                                     <constraint firstItem="d6F-Wb-dJS" firstAttribute="leading" secondItem="FgE-ql-5zA" secondAttribute="leading" id="zb7-Ox-gw4"/>
                                 </constraints>
                             </view>
@@ -1786,6 +1794,7 @@ Cg
                     <connections>
                         <outlet property="alertTapRec" destination="lqA-Ql-bI7" id="R3J-lV-6N7"/>
                         <outlet property="alertsLabel" destination="QJU-l0-vX9" id="jxm-Ch-gp2"/>
+                        <outlet property="alertsSwitch" destination="6o5-br-rnc" id="Aat-Sb-OdZ"/>
                         <outlet property="appVersionLabel" destination="vEH-5d-V0Y" id="1ZX-Jz-NEw"/>
                         <outlet property="picker" destination="mPk-9k-KR9" id="Ybb-44-FtG"/>
                         <outlet property="pickerDoneTextView" destination="d6F-Wb-dJS" id="lqe-mk-FX0"/>
