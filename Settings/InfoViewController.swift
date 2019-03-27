@@ -187,7 +187,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         forcastString.append(". ")
         forcastString.append(dailyOutlook!)
         
-        content.title = "Daily Forcast"
+        content.title = "Daily Forecast"
         content.body = forcastString
         content.categoryIdentifier = "DailyAlert"
         content.sound = UNNotificationSound.default()
