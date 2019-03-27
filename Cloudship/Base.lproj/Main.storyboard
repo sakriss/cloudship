@@ -1721,18 +1721,53 @@ Cg
                                     <constraint firstAttribute="height" constant="105" id="FSt-it-N1F"/>
                                 </constraints>
                             </pickerView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FgE-ql-5zA">
+                                <rect key="frame" x="0.0" y="129" width="375" height="70"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="   Tap to set Daily Weather Alerts" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="d6F-Wb-dJS">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="21"/>
+                                        <color key="backgroundColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                        <color key="textColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="   Weather alert set for: " textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QJU-l0-vX9">
+                                        <rect key="frame" x="0.0" y="29" width="191" height="21"/>
+                                        <gestureRecognizers/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.086274509799999996" green="0.16078431369999999" blue="0.33333333329999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="lqA-Ql-bI7" appends="YES" id="V92-5i-Fzw"/>
+                                        </connections>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.83529411760000005" green="0.86274509799999999" blue="0.90980392160000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="QJU-l0-vX9" secondAttribute="trailing" id="4UO-Yj-myc"/>
+                                    <constraint firstItem="QJU-l0-vX9" firstAttribute="leading" secondItem="FgE-ql-5zA" secondAttribute="leading" id="FkP-qb-f0D"/>
+                                    <constraint firstItem="d6F-Wb-dJS" firstAttribute="top" secondItem="FgE-ql-5zA" secondAttribute="top" id="UQ8-VR-Q0n"/>
+                                    <constraint firstItem="QJU-l0-vX9" firstAttribute="top" secondItem="d6F-Wb-dJS" secondAttribute="bottom" constant="8" id="XVd-Z1-8Kw"/>
+                                    <constraint firstAttribute="height" constant="70" id="Z5l-3k-STt"/>
+                                    <constraint firstAttribute="trailing" secondItem="d6F-Wb-dJS" secondAttribute="trailing" id="Zk7-su-Tnz"/>
+                                    <constraint firstItem="d6F-Wb-dJS" firstAttribute="leading" secondItem="FgE-ql-5zA" secondAttribute="leading" id="zb7-Ox-gw4"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="oTb-Ed-ytt" firstAttribute="top" secondItem="nKQ-87-mM8" secondAttribute="bottom" constant="8" id="1Vy-dW-mOT"/>
+                            <constraint firstItem="FgE-ql-5zA" firstAttribute="leading" secondItem="628-nP-lK2" secondAttribute="leading" id="3iT-6u-H2m"/>
                             <constraint firstItem="628-nP-lK2" firstAttribute="trailing" secondItem="vEH-5d-V0Y" secondAttribute="trailing" id="CPe-xJ-mRf"/>
                             <constraint firstItem="628-nP-lK2" firstAttribute="trailing" secondItem="4HH-KP-HkI" secondAttribute="trailing" id="G5f-YQ-dq2"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="bottom" secondItem="628-nP-lK2" secondAttribute="bottom" id="GUb-UP-YvJ"/>
+                            <constraint firstItem="FgE-ql-5zA" firstAttribute="top" secondItem="4HH-KP-HkI" secondAttribute="bottom" constant="8" id="HEh-qb-ccp"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="top" secondItem="dGd-7n-7lX" secondAttribute="bottom" constant="8" id="N97-XR-T6L"/>
                             <constraint firstItem="vEH-5d-V0Y" firstAttribute="top" secondItem="628-nP-lK2" secondAttribute="top" constant="8" id="OQb-ue-Rb7"/>
                             <constraint firstItem="mPk-9k-KR9" firstAttribute="trailing" secondItem="628-nP-lK2" secondAttribute="trailing" id="Vy2-Ua-xrs"/>
                             <constraint firstItem="mPk-9k-KR9" firstAttribute="leading" secondItem="628-nP-lK2" secondAttribute="leading" id="Xbt-VK-F81"/>
                             <constraint firstItem="4HH-KP-HkI" firstAttribute="top" secondItem="vEH-5d-V0Y" secondAttribute="bottom" constant="8" id="ZJm-GN-pde"/>
+                            <constraint firstItem="FgE-ql-5zA" firstAttribute="trailing" secondItem="628-nP-lK2" secondAttribute="trailing" id="aAO-8j-lSo"/>
                             <constraint firstItem="UyA-l2-oDo" firstAttribute="top" secondItem="u2h-Gt-FLW" secondAttribute="bottom" constant="8" id="bzm-2n-wc1"/>
                             <constraint firstItem="oTb-Ed-ytt" firstAttribute="centerX" secondItem="Z2y-DW-Nek" secondAttribute="centerX" id="cWL-eM-j6R"/>
                             <constraint firstItem="vEH-5d-V0Y" firstAttribute="leading" secondItem="628-nP-lK2" secondAttribute="leading" id="dDm-HW-VZn"/>
@@ -1749,14 +1784,18 @@ Cg
                         <viewLayoutGuide key="safeArea" id="628-nP-lK2"/>
                     </view>
                     <connections>
+                        <outlet property="alertTapRec" destination="lqA-Ql-bI7" id="R3J-lV-6N7"/>
+                        <outlet property="alertsLabel" destination="QJU-l0-vX9" id="jxm-Ch-gp2"/>
                         <outlet property="appVersionLabel" destination="vEH-5d-V0Y" id="1ZX-Jz-NEw"/>
                         <outlet property="picker" destination="mPk-9k-KR9" id="Ybb-44-FtG"/>
+                        <outlet property="pickerDoneTextView" destination="d6F-Wb-dJS" id="lqe-mk-FX0"/>
                         <outlet property="unitsLabel" destination="4HH-KP-HkI" id="qPy-8A-Cst"/>
                         <outlet property="unitsTapRec" destination="NFF-MV-7zr" id="7vW-En-Mj8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WEU-RZ-Pwh" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="NFF-MV-7zr"/>
+                <tapGestureRecognizer id="lqA-Ql-bI7"/>
             </objects>
             <point key="canvasLocation" x="80.799999999999997" y="-631.0344827586207"/>
         </scene>
