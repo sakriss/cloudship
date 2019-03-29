@@ -21,6 +21,7 @@ class DailyViewController: UIViewController {
     //--------------------------------------------------------------------------
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     let dataPoint = WeatherController.shared.weather?.daily
+    var isExpanded = false
     
     //--------------------------------------------------------------------------
     // MARK: - View Lifecycle
@@ -53,13 +54,18 @@ extension DailyViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let row = tableView.cellForRow(at: indexPath)
         let cellHeight = row?.bounds.height
+        let cell = tableView.cellForRow(at: indexPath) as? DailyTableViewCell
         
         if indexPath.row == selectedRowIndex.row {
             if cellHeight == 115 {
+                
+                cell?.dailyViewMoreLabel.text = "-"
                 return 185
             }
             
         }
+        cell?.dailyViewMoreLabel.text = "+"
+        
         return 115
     }
 }

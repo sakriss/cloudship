@@ -60,10 +60,22 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         }
     
     }
+    
     @IBAction func rateAppButton(_ sender: UIButton) {
-        //Add link to App Store for review
+        let appID = "1412122012"
+//        let urlStr = "itms-apps://itunes.apple.com/app/id\(appID)" // (Option 1) Open App Page
+        let urlStr = "itms-apps://itunes.apple.com/app/viewContentsUserReviews?id=\(appID)" // (Option 2) Open App Review Tab
+        
+        if let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
+        }
         
     }
+    
     @IBAction func privacyPolicyButton(_ sender: UIButton) {
     }
     

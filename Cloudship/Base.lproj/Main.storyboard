@@ -1835,10 +1835,10 @@ Cg
             </objects>
             <point key="canvasLocation" x="879" y="-1011"/>
         </scene>
-        <!--Daily Forcast-->
+        <!--Daily Forecast-->
         <scene sceneID="MbB-ej-PYS">
             <objects>
-                <viewController title="Daily Forcast" id="wsF-52-z12" customClass="DailyViewController" customModule="Cloudship" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Daily Forecast" id="wsF-52-z12" customClass="DailyViewController" customModule="Cloudship" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rpU-M7-6jF">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
