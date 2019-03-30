@@ -33,6 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        window?.backgroundColor = UIColor.white
 //        window?.makeKeyAndVisible()
         
+        UIApplication.shared.statusBarStyle = .lightContent
+        
         GADMobileAds.sharedInstance().start(completionHandler: nil)
         
                 if UserDefaults.standard.string(forKey: "Units") != nil {
