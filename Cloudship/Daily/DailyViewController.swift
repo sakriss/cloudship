@@ -33,7 +33,7 @@ class DailyViewController: UIViewController {
             dailySummaryLabel.text = dailySummary
         }
         
-        self.dailyForcastTableView.rowHeight = UITableViewAutomaticDimension
+        self.dailyForcastTableView.rowHeight = UITableView.automaticDimension
         self.dailyForcastTableView.estimatedRowHeight = 115
     }
     

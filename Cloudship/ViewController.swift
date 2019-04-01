@@ -48,7 +48,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     private let refreshControl = UIRefreshControl()
     private let sharedDefaults = UserDefaults(suiteName: "group.happygiraffe.Cloudship-test")
     
-    let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    let activityIndicator = UIActivityIndicatorView(style: .gray)
     
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
@@ -78,16 +78,16 @@ class ViewController: UIViewController, UISearchBarDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFailed) , name: WeatherController.weatherDataParseFailed, object: nil)
         
-        let attributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
+        let attributes = [NSAttributedString.Key.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
         refreshControl.tintColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
         refreshControl.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh weather info...", attributes: attributes)
-        refreshControl.addTarget(self, action: #selector(refreshData), for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshData), for: UIControl.Event.valueChanged)
         self.currentlyTableView.addSubview(refreshControl)
         
         // In this case, we instantiate the banner with desired ad size.
         bannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.adUnitID = "ca-app-pub-8795986379052808/6427921529"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
         
@@ -159,7 +159,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
 //    }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        let searchRequest = MKLocalSearchRequest()
+        let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
         
         let activeSearch = MKLocalSearch(request: searchRequest)
@@ -193,8 +193,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchTableView.isHidden = true
-        var units = defaults.string(forKey: "Units")
-        let searchRequest = MKLocalSearchRequest()
+        let units = defaults.string(forKey: "Units")
+        let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
         
         let activeSearch = MKLocalSearch(request: searchRequest)
@@ -235,13 +235,13 @@ class ViewController: UIViewController, UISearchBarDelegate {
     func loadingDataAnimation() {
         
         //*** small alert on load with blur background ***/
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.light)
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = view.bounds
         let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
         loadingIndicator.hidesWhenStopped = true
-        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        loadingIndicator.style = UIActivityIndicatorView.Style.gray
         loadingIndicator.startAnimating()
         view.addSubview(blurEffectView)
         alert.view.addSubview(loadingIndicator)
@@ -407,7 +407,7 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        var units = defaults.string(forKey: "Units")
+        let units = defaults.string(forKey: "Units")
         for location in locations {
             print("\(location.coordinate.latitude), \(location.coordinate.longitude)")
             
@@ -463,7 +463,7 @@ extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if searchTableView == tableView {
-            var units = defaults.string(forKey: "Units")
+            let units = defaults.string(forKey: "Units")
             
             let latitude: Double
             let longitude: Double

@@ -22,7 +22,7 @@ class SearchSearchTableView: UITableViewController {
 extension SearchSearchTableView : UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         
-        let searchRequest = MKLocalSearchRequest()
+        let searchRequest = MKLocalSearch.Request()
         //searchRequest.naturalLanguageQuery = searchBar.text
         
         let activeSearch = MKLocalSearch(request: searchRequest)

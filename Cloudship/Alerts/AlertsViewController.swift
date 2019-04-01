@@ -21,7 +21,7 @@ class AlertsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.alertsTableView.rowHeight = UITableViewAutomaticDimension
+        self.alertsTableView.rowHeight = UITableView.automaticDimension
         self.alertsTableView.estimatedRowHeight = 150
         
     }

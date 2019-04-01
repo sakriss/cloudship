@@ -21,7 +21,7 @@ class MinutelyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.minutelyTableView.rowHeight = UITableViewAutomaticDimension
+        self.minutelyTableView.rowHeight = UITableView.automaticDimension
         self.minutelyTableView.estimatedRowHeight = 80
     }
     

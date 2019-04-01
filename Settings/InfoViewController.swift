@@ -56,7 +56,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     
     @IBAction func poweredByDarkSkyLinkButton(_ sender: UIButton) {
         if let url = NSURL(string: "https://darksky.net/poweredby/"){
-            UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
+            UIApplication.shared.open(url as URL, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
         }
     
     }
@@ -68,7 +68,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         
         if let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
             } else {
                 UIApplication.shared.openURL(url)
             }
@@ -216,7 +216,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         content.title = "Daily Forecast"
         content.body = forcastString
         content.categoryIdentifier = "DailyAlert"
-        content.sound = UNNotificationSound.default()
+        content.sound = UNNotificationSound.default
 
         var dateComponents = DateComponents()
         dateComponents.hour = alertHour
@@ -251,8 +251,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     }
     
     func showSendMailErrorAlert() {
-        let sendEmailErrorAlert = UIAlertController(title: "Could not send the Email", message: "Email is not set up on your device", preferredStyle: UIAlertControllerStyle.alert)
-        sendEmailErrorAlert.addAction(UIAlertAction(title: "DISMISS", style: UIAlertActionStyle.default, handler: nil))
+        let sendEmailErrorAlert = UIAlertController(title: "Could not send the Email", message: "Email is not set up on your device", preferredStyle: UIAlertController.Style.alert)
+        sendEmailErrorAlert.addAction(UIAlertAction(title: "DISMISS", style: UIAlertAction.Style.default, handler: nil))
         UIApplication.shared.keyWindow?.rootViewController?.present(sendEmailErrorAlert, animated: true, completion: nil)
     }
     
@@ -337,4 +337,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
 
     }
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

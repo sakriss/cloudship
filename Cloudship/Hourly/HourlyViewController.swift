@@ -21,7 +21,7 @@ class HourlyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.hourlyTableView.rowHeight = UITableViewAutomaticDimension
+        self.hourlyTableView.rowHeight = UITableView.automaticDimension
         self.hourlyTableView.estimatedRowHeight = 80
     }
 
