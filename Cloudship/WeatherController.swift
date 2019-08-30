@@ -15,7 +15,7 @@ class WeatherController: Codable {
     static let shared = WeatherController()
     
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
-    static let weatherDataParseFailed = Notification.Name("weatherDataParseFaild")
+    static let weatherDataParseFailed = Notification.Name("weatherDataParseFailed")
     
     var weather: Weather?
     

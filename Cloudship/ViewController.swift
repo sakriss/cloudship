@@ -60,6 +60,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
     //--------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
 
         var units = defaults.string(forKey: "Units")
         
@@ -142,7 +144,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         view.addConstraint(NSLayoutConstraint(item: bannerView,
                                               attribute: .bottom,
                                               relatedBy: .equal,
-                                              toItem: bottomLayoutGuide,
+                                              toItem: view.safeAreaLayoutGuide.bottomAnchor,
                                               attribute: .top,
                                               multiplier: 1,
                                               constant: 0))
