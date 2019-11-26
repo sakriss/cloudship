@@ -75,7 +75,13 @@ class ViewController: UIViewController, UISearchBarDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
 //        locationManager.requestWhenInUseAuthorization()
-        locationManager.requestAlwaysAuthorization()
+         let authStatus = CLLocationManager.authorizationStatus()
+               
+               if authStatus == .notDetermined {
+                   locationManager.requestWhenInUseAuthorization()
+               } else {
+                   locationManager.requestLocation()
+               }
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFailed) , name: WeatherController.weatherDataParseFailed, object: nil)
@@ -402,7 +408,7 @@ extension ViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.locationAuthStatus = status
-        if status == .authorizedAlways {
+        if status == .authorizedWhenInUse {
             print("We can now get your location")
             manager.requestLocation()
         }

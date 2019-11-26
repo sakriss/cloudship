@@ -108,17 +108,18 @@ extension DailyViewController: UITableViewDataSource {
         
         let dateString = "\(dailyTime)" // the date string to be parsed
         let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss +zzzz"
+        dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        dateFormatterGet.locale = Locale(identifier: "en_US")
+        dateFormatterGet.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
 
+        if let date = dateFormatterGet.date(from: dateString) {
+        let format = "EEEE, MMMM d"
         let dateFormatterPrint = DateFormatter()
-        dateFormatterPrint.dateFormat = "EEEE, MMMM d"
-        dateFormatterPrint.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatterPrint.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
-        
-        let date: Date? = dateFormatterGet.date(from: dateString)
-        print(dateFormatterPrint.string(from: date!))
-        DispatchQueue.main.async {
-            cell.dayOfWeekLabel.text = dateFormatterPrint.string(from: date!)
+        dateFormatterPrint.dateFormat = format
+        let string = dateFormatterPrint.string(from: date)
+            cell.dayOfWeekLabel.text = string
+        } else {
+            print("Unable to parse date string")
         }
         
         if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {
