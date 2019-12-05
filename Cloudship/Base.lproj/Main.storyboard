@@ -1720,7 +1720,7 @@ Cg
                                     <constraint firstAttribute="height" constant="105" id="FSt-it-N1F"/>
                                 </constraints>
                             </pickerView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FgE-ql-5zA">
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FgE-ql-5zA">
                                 <rect key="frame" x="0.0" y="109" width="375" height="70"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="   Tap to set Daily Weather Alerts" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="d6F-Wb-dJS">

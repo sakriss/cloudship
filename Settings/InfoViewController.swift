@@ -281,14 +281,14 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
             if userDef == "units=us" {
                 unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
+                picker.selectRow(0, inComponent: 0, animated: false)
             }
             
             if userDef == "units=si" {
                 unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
+                picker.selectRow(1, inComponent: 0, animated: false)
             }
         }
-        
-        
     }
     
     //--------------------------------------------------------------------------
@@ -297,6 +297,15 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     
     @objc func tapFunction() {
         picker.isHidden = false
+        if let userDef = UserDefaults.standard.string(forKey: "Units") {
+            if userDef == "units=us" {
+                picker.selectRow(0, inComponent: 0, animated: false)
+            }
+            
+            if userDef == "units=si" {
+                picker.selectRow(1, inComponent: 0, animated: false)
+            }
+        }
         view.addSubview(picker)
         unitsLabel.isUserInteractionEnabled = true
     }
@@ -316,10 +325,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         return 2
     }
     
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        
-        return units[row]
-        
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        return NSAttributedString(string: units[row], attributes: [NSAttributedString.Key.foregroundColor : UIColor.darkText])
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
