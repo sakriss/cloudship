@@ -694,38 +694,27 @@ extension ViewController: UICollectionViewDataSource {
         let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
         switch conditionIcon {
         case "partly-cloudy-day":
-            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy-black.png")
         case "partly-cloudy-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudynight.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "cloudynight-black.png")
         case "cloudy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "cloudy-black.png")
         case "clear-day":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "sunny-black.png")
         case "clear-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "clearnight-black.png")
         case "rain":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "rain-black.png")
         case "snow":
-            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "snow-black.png")
         case "sleet":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "sleet-black.png")
         case "wind":
-            cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "windy-black.png")
         case "fog":
-            cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "fog-black.png")
         default:
             cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
-            
         }
         
         let percentFormatter = NumberFormatter()
