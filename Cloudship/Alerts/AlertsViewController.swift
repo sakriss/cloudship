@@ -56,12 +56,8 @@ extension AlertsViewController: UITableViewDataSource, UITableViewDelegate {
         cell.setURL(url: url)
         
         if let alertsTitle = dataPoint?.alerts?[indexPath.row].title {
-            cell.alertTitleLabel.text = ("\u{26A0} ") + String(alertsTitle.uppercased()) + (" \u{26A0}")
+            cell.alertTitleLabel.text = ("\u{1F6A8} ") + String(alertsTitle.uppercased()) + (" \u{1F6A8}")
 
-        }
-        
-        if let alertsSeverity = dataPoint?.alerts?[indexPath.row].severity {
-            cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
         }
         
         if let alertsDescription = dataPoint?.alerts?[indexPath.row].description {
@@ -110,6 +106,9 @@ extension AlertsViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+//--------------------------------------------------------------------------
+// MARK: - Alerts Cell Delegate
+//--------------------------------------------------------------------------
 extension AlertsViewController: AlertsCellDelegate {
     func didTapURLButton(url: String) {
         let alertsURL = URL(string: url)!

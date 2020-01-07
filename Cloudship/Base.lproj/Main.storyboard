@@ -2075,17 +2075,10 @@ Cg
                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="14V-of-rqQ">
-                                                    <rect key="frame" x="15" y="27" width="330" height="21"/>
-                                                    <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
-                                                    <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qfc-fX-v9Q">
-                                                    <rect key="frame" x="15" y="56" width="330" height="21"/>
+                                                    <rect key="frame" x="15" y="28" width="330" height="19.5"/>
                                                     <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -2100,14 +2093,14 @@ Cg
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r6C-Fc-cau">
-                                                    <rect key="frame" x="15" y="85" width="330" height="21"/>
+                                                    <rect key="frame" x="15" y="55.5" width="330" height="19.5"/>
                                                     <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
                                                     <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="krp-W6-BhA">
-                                                    <rect key="frame" x="15" y="105" width="130" height="30"/>
+                                                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="krp-W6-BhA">
+                                                    <rect key="frame" x="15" y="80" width="337" height="30"/>
                                                     <state key="normal" title="More Information..."/>
                                                     <connections>
                                                         <action selector="alertsURLButtonTapped:" destination="qQg-RZ-kpr" eventType="touchUpInside" id="mQc-BR-gB3"/>
@@ -2117,8 +2110,7 @@ Cg
                                             <color key="backgroundColor" red="0.47058823529999999" green="0.52941176469999995" blue="0.6705882353" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
                                                 <constraint firstItem="r6C-Fc-cau" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leadingMargin" id="2y0-eP-YrQ"/>
-                                                <constraint firstItem="14V-of-rqQ" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leading" constant="15" id="52b-ia-BAR"/>
-                                                <constraint firstItem="krp-W6-BhA" firstAttribute="top" secondItem="r6C-Fc-cau" secondAttribute="bottom" id="5m7-Xl-353"/>
+                                                <constraint firstItem="krp-W6-BhA" firstAttribute="top" secondItem="r6C-Fc-cau" secondAttribute="bottom" constant="8" id="3FD-01-e5b"/>
                                                 <constraint firstItem="krp-W6-BhA" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leadingMargin" id="8Uw-Fy-B3t"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="QQM-FU-tM1" secondAttribute="bottom" constant="16" id="93u-uD-Gd4"/>
                                                 <constraint firstItem="QQM-FU-tM1" firstAttribute="top" secondItem="krp-W6-BhA" secondAttribute="bottom" constant="8.5" id="94Y-W9-Hd1"/>
@@ -2127,20 +2119,18 @@ Cg
                                                 <constraint firstAttribute="trailingMargin" secondItem="r6C-Fc-cau" secondAttribute="trailing" constant="15" id="A4L-Hu-leR"/>
                                                 <constraint firstAttribute="trailing" secondItem="LKi-ga-jxi" secondAttribute="trailing" constant="15" id="G3X-yH-wV6"/>
                                                 <constraint firstItem="Qfc-fX-v9Q" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leadingMargin" id="JDE-nK-CKE"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="14V-of-rqQ" secondAttribute="trailing" constant="15" id="Y7e-rm-XRG"/>
-                                                <constraint firstItem="Qfc-fX-v9Q" firstAttribute="top" secondItem="14V-of-rqQ" secondAttribute="bottom" constant="8" id="aDJ-ZR-IYX"/>
-                                                <constraint firstItem="14V-of-rqQ" firstAttribute="top" secondItem="LKi-ga-jxi" secondAttribute="bottom" constant="6.5" id="aTe-nL-GhJ"/>
                                                 <constraint firstItem="QQM-FU-tM1" firstAttribute="leading" secondItem="YCh-2P-vE3" secondAttribute="leading" constant="15" id="bDN-st-Imv"/>
                                                 <constraint firstItem="r6C-Fc-cau" firstAttribute="top" secondItem="Qfc-fX-v9Q" secondAttribute="bottom" constant="8" id="cHq-rS-k1F"/>
+                                                <constraint firstItem="Qfc-fX-v9Q" firstAttribute="top" secondItem="LKi-ga-jxi" secondAttribute="bottom" constant="7.5" id="eA7-me-q5S"/>
                                                 <constraint firstItem="QQM-FU-tM1" firstAttribute="trailing" secondItem="YCh-2P-vE3" secondAttribute="trailing" constant="-15" id="fMw-ex-EZH"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="Qfc-fX-v9Q" secondAttribute="trailing" constant="15" id="jbg-Ba-uoS"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="krp-W6-BhA" secondAttribute="trailing" constant="8" id="pt6-Ub-NXF"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="alertDescriptionLabel" destination="QQM-FU-tM1" id="aXj-xM-Tdq"/>
                                             <outlet property="alertEffectiveTime" destination="Qfc-fX-v9Q" id="i0V-so-BUV"/>
                                             <outlet property="alertExpiresTime" destination="r6C-Fc-cau" id="pxT-JL-l0f"/>
-                                            <outlet property="alertSeverityLabel" destination="14V-of-rqQ" id="b6f-Et-S2t"/>
                                             <outlet property="alertTitleLabel" destination="LKi-ga-jxi" id="SVR-ZR-v4l"/>
                                             <outlet property="alertsMoreInfoButton" destination="krp-W6-BhA" id="EfI-QJ-Lrw"/>
                                         </connections>
