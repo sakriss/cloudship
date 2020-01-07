@@ -10,10 +10,10 @@ import UIKit
 
 class Alerts: Codable {
     private(set) var description: String = ""
-    private(set) var expires: Date?
+    private(set) var expires: Double?
     private(set) var regions: [String] = []
     private(set) var severity: String = ""
-    private(set) var time: Date?
+    private(set) var time: Double?
     private(set) var title: String = ""
     private(set) var uri: String = ""
 }
