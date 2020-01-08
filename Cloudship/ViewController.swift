@@ -581,7 +581,7 @@ extension ViewController: UITableViewDataSource {
             print(alertsActive)
             cell.alertViewContainer.isHidden = false
             if let alertCount = dataPoint?.alerts?.count {
-                cell.alertHeaderLabel.text = "⚠️ Active Alerts - \(alertCount) ⚠️"
+                cell.alertHeaderLabel.text = "⚠️ Active Alerts (\(alertCount)) ⚠️"
             }
         }
         
