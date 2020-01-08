@@ -287,6 +287,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
+                                            <outlet property="alertHeaderLabel" destination="H96-wB-aEL" id="zu4-M7-KC9"/>
                                             <outlet property="alertViewContainer" destination="1w0-v6-eMH" id="QJg-P5-qLi"/>
                                             <outlet property="backgroundAnimatedImage" destination="6Py-FL-SAU" id="6Oc-eV-48H"/>
                                             <outlet property="currentConditionLabel" destination="hqs-Ws-Wy3" id="khs-XY-g7W"/>

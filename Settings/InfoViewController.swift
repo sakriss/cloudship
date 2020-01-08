@@ -131,8 +131,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
         
-        setUpAlertPicker()
-        registerLocal()
+        //removing these until I get the alerts fixed
+//        setUpAlertPicker()
+//        registerLocal()
     }
     
     //--------------------------------------------------------------------------

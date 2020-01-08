@@ -579,7 +579,10 @@ extension ViewController: UITableViewDataSource {
 
         if let alertsActive = dataPoint?.alerts?[indexPath.row] {
             print(alertsActive)
-                cell.alertViewContainer.isHidden = false
+            cell.alertViewContainer.isHidden = false
+            if let alertCount = dataPoint?.alerts?.count {
+                cell.alertHeaderLabel.text = "⚠️ Active Alerts - \(alertCount) ⚠️"
+            }
         }
         
         //load animated gif
