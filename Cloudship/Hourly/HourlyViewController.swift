@@ -24,6 +24,11 @@ class HourlyViewController: UIViewController {
         self.hourlyTableView.rowHeight = UITableView.automaticDimension
         self.hourlyTableView.estimatedRowHeight = 80
     }
+    
+    //--------------------------------------------------------------------------
+    // MARK: - Variables
+    //--------------------------------------------------------------------------
+    let dataPointHourly = WeatherController.shared.climacellHourlyWeather
 
 }
 
@@ -33,7 +38,7 @@ class HourlyViewController: UIViewController {
 
 extension HourlyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (WeatherController.shared.weather?.hourly?.data?.count)!
+        return (dataPointHourly?.count)!
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -50,12 +55,13 @@ extension HourlyViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
-        let time = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
-        let dateString = "\(time)" // the date string to be parsed
+        let time = (dataPointHourly?[indexPath.row].observation_time?.value)!
+//        let dateString = "\(time)" // the date string to be parsed
         let df1 = DateFormatter()
         df1.locale = Locale(identifier: "en_US")
-        df1.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-        if let date = df1.date(from: dateString) {
+        df1.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+        df1.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        if let date = df1.date(from: time) {
             let format = "EEEE"
             let df2 = DateFormatter()
             df2.dateFormat = format
@@ -66,12 +72,13 @@ extension HourlyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        let hourlyTime = NSDate(timeIntervalSince1970: (dataPoint?.hourly?.data?[indexPath.row].time)!)
-        let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+        let hourlyTime = (dataPointHourly?[indexPath.row].observation_time?.value)!
+//        let dailyHourString = "\(hourlyTime)" // the date string to be parsed
         let df3 = DateFormatter()
         df3.locale = Locale(identifier: "en_US")
-        df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-        if let hour = df3.date(from: dailyHourString) {
+        df3.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+        df3.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        if let hour = df3.date(from: hourlyTime) {
             let format = "ha"
             let df4 = DateFormatter()
             df4.dateFormat = format
@@ -83,56 +90,80 @@ extension HourlyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.row].temperature {
+        if let hourlyTemp = dataPointHourly?[indexPath.row].temp?.value {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
                 cell.hourlyTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        let conditionIcon = dataPoint?.hourly?.data?[indexPath.row].icon
+        let conditionIcon = dataPointHourly?[indexPath.row].weather_code?.value
         switch conditionIcon {
-        case "partly-cloudy-day":
-                cell.conditionIconImage.image = UIImage(named: "mostlycloudy.png")
-
-        case "partly-cloudy-night":
-                cell.conditionIconImage.image = UIImage(named: "cloudynight.png")
-
+        case "partly_cloudy":
+            cell.conditionIconImage.image = UIImage(named: "mostlycloudy.png")
+            
+        case "mostly_cloudy":
+            cell.conditionIconImage.image = UIImage(named: "mostlycloudy.png")
+            
         case "cloudy":
-                cell.conditionIconImage.image = UIImage(named: "cloudy.png")
-
-        case "clear-day":
-                cell.conditionIconImage.image = UIImage(named: "sunny.png")
-
+            cell.conditionIconImage.image = UIImage(named: "cloudy.png")
+            
+        case "clear":
+            cell.conditionIconImage.image = UIImage(named: "sunny.png")
+        
+        case "mostly_clear":
+        cell.conditionIconImage.image = UIImage(named: "sunny.png")
+            
         case "clear-night":
-                cell.conditionIconImage.image = UIImage(named: "clearnight.png")
+            cell.conditionIconImage.image = UIImage(named: "clearnight.png")
             
         case "rain":
-                cell.conditionIconImage.image = UIImage(named: "rain.png")
+            cell.conditionIconImage.image = UIImage(named: "rain.png")
+            
+        case "rain_light":
+            cell.conditionIconImage.image = UIImage(named: "rain.png")
+            
+        case "rain_heavy":
+            cell.conditionIconImage.image = UIImage(named: "rain.png")
+            
+        case "drizzle":
+            cell.conditionIconImage.image = UIImage(named: "rain.png")
+            
+        case "snow_light":
+            cell.conditionIconImage.image = UIImage(named: "snow.png")
             
         case "snow":
-                cell.conditionIconImage.image = UIImage(named: "snow.png")
+            cell.conditionIconImage.image = UIImage(named: "snow.png")
             
-        case "sleet":
-                cell.conditionIconImage.image = UIImage(named: "sleet.png")
+        case "snow_heavy":
+            cell.conditionIconImage.image = UIImage(named: "snow.png")
+            
+        case "flurries":
+        cell.conditionIconImage.image = UIImage(named: "snow.png")
+            
+        case "freezing_rain":
+            cell.conditionIconImage.image = UIImage(named: "sleet.png")
             
         case "wind":
-                cell.conditionIconImage.image = UIImage(named: "wind.png")
+            cell.conditionIconImage.image = UIImage(named: "wind.png")
             
         case "fog":
-                cell.conditionIconImage.image = UIImage(named: "fog.png")
+            cell.conditionIconImage.image = UIImage(named: "fog.png")
+        
+        case "fog_light":
+        cell.conditionIconImage.image = UIImage(named: "fog.png")
             
         default:
-                cell.conditionIconImage.image = UIImage(named: "default.png")
-
+            cell.conditionIconImage.image = UIImage(named: "default.png")
+            
         }
         
         let percentFormatter = NumberFormatter()
         percentFormatter.numberStyle = .percent
         
-        if let precipChance = dataPoint?.hourly?.data?[indexPath.row].precipProbability {
-            cell.hourlyPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
+        if let precipChance = dataPointHourly?[indexPath.row].precipitation_probability?.value {
+            cell.hourlyPrecipLabel.text = String(format: "%.0f", precipChance) + "%"
         }
         
-        if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {
+        if let windBearingIcon = dataPointHourly?[indexPath.row].wind_direction?.value {
             
             switch windBearingIcon {
             case 0:
@@ -158,7 +189,7 @@ extension HourlyViewController: UITableViewDataSource {
             }
         }
         
-        if let windData = dataPoint?.hourly?.data?[indexPath.row].windSpeed {
+        if let windData = dataPointHourly?[indexPath.row].wind_speed?.value {
             cell.hourlyWindLabel.text = String(format: "%.1f", windData)
         }
         

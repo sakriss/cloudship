@@ -43,6 +43,26 @@
 		16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */; };
 		16F5BD832100010600A93A03 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16F5BD822100010600A93A03 /* Settings.bundle */; };
 		37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */; };
+		D21926532441346B005184BF /* ClimacellDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926522441346A005184BF /* ClimacellDaily.swift */; };
+		D21926562444D4DD005184BF /* ClimaDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926552444D4DC005184BF /* ClimaDaily.swift */; };
+		D21926582444D554005184BF /* Humidity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926572444D554005184BF /* Humidity.swift */; };
+		D219265B2444D657005184BF /* ObservationTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219265A2444D657005184BF /* ObservationTime.swift */; };
+		D219265D2444D6C5005184BF /* PrecipitationProbability.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219265C2444D6C5005184BF /* PrecipitationProbability.swift */; };
+		D219265F2444D6F8005184BF /* Sunrise.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219265E2444D6F8005184BF /* Sunrise.swift */; };
+		D21926612444D72A005184BF /* Sunset.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926602444D72A005184BF /* Sunset.swift */; };
+		D21926632444D74E005184BF /* DailyTemp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926622444D74E005184BF /* DailyTemp.swift */; };
+		D21926652444D778005184BF /* WeatherCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926642444D778005184BF /* WeatherCode.swift */; };
+		D21926672444D79B005184BF /* WindDirectionDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926662444D79B005184BF /* WindDirectionDaily.swift */; };
+		D21926692444D7D4005184BF /* WindSpeedDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926682444D7D4005184BF /* WindSpeedDaily.swift */; };
+		D219266B2444D8DC005184BF /* Max.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219266A2444D8DC005184BF /* Max.swift */; };
+		D219266D2444D8FF005184BF /* Min.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219266C2444D8FF005184BF /* Min.swift */; };
+		D21926702444DD74005184BF /* ClimaHourly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219266F2444DD74005184BF /* ClimaHourly.swift */; };
+		D21926722444E14B005184BF /* Temp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926712444E14B005184BF /* Temp.swift */; };
+		D21926742444E6B5005184BF /* WindSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926732444E6B5005184BF /* WindSpeed.swift */; };
+		D21926762444E6EF005184BF /* WindDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926752444E6EF005184BF /* WindDirection.swift */; };
+		D22606E92440DAF100F7A01C /* RealTime2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606E82440DAF100F7A01C /* RealTime2.swift */; };
+		D22606EB2440DB7300F7A01C /* Temp2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606EA2440DB7300F7A01C /* Temp2.swift */; };
+		D22606ED2440DBAC00F7A01C /* ObservationTime2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606EC2440DBAC00F7A01C /* ObservationTime2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -102,6 +122,26 @@
 		16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyTableViewCell.swift; sourceTree = "<group>"; };
 		16F5BD822100010600A93A03 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.debug.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.debug.xcconfig"; sourceTree = "<group>"; };
+		D21926522441346A005184BF /* ClimacellDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimacellDaily.swift; sourceTree = "<group>"; };
+		D21926552444D4DC005184BF /* ClimaDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimaDaily.swift; sourceTree = "<group>"; };
+		D21926572444D554005184BF /* Humidity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Humidity.swift; sourceTree = "<group>"; };
+		D219265A2444D657005184BF /* ObservationTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationTime.swift; sourceTree = "<group>"; };
+		D219265C2444D6C5005184BF /* PrecipitationProbability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrecipitationProbability.swift; sourceTree = "<group>"; };
+		D219265E2444D6F8005184BF /* Sunrise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sunrise.swift; sourceTree = "<group>"; };
+		D21926602444D72A005184BF /* Sunset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sunset.swift; sourceTree = "<group>"; };
+		D21926622444D74E005184BF /* DailyTemp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTemp.swift; sourceTree = "<group>"; };
+		D21926642444D778005184BF /* WeatherCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherCode.swift; sourceTree = "<group>"; };
+		D21926662444D79B005184BF /* WindDirectionDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindDirectionDaily.swift; sourceTree = "<group>"; };
+		D21926682444D7D4005184BF /* WindSpeedDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindSpeedDaily.swift; sourceTree = "<group>"; };
+		D219266A2444D8DC005184BF /* Max.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Max.swift; sourceTree = "<group>"; };
+		D219266C2444D8FF005184BF /* Min.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Min.swift; sourceTree = "<group>"; };
+		D219266F2444DD74005184BF /* ClimaHourly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimaHourly.swift; sourceTree = "<group>"; };
+		D21926712444E14B005184BF /* Temp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Temp.swift; sourceTree = "<group>"; };
+		D21926732444E6B5005184BF /* WindSpeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindSpeed.swift; sourceTree = "<group>"; };
+		D21926752444E6EF005184BF /* WindDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindDirection.swift; sourceTree = "<group>"; };
+		D22606E82440DAF100F7A01C /* RealTime2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime2.swift; sourceTree = "<group>"; };
+		D22606EA2440DB7300F7A01C /* Temp2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Temp2.swift; sourceTree = "<group>"; };
+		D22606EC2440DBAC00F7A01C /* ObservationTime2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationTime2.swift; sourceTree = "<group>"; };
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -153,6 +193,10 @@
 		162DC6032020FAAB00C19DCE /* Cloudship */ = {
 			isa = PBXGroup;
 			children = (
+				D219266E2444DD51005184BF /* ClimacellHourly */,
+				D21926592444D605005184BF /* CommonData */,
+				D21926542444D48F005184BF /* ClimacellDaily */,
+				D22606E72440DACA00F7A01C /* RealTime */,
 				16C5224C214C566D007F9935 /* Cloudship.entitlements */,
 				162DC61B2020FDCD00C19DCE /* Flags */,
 				162DC61A2020FDC500C19DCE /* Alerts */,
@@ -263,6 +307,54 @@
 				EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D21926542444D48F005184BF /* ClimacellDaily */ = {
+			isa = PBXGroup;
+			children = (
+				D21926552444D4DC005184BF /* ClimaDaily.swift */,
+			);
+			path = ClimacellDaily;
+			sourceTree = "<group>";
+		};
+		D21926592444D605005184BF /* CommonData */ = {
+			isa = PBXGroup;
+			children = (
+				D21926572444D554005184BF /* Humidity.swift */,
+				D219265A2444D657005184BF /* ObservationTime.swift */,
+				D219265C2444D6C5005184BF /* PrecipitationProbability.swift */,
+				D219265E2444D6F8005184BF /* Sunrise.swift */,
+				D21926602444D72A005184BF /* Sunset.swift */,
+				D21926622444D74E005184BF /* DailyTemp.swift */,
+				D21926642444D778005184BF /* WeatherCode.swift */,
+				D21926662444D79B005184BF /* WindDirectionDaily.swift */,
+				D21926682444D7D4005184BF /* WindSpeedDaily.swift */,
+				D219266A2444D8DC005184BF /* Max.swift */,
+				D219266C2444D8FF005184BF /* Min.swift */,
+				D21926712444E14B005184BF /* Temp.swift */,
+				D21926732444E6B5005184BF /* WindSpeed.swift */,
+				D21926752444E6EF005184BF /* WindDirection.swift */,
+			);
+			path = CommonData;
+			sourceTree = "<group>";
+		};
+		D219266E2444DD51005184BF /* ClimacellHourly */ = {
+			isa = PBXGroup;
+			children = (
+				D219266F2444DD74005184BF /* ClimaHourly.swift */,
+			);
+			path = ClimacellHourly;
+			sourceTree = "<group>";
+		};
+		D22606E72440DACA00F7A01C /* RealTime */ = {
+			isa = PBXGroup;
+			children = (
+				D22606E82440DAF100F7A01C /* RealTime2.swift */,
+				D22606EA2440DB7300F7A01C /* Temp2.swift */,
+				D22606EC2440DBAC00F7A01C /* ObservationTime2.swift */,
+				D21926522441346A005184BF /* ClimacellDaily.swift */,
+			);
+			path = RealTime;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -434,35 +526,55 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D21926672444D79B005184BF /* WindDirectionDaily.swift in Sources */,
 				1620610420AF6462004E00BD /* HourlyData.swift in Sources */,
+				D21926612444D72A005184BF /* Sunset.swift in Sources */,
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
+				D219265D2444D6C5005184BF /* PrecipitationProbability.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
+				D21926742444E6B5005184BF /* WindSpeed.swift in Sources */,
+				D22606ED2440DBAC00F7A01C /* ObservationTime2.swift in Sources */,
 				168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */,
 				16148A7320F3B0AE00452F5D /* SearchSearchTableView.swift in Sources */,
 				1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */,
+				D21926722444E14B005184BF /* Temp.swift in Sources */,
 				162DC6252022278D00C19DCE /* Configuration.swift in Sources */,
+				D219265F2444D6F8005184BF /* Sunrise.swift in Sources */,
+				D22606E92440DAF100F7A01C /* RealTime2.swift in Sources */,
 				162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */,
+				D21926762444E6EF005184BF /* WindDirection.swift in Sources */,
 				168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */,
 				16148A7520F52AEF00452F5D /* SearchTableViewCell.swift in Sources */,
 				1620610A20AF6689004E00BD /* Minutely.swift in Sources */,
+				D219266D2444D8FF005184BF /* Min.swift in Sources */,
 				1620610820AF6582004E00BD /* DailyData.swift in Sources */,
 				1620611620AF6FAC004E00BD /* WeatherInfo.swift in Sources */,
 				1620610E20AF66FE004E00BD /* Currently.swift in Sources */,
+				D21926692444D7D4005184BF /* WindSpeedDaily.swift in Sources */,
+				D21926582444D554005184BF /* Humidity.swift in Sources */,
 				16148A6F20EC2F3500452F5D /* InfoViewController.swift in Sources */,
 				16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */,
+				D21926702444DD74005184BF /* ClimaHourly.swift in Sources */,
+				D219266B2444D8DC005184BF /* Max.swift in Sources */,
 				1620611820B31F4A004E00BD /* MinutelyViewController.swift in Sources */,
 				1620610220AF63EE004E00BD /* Hourly.swift in Sources */,
 				1620611420AF69A6004E00BD /* WeatherController.swift in Sources */,
 				1620610C20AF66B1004E00BD /* MinutelyData.swift in Sources */,
 				162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */,
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
+				D21926652444D778005184BF /* WeatherCode.swift in Sources */,
 				16695922215EAF60002BC386 /* RadarViewController.swift in Sources */,
+				D21926532441346B005184BF /* ClimacellDaily.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
+				D21926632444D74E005184BF /* DailyTemp.swift in Sources */,
+				D219265B2444D657005184BF /* ObservationTime.swift in Sources */,
 				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
+				D22606EB2440DB7300F7A01C /* Temp2.swift in Sources */,
 				161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */,
 				1620610020AF61BE004E00BD /* Weather.swift in Sources */,
 				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
+				D21926562444D4DD005184BF /* ClimaDaily.swift in Sources */,
 				1620611A20B5C781004E00BD /* DailyTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

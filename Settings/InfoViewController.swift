@@ -279,11 +279,11 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func unitsToDisplay() {
         print(UserDefaults.standard.string(forKey: "Units")!)
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
-            if userDef == "units=us" {
+            if userDef == "units_system=us" {
                 unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
             }
             
-            if userDef == "units=si" {
+            if userDef == "units_system=si" {
                 unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
             }
         }

@@ -215,7 +215,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let longitude = response?.boundingRegion.center.longitude
 
 //                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!, units: units!)
+                WeatherController.shared.fetchWeatherInfo(lat: latitude!, lon: longitude!, units: units!)
                 //self.navigationItem.title = searchBar.text
 
                 let geoCoder = CLGeocoder()
@@ -280,6 +280,14 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointDaily = WeatherController.shared.climacellDailyWeather
+        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
+        
+        if let blah = dataPointHourly?[0].temp?.value{
+            print("REALTIME WEATHER IS: \(blah)")
+            let formattedTemp = String(format: "%.0f", blah)
+            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
+        }
         
         if let currentTemp = dataPoint?.currently?.temperature {
             let formattedTemp = String(format: "%.0f", currentTemp)
@@ -421,7 +429,7 @@ extension ViewController: CLLocationManagerDelegate {
             
             lastLocation = location
             chosenLocation = location
-            WeatherController.shared.fetchWeatherInfo(latitude: location.coordinate.latitude, longitude:location.coordinate.longitude, units: units!)
+            WeatherController.shared.fetchWeatherInfo(lat: location.coordinate.latitude, lon:location.coordinate.longitude, units: units!)
             
             let geocoder = CLGeocoder()
             geocoder.reverseGeocodeLocation(location) { (placemarks:[CLPlacemark]?, error: Error?) in
@@ -490,7 +498,7 @@ extension ViewController: UITableViewDelegate {
                 chosenLocation = lastLoc
             }
             
-            WeatherController.shared.fetchWeatherInfo(latitude: latitude, longitude: longitude, units: units!)
+            WeatherController.shared.fetchWeatherInfo(lat: latitude, lon: longitude, units: units!)
             
             let geoCoder = CLGeocoder()
             let location = CLLocation(latitude: latitude, longitude: longitude)
@@ -549,22 +557,24 @@ extension ViewController: UITableViewDataSource {
         cell.alertViewContainer.isHidden = true
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
+        let dataPointDaily = WeatherController.shared.climacellDailyWeather
         
-        if let currentTemp = dataPoint?.currently?.temperature {
+            if let currentTemp = dataPointHourly?[0].temp?.value {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
                 cell.currentTempLabel.text = newCurrentTemp
         }
         
-        if let currentCondition = dataPoint?.currently?.summary {
+            if let currentCondition = dataPointHourly?[0].weather_code?.value {
                 cell.currentConditionLabel.text = currentCondition
         }
         
-        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax {
+            if let highTemp = dataPointDaily?[0].temp?[1].max?.value {
             let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        if let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+        if let lowTemp = dataPointDaily?[0].temp?[0].min?.value {
             let newLowTemp = String(format: "%.0f", lowTemp)
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
         }
@@ -665,11 +675,12 @@ extension ViewController: UICollectionViewDataSource {
         cell.layer.borderWidth = 0.5
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
         
-        if let hourTime = dataPoint?.hourly?.data?[indexPath.item].time {
-            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
+        if let hourTime = dataPointHourly?[indexPath.item].observation_time {
+//            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
             
-            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+            let dailyHourString = "\(hourTime)" // the date string to be parsed
             let df3 = DateFormatter()
             df3.locale = Locale(identifier: "en_US")
             df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
@@ -686,24 +697,27 @@ extension ViewController: UICollectionViewDataSource {
             }
         }
         
-        if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.item].temperature {
+        if let hourlyTemp = dataPointHourly?[indexPath.item].temp?.value {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
             cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
         switch conditionIcon {
-        case "partly-cloudy-day":
+        case "partly_cloudy":
             cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
             
-        case "partly-cloudy-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudynight.png")
+        case "mostly_cloudy":
+            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
             
         case "cloudy":
             cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
             
-        case "clear-day":
+        case "clear":
             cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
+        
+        case "mostly_clear":
+        cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
             
         case "clear-night":
             cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
@@ -711,10 +725,28 @@ extension ViewController: UICollectionViewDataSource {
         case "rain":
             cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
             
+        case "rain_light":
+            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+            
+        case "rain_heavy":
+            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+            
+        case "drizzle":
+            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+            
+        case "snow_light":
+            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+            
         case "snow":
             cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
             
-        case "sleet":
+        case "snow_heavy":
+            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+            
+        case "flurries":
+        cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+            
+        case "freezing_rain":
             cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
             
         case "wind":
@@ -722,17 +754,18 @@ extension ViewController: UICollectionViewDataSource {
             
         case "fog":
             cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
+        
+        case "fog_light":
+        cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
             
         default:
             cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
             
         }
         
-        let percentFormatter = NumberFormatter()
-        percentFormatter.numberStyle = .percent
-        
-        if let precipChance = dataPoint?.hourly?.data?[indexPath.item].precipProbability {
-            cell.lookingAheadPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
+        if let precipChance = dataPointHourly?[indexPath.item].precipitation_probability?.value {
+            let newPrecip = String(format: "%.0f", precipChance)
+            cell.lookingAheadPrecipLabel.text = newPrecip + "%"
         }
         
         return cell

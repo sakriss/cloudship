@@ -20,5 +20,11 @@ class Weather: Codable {
     private(set) var daily: Daily?
     private(set) var alerts: [Alerts]?
     
+//    private(set) var realtime: [RealTime]?
+//    private(set) var lat: Double?
+//    private(set) var lon: Double?
+//    private(set) var temp: Temp?
+//    private(set) var observationTime: ObservationTime?
+    
 
 }

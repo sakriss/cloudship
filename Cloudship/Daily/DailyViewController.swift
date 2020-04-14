@@ -21,6 +21,7 @@ class DailyViewController: UIViewController {
     //--------------------------------------------------------------------------
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     let dataPoint = WeatherController.shared.weather?.daily
+    let dataPointDaily = WeatherController.shared.climacellDailyWeather
     var isExpanded = false
     
     //--------------------------------------------------------------------------
@@ -76,7 +77,7 @@ extension DailyViewController: UITableViewDelegate {
 
 extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (dataPoint?.data?.count)!
+        return (dataPointDaily?.count)!
         
     }
     
@@ -104,15 +105,17 @@ extension DailyViewController: UITableViewDataSource {
         
         let dataPoint = WeatherController.shared.weather
         
-        let dailyTime = Date(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
+        let dailyTime = (dataPointDaily?[indexPath.row].observation_time?.value)!
         
-        let dateString = "\(dailyTime)" // the date string to be parsed
+//        let dateString = "\(dailyTime)" // the date string to be parsed
         let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
         dateFormatterGet.locale = Locale(identifier: "en_US")
-        dateFormatterGet.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
+        dateFormatterGet.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+        dateFormatterGet.dateFormat = "yyyy-MM-dd"
+        
+//        dateFormatterGet.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
 
-        if let date = dateFormatterGet.date(from: dateString) {
+        if let date = dateFormatterGet.date(from: dailyTime) {
         let format = "EEEE, MMMM d"
         let dateFormatterPrint = DateFormatter()
         dateFormatterPrint.dateFormat = format
@@ -122,13 +125,13 @@ extension DailyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {
-            DispatchQueue.main.async {
-                cell.dailySummaryLabel.text = String(dailySummary)
-            }
+        if let dailySummary = dataPointDaily?[indexPath.row].weather_code?.value {
+            let dailySummaryModified = dailySummary.replacingOccurrences(of: "_", with: " ")
+            cell.dailySummaryLabel.text = String(dailySummaryModified.capitalized)
+            
         }
         
-        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax, let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+        if let highTemp = dataPointDaily?[indexPath.row].temp?[1].max?.value, let lowTemp = dataPointDaily?[indexPath.row].temp?[0].min?.value {
             let newHighTemp = String(format: "%.0f", highTemp)
             let newLowTemp = String(format: "%.0f", lowTemp)
                 //cell.dailyHighTempLabel.text = String(format: "%.0f", highTemp)
@@ -138,20 +141,22 @@ extension DailyViewController: UITableViewDataSource {
         let percentFormatter = NumberFormatter()
         percentFormatter.numberStyle = .percent
 
-        if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
-                cell.dailyPercipPercent.text = percentFormatter.string(from: precipChance as NSNumber)
+        if let precipChance = dataPointDaily?[indexPath.row].precipitation_probability?.value {
+            let newPrecip = String(format: "%.0f", precipChance)
+                cell.dailyPercipPercent.text = newPrecip + "%"
         }
         
-        if let dailyHumidity = dataPoint?.daily?.data?[indexPath.row].humidity {
-            cell.dailyHumidityLabel.text = percentFormatter.string(from: dailyHumidity as NSNumber)
+        if let dailyHumidity = dataPointDaily?[indexPath.row].humidity?[1].max?.value {
+            let newHumidity = String(format: "%.0f", dailyHumidity)
+            cell.dailyHumidityLabel.text = newHumidity + "%"
         }
         
-        if let dailyWindSpeed = dataPoint?.daily?.data?[indexPath.row].windSpeed {
+        if let dailyWindSpeed = dataPointDaily?[indexPath.row].wind_speed?[1].max?.value {
             let newDailyWindSpeed = String(format: "%.0f", dailyWindSpeed)
             cell.dailyWindSpeedLabel.text = newDailyWindSpeed + units
         }
         
-        if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {
+        if let windBearingIcon = dataPointDaily?[indexPath.row].wind_direction?[1].max?.value {
             
             switch windBearingIcon {
             case 0:
@@ -177,13 +182,15 @@ extension DailyViewController: UITableViewDataSource {
             }
         }
         
-        let dailySunriseTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunriseTime)!)
+        let dailySunriseTime = (dataPointDaily?[indexPath.row].sunrise?.value)!
             
-            let dailySunriseString = "\(dailySunriseTime)" // the date string to be parsed
+//            let dailySunriseString = "\(dailySunriseTime)" // the date string to be parsed
             let df3 = DateFormatter()
             df3.locale = Locale(identifier: "en_US")
-            df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            if let hour = df3.date(from: dailySunriseString) {
+        df3.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+            df3.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+//                              2020-04-13 T 12:24:35.826 Z
+            if let hour = df3.date(from: dailySunriseTime) {
                 let format = "h:mma"
                 let df4 = DateFormatter()
                 df4.dateFormat = format
@@ -195,13 +202,14 @@ extension DailyViewController: UITableViewDataSource {
                 print("Unable to parse date string")
             }
             
-        let dailySunsetTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunsetTime)!)
+        let dailySunsetTime = (dataPointDaily?[indexPath.row].sunset?.value)!
         
-        let dailySunsetString = "\(dailySunsetTime)" // the date string to be parsed
+//        let dailySunsetString = "\(dailySunsetTime)" // the date string to be parsed
         let df5 = DateFormatter()
         df5.locale = Locale(identifier: "en_US")
-        df5.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-        if let hour = df5.date(from: dailySunsetString) {
+        df5.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+        df5.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        if let hour = df5.date(from: dailySunsetTime) {
             let format = "h:mma"
             let df6 = DateFormatter()
             df6.dateFormat = format
