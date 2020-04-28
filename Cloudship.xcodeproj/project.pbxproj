@@ -43,6 +43,18 @@
 		16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */; };
 		16F5BD832100010600A93A03 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16F5BD822100010600A93A03 /* Settings.bundle */; };
 		37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */; };
+		D219267924463742005184BF /* WeatherbitCurrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219267824463742005184BF /* WeatherbitCurrent.swift */; };
+		D219267B244637C6005184BF /* WeatherbitCurrentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219267A244637C6005184BF /* WeatherbitCurrentData.swift */; };
+		D219267D24464517005184BF /* WeatherbitWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219267C24464517005184BF /* WeatherbitWeather.swift */; };
+		D219267F24464D74005184BF /* WeatherbitDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219267E24464D74005184BF /* WeatherbitDaily.swift */; };
+		D219268124464E26005184BF /* WeatherbitDailyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219268024464E26005184BF /* WeatherbitDailyData.swift */; };
+		D219268324464E95005184BF /* WeatherbitDailyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219268224464E95005184BF /* WeatherbitDailyWeather.swift */; };
+		D219268724466B3A005184BF /* WeatherbitHourly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219268624466B3A005184BF /* WeatherbitHourly.swift */; };
+		D219268924466B60005184BF /* WeatherbitHourlyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219268824466B60005184BF /* WeatherbitHourlyData.swift */; };
+		D252F0B4245141D300FEDA76 /* WeatherbitAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */; };
+		D252F0B62451424A00FEDA76 /* WeatherbitAlertsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */; };
+		D252F0B824514F0200FEDA76 /* WbAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B724514F0200FEDA76 /* WbAlerts.swift */; };
+		D252F0BA24579D3400FEDA76 /* WeatherbitHourlyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B924579D3400FEDA76 /* WeatherbitHourlyWeather.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -102,6 +114,18 @@
 		16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyTableViewCell.swift; sourceTree = "<group>"; };
 		16F5BD822100010600A93A03 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.debug.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.debug.xcconfig"; sourceTree = "<group>"; };
+		D219267824463742005184BF /* WeatherbitCurrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitCurrent.swift; sourceTree = "<group>"; };
+		D219267A244637C6005184BF /* WeatherbitCurrentData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitCurrentData.swift; sourceTree = "<group>"; };
+		D219267C24464517005184BF /* WeatherbitWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitWeather.swift; sourceTree = "<group>"; };
+		D219267E24464D74005184BF /* WeatherbitDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitDaily.swift; sourceTree = "<group>"; };
+		D219268024464E26005184BF /* WeatherbitDailyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitDailyData.swift; sourceTree = "<group>"; };
+		D219268224464E95005184BF /* WeatherbitDailyWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitDailyWeather.swift; sourceTree = "<group>"; };
+		D219268624466B3A005184BF /* WeatherbitHourly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitHourly.swift; sourceTree = "<group>"; };
+		D219268824466B60005184BF /* WeatherbitHourlyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitHourlyData.swift; sourceTree = "<group>"; };
+		D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitAlert.swift; sourceTree = "<group>"; };
+		D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitAlertsData.swift; sourceTree = "<group>"; };
+		D252F0B724514F0200FEDA76 /* WbAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WbAlerts.swift; sourceTree = "<group>"; };
+		D252F0B924579D3400FEDA76 /* WeatherbitHourlyWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitHourlyWeather.swift; sourceTree = "<group>"; };
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -129,6 +153,7 @@
 		162DC5F82020FAAB00C19DCE = {
 			isa = PBXGroup;
 			children = (
+				D219267724463717005184BF /* Weatherbit */,
 				16F5BD822100010600A93A03 /* Settings.bundle */,
 				16148A7420F52AEF00452F5D /* SearchTableViewCell.swift */,
 				16148A7220F3B0AD00452F5D /* SearchSearchTableView.swift */,
@@ -263,6 +288,25 @@
 				EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D219267724463717005184BF /* Weatherbit */ = {
+			isa = PBXGroup;
+			children = (
+				D219267824463742005184BF /* WeatherbitCurrent.swift */,
+				D219267A244637C6005184BF /* WeatherbitCurrentData.swift */,
+				D219267E24464D74005184BF /* WeatherbitDaily.swift */,
+				D219268024464E26005184BF /* WeatherbitDailyData.swift */,
+				D219268224464E95005184BF /* WeatherbitDailyWeather.swift */,
+				D219268624466B3A005184BF /* WeatherbitHourly.swift */,
+				D219268824466B60005184BF /* WeatherbitHourlyData.swift */,
+				D252F0B924579D3400FEDA76 /* WeatherbitHourlyWeather.swift */,
+				D219267C24464517005184BF /* WeatherbitWeather.swift */,
+				D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */,
+				D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */,
+				D252F0B724514F0200FEDA76 /* WbAlerts.swift */,
+			);
+			path = Weatherbit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -438,6 +482,7 @@
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
+				D252F0B824514F0200FEDA76 /* WbAlerts.swift in Sources */,
 				168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */,
 				16148A7320F3B0AE00452F5D /* SearchSearchTableView.swift in Sources */,
 				1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */,
@@ -445,25 +490,36 @@
 				162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */,
 				168C8CF920C255A800D0413C /* AlertsViewController.swift in Sources */,
 				16148A7520F52AEF00452F5D /* SearchTableViewCell.swift in Sources */,
+				D219267D24464517005184BF /* WeatherbitWeather.swift in Sources */,
 				1620610A20AF6689004E00BD /* Minutely.swift in Sources */,
 				1620610820AF6582004E00BD /* DailyData.swift in Sources */,
+				D219267924463742005184BF /* WeatherbitCurrent.swift in Sources */,
 				1620611620AF6FAC004E00BD /* WeatherInfo.swift in Sources */,
+				D219267F24464D74005184BF /* WeatherbitDaily.swift in Sources */,
 				1620610E20AF66FE004E00BD /* Currently.swift in Sources */,
 				16148A6F20EC2F3500452F5D /* InfoViewController.swift in Sources */,
 				16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */,
 				1620611820B31F4A004E00BD /* MinutelyViewController.swift in Sources */,
+				D219268324464E95005184BF /* WeatherbitDailyWeather.swift in Sources */,
 				1620610220AF63EE004E00BD /* Hourly.swift in Sources */,
 				1620611420AF69A6004E00BD /* WeatherController.swift in Sources */,
+				D219268124464E26005184BF /* WeatherbitDailyData.swift in Sources */,
 				1620610C20AF66B1004E00BD /* MinutelyData.swift in Sources */,
 				162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */,
+				D219268724466B3A005184BF /* WeatherbitHourly.swift in Sources */,
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
+				D219267B244637C6005184BF /* WeatherbitCurrentData.swift in Sources */,
 				16695922215EAF60002BC386 /* RadarViewController.swift in Sources */,
+				D219268924466B60005184BF /* WeatherbitHourlyData.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
+				D252F0B62451424A00FEDA76 /* WeatherbitAlertsData.swift in Sources */,
 				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
+				D252F0BA24579D3400FEDA76 /* WeatherbitHourlyWeather.swift in Sources */,
 				161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */,
 				1620610020AF61BE004E00BD /* Weather.swift in Sources */,
 				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
 				1620611A20B5C781004E00BD /* DailyTableViewCell.swift in Sources */,
+				D252F0B4245141D300FEDA76 /* WeatherbitAlert.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

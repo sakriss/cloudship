@@ -280,6 +280,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointCurrent = WeatherController.shared.weatherbitWeatherCurrent
         
         if let currentTemp = dataPoint?.currently?.temperature {
             let formattedTemp = String(format: "%.0f", currentTemp)
@@ -549,22 +550,26 @@ extension ViewController: UITableViewDataSource {
         cell.alertViewContainer.isHidden = true
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointCurrent = WeatherController.shared.weatherbitWeatherCurrent
+        let dataPointDaily = WeatherController.shared.weatherbitWeatherDaily
+        let dataPointHourly = WeatherController.shared.weatherbitWeatherHourly
+        let dataPointAlert = WeatherController.shared.weatherbitWeatherAlerts
         
-        if let currentTemp = dataPoint?.currently?.temperature {
+            if let currentTemp = dataPointCurrent?.data?[0].app_temp {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
                 cell.currentTempLabel.text = newCurrentTemp
         }
         
-        if let currentCondition = dataPoint?.currently?.summary {
-                cell.currentConditionLabel.text = currentCondition
+            if let currentCondition = dataPointCurrent?.data?[0].weather?.descriptionField {
+                cell.currentConditionLabel.text = String(currentCondition)
         }
         
-        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax {
+            if let highTemp = dataPointDaily?.data?[0].appMaxTemp {
             let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        if let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+            if let lowTemp = dataPointDaily?.data?[0].appMinTemp {
             let newLowTemp = String(format: "%.0f", lowTemp)
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
         }
@@ -574,41 +579,77 @@ extension ViewController: UITableViewDataSource {
         }
         
         if let lookingAhead = dataPoint?.minutely?.summary {
-                cell.currentSummaryLabel.text = lookingAhead
+            cell.currentSummaryLabel.text = lookingAhead
         }
-
-        if let alertsActive = dataPoint?.alerts?[indexPath.row] {
-            print(alertsActive)
+            let alertsCount = dataPointAlert?.alerts?.count ?? 0
+            if alertsCount >= 1 {
                 cell.alertViewContainer.isHidden = false
-        }
+            }
+//            if let alertsActive = dataPointAlert?.alerts?[0].descriptionField {
+//            print(alertsActive)
+//                cell.alertViewContainer.isHidden = false
+//        }
         
         //load animated gif
         //TODO: load animation based on current weather conditions
         //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
-        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        let conditionIcon = dataPointCurrent?.data?[indexPath.row].weather?.icon
         switch conditionIcon {
-        case "cloudy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
-        case "partly-cloudy-day":
+        case "t01d", "t02d", "t03d":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "partly-cloudy-night":
+        case "t01n","t02n", "t03n":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "clear-day":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "clear-night":
-            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
-        case "rain":
+        case "t04d","t05d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
+        case "t04n","t05n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+        case "d01d","d02d", "d03d":
             cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "snow":
+        case "d01n","d02n", "d03n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "r01d","r02d", "r03d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "r01n","r02n", "r03n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "f01d","r04d","r05d","r06d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "f01n","r04n","r05n","r06n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "s01d","s02d","s03d","s04d","s05d":
             cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "sleet":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "wind":
-            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
-        case "fog":
+         case "s01n","s02n","s03n","s04n","s05n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+         case "a01d","a02d","a03d","a04d","a05d", "a06d":
             cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+        case "a01n","a02n","a03n","a04n","a05n", "a06n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+        case "c01d","c02d","c03d","c04d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+        case "c01n","c02n","c03n","c04n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            
+//        case "partly-cloudy-day":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
+//        case "partly-cloudy-night":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+//        case "clear-day":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+//        case "clear-night":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
+//        case "rain":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+//        case "snow":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+//        case "sleet":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+//        case "wind":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
+//        case "fog":
+//            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+//        default:
+//            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         }
             
             cell.dailyButton.layer.cornerRadius = 7
@@ -665,15 +706,16 @@ extension ViewController: UICollectionViewDataSource {
         cell.layer.borderWidth = 0.5
         
         let dataPoint = WeatherController.shared.weather
+        let dataPointHourly = WeatherController.shared.weatherbitWeatherHourly
         
-        if let hourTime = dataPoint?.hourly?.data?[indexPath.item].time {
-            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
+        if let hourTime = dataPointHourly?.data?[indexPath.row].timestampLocal {
+//            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
             
-            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+//            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
             let df3 = DateFormatter()
             df3.locale = Locale(identifier: "en_US")
-            df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            if let hour = df3.date(from: dailyHourString) {
+            df3.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            if let hour = df3.date(from: hourTime) {
                 let format = "ha"
                 let df4 = DateFormatter()
                 df4.dateFormat = format
@@ -686,52 +728,53 @@ extension ViewController: UICollectionViewDataSource {
             }
         }
         
-        if let hourlyTemp = dataPoint?.hourly?.data?[indexPath.item].temperature {
+        if let hourlyTemp = dataPointHourly?.data?[indexPath.row].appTemp {
             let newHighTemp = String(format: "%.0f", hourlyTemp)
             cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
         }
         
-        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        let conditionIcon = dataPointHourly?.data?[indexPath.row].weather?.icon
         switch conditionIcon {
-        case "partly-cloudy-day":
-            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-            
-        case "partly-cloudy-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudynight.png")
-            
-        case "cloudy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
-            
-        case "clear-day":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-            
-        case "clear-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
-            
-        case "rain":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
-        case "snow":
-            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
-        case "sleet":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
-            
-        case "wind":
-            cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
-            
-        case "fog":
-            cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-            
+        case "t01d", "t02d","t03d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "t01d")
+        case "t01n","t02n", "t03n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "t01d")
+        case "t04d","t05d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "t04d")
+        case "t04n","t05n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "t04n")
+        case "d01d","d02d", "d03d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "d01d")
+        case "d01n","d02n", "d03n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "d01n")
+        case "r01d","r02d", "r03d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "r01d")
+        case "r01n","r02n", "r03n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "r01n")
+        case "f01d","r04d","r05d","r06d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "f01d")
+        case "f01n","r04n","r05n","r06n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "f01n")
+        case "s01d","s02d","s03d","s04d","s05d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "s01d")
+         case "s01n","s02n","s03n","s04n","s05n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "s01n")
+         case "a01d","a02d","a03d","a04d","a05d", "a06d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "a01d")
+        case "a01n","a02n","a03n","a04n","a05n", "a06n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "a01n")
+        case "c01d","c02d","c03d","c04d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c01d")
+        case "c01n","c02n","c03n","c04n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c01n")
         default:
-            cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
-            
+            cell.lookingAheadConditionImage.image = UIImage(named: "c01d")
         }
         
         let percentFormatter = NumberFormatter()
         percentFormatter.numberStyle = .percent
         
-        if let precipChance = dataPoint?.hourly?.data?[indexPath.item].precipProbability {
+        if let precipChance = dataPointHourly?.data?[indexPath.row].precip {
             cell.lookingAheadPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
         }
         

@@ -41,7 +41,7 @@ class AlertsViewController: UIViewController {
 //--------------------------------------------------------------------------
 extension AlertsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (WeatherController.shared.weather?.alerts?.count)!
+        return (WeatherController.shared.weatherbitWeatherAlerts?.alerts?.count)!
         
     }
     
@@ -50,7 +50,20 @@ extension AlertsViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let dataPoint = WeatherController.shared.weather
+        if indexPath.row % 2 == 0 {
+            cell.contentView.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+            cell.alertTitleLabel.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+            cell.alertDescriptionLabel.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+            cell.alertSeverityLabel.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 1)
+            
+        } else {
+            cell.contentView.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+            cell.alertTitleLabel.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+            cell.alertDescriptionLabel.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+            cell.alertSeverityLabel.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
+        }
+        
+        let dataPoint = WeatherController.shared.weatherbitWeatherAlerts
         
         if let alertsTitle = dataPoint?.alerts?[indexPath.row].title {
             cell.alertTitleLabel.text = ("\u{26A0} ") + String(alertsTitle.uppercased()) + (" \u{26A0}")
@@ -61,7 +74,7 @@ extension AlertsViewController: UITableViewDataSource {
             cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
         }
         
-        if let alertsDescription = dataPoint?.alerts?[indexPath.row].description {
+        if let alertsDescription = dataPoint?.alerts?[indexPath.row].descriptionField {
             let formattedDescription = alertsDescription.replacingOccurrences(of: "*", with: "\n\n*")
             cell.alertDescriptionLabel.text = String(formattedDescription)
         }

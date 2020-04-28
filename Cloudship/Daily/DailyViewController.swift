@@ -21,6 +21,7 @@ class DailyViewController: UIViewController {
     //--------------------------------------------------------------------------
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     let dataPoint = WeatherController.shared.weather?.daily
+    let dataPointDaily = WeatherController.shared.weatherbitWeatherDaily
     var isExpanded = false
     
     //--------------------------------------------------------------------------
@@ -76,7 +77,7 @@ extension DailyViewController: UITableViewDelegate {
 
 extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (dataPoint?.data?.count)!
+        return (dataPointDaily?.data?.count)!
         
     }
     
@@ -101,18 +102,18 @@ extension DailyViewController: UITableViewDataSource {
             cell.backgroundColor = UIColor(red: 120/255, green: 135/255, blue: 171/255, alpha: 1)
         }
         
-        
         let dataPoint = WeatherController.shared.weather
+        let dataPointDaily = WeatherController.shared.weatherbitWeatherDaily
         
-        let dailyTime = Date(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].time)!)
+        let dailyTime = (dataPointDaily?.data?[indexPath.row].datetime)!
         
-        let dateString = "\(dailyTime)" // the date string to be parsed
+//        let dateString = "\(dailyTime)" // the date string to be parsed
         let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        dateFormatterGet.dateFormat = "yyyy-MM-dd"
         dateFormatterGet.locale = Locale(identifier: "en_US")
-        dateFormatterGet.timeZone = TimeZone(identifier: (dataPoint?.timezone)!)
+//        dateFormatterGet.timeZone = TimeZone(identifier: (dataPointDaily?.data?[indexPath.row].timezone)!)
 
-        if let date = dateFormatterGet.date(from: dateString) {
+        if let date = dateFormatterGet.date(from: dailyTime) {
         let format = "EEEE, MMMM d"
         let dateFormatterPrint = DateFormatter()
         dateFormatterPrint.dateFormat = format
@@ -122,13 +123,11 @@ extension DailyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        if let dailySummary = dataPoint?.daily?.data?[indexPath.row].summary {
-            DispatchQueue.main.async {
-                cell.dailySummaryLabel.text = String(dailySummary)
-            }
+        if let dailySummary = dataPointDaily?.data?[indexPath.row].weather?.descriptionField {
+                cell.dailySummaryLabel.text = dailySummary
         }
         
-        if let highTemp = dataPoint?.daily?.data?[indexPath.row].temperatureMax, let lowTemp = dataPoint?.daily?.data?[indexPath.row].temperatureLow {
+        if let highTemp = dataPointDaily?.data?[indexPath.row].highTemp, let lowTemp = dataPointDaily?.data?[indexPath.row].lowTemp {
             let newHighTemp = String(format: "%.0f", highTemp)
             let newLowTemp = String(format: "%.0f", lowTemp)
                 //cell.dailyHighTempLabel.text = String(format: "%.0f", highTemp)
@@ -138,20 +137,22 @@ extension DailyViewController: UITableViewDataSource {
         let percentFormatter = NumberFormatter()
         percentFormatter.numberStyle = .percent
 
-        if let precipChance = dataPoint?.daily?.data?[indexPath.row].precipProbability {
-                cell.dailyPercipPercent.text = percentFormatter.string(from: precipChance as NSNumber)
+        if let precipChance = dataPointDaily?.data?[indexPath.row].precip {
+            cell.dailyPercipPercent.text = percentFormatter.string(from: NSNumber(value: precipChance))
         }
         
-        if let dailyHumidity = dataPoint?.daily?.data?[indexPath.row].humidity {
-            cell.dailyHumidityLabel.text = percentFormatter.string(from: dailyHumidity as NSNumber)
+        if let dailyHumidity = dataPointDaily?.data?[indexPath.row].rh {
+            let dailyHumidityString = String(format: "%.0f", dailyHumidity)
+            cell.dailyHumidityLabel.text = dailyHumidityString + "%"
+            
         }
         
-        if let dailyWindSpeed = dataPoint?.daily?.data?[indexPath.row].windSpeed {
+        if let dailyWindSpeed = dataPointDaily?.data?[indexPath.row].windSpd {
             let newDailyWindSpeed = String(format: "%.0f", dailyWindSpeed)
             cell.dailyWindSpeedLabel.text = newDailyWindSpeed + units
         }
         
-        if let windBearingIcon = dataPoint?.hourly?.data?[indexPath.row].windBearing {
+        if let windBearingIcon = dataPointDaily?.data?[indexPath.row].windDir {
             
             switch windBearingIcon {
             case 0:
@@ -177,7 +178,7 @@ extension DailyViewController: UITableViewDataSource {
             }
         }
         
-        let dailySunriseTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunriseTime)!)
+        let dailySunriseTime = NSDate(timeIntervalSince1970: (dataPointDaily?.data?[indexPath.row].sunriseTs!)!)
             
             let dailySunriseString = "\(dailySunriseTime)" // the date string to be parsed
             let df3 = DateFormatter()
@@ -195,7 +196,7 @@ extension DailyViewController: UITableViewDataSource {
                 print("Unable to parse date string")
             }
             
-        let dailySunsetTime = NSDate(timeIntervalSince1970: (dataPoint?.daily?.data?[indexPath.row].sunsetTime)!)
+        let dailySunsetTime = NSDate(timeIntervalSince1970: (dataPointDaily?.data?[indexPath.row].sunsetTs!)!)
         
         let dailySunsetString = "\(dailySunsetTime)" // the date string to be parsed
         let df5 = DateFormatter()
@@ -213,8 +214,9 @@ extension DailyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        if let dailyCloudCover = dataPoint?.daily?.data?[indexPath.row].cloudCover {
-            cell.dailyCloudCoverLabel.text = percentFormatter.string(from: dailyCloudCover as NSNumber)
+        if let dailyCloudCover = dataPointDaily?.data?[indexPath.row].clouds {
+            let dailyCloudCoverString = String(format: "%.0f", dailyCloudCover)
+            cell.dailyCloudCoverLabel.text = dailyCloudCoverString + "%"
         }
         
         return cell
