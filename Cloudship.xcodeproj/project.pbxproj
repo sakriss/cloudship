@@ -53,7 +53,6 @@
 		D219268924466B60005184BF /* WeatherbitHourlyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D219268824466B60005184BF /* WeatherbitHourlyData.swift */; };
 		D252F0B4245141D300FEDA76 /* WeatherbitAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */; };
 		D252F0B62451424A00FEDA76 /* WeatherbitAlertsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */; };
-		D252F0B824514F0200FEDA76 /* WbAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B724514F0200FEDA76 /* WbAlerts.swift */; };
 		D252F0BA24579D3400FEDA76 /* WeatherbitHourlyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = D252F0B924579D3400FEDA76 /* WeatherbitHourlyWeather.swift */; };
 /* End PBXBuildFile section */
 
@@ -124,7 +123,6 @@
 		D219268824466B60005184BF /* WeatherbitHourlyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitHourlyData.swift; sourceTree = "<group>"; };
 		D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitAlert.swift; sourceTree = "<group>"; };
 		D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitAlertsData.swift; sourceTree = "<group>"; };
-		D252F0B724514F0200FEDA76 /* WbAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WbAlerts.swift; sourceTree = "<group>"; };
 		D252F0B924579D3400FEDA76 /* WeatherbitHourlyWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherbitHourlyWeather.swift; sourceTree = "<group>"; };
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
@@ -304,7 +302,6 @@
 				D219267C24464517005184BF /* WeatherbitWeather.swift */,
 				D252F0B3245141D300FEDA76 /* WeatherbitAlert.swift */,
 				D252F0B52451424A00FEDA76 /* WeatherbitAlertsData.swift */,
-				D252F0B724514F0200FEDA76 /* WbAlerts.swift */,
 			);
 			path = Weatherbit;
 			sourceTree = "<group>";
@@ -482,7 +479,6 @@
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
-				D252F0B824514F0200FEDA76 /* WbAlerts.swift in Sources */,
 				168C8CFB20C25A7400D0413C /* AlertsTableViewCell.swift in Sources */,
 				16148A7320F3B0AE00452F5D /* SearchSearchTableView.swift in Sources */,
 				1646BDAD20BF5555006FF7F5 /* Gif.swift in Sources */,

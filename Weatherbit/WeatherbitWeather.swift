@@ -35,36 +35,4 @@ class WeatherbitWeather: Codable {
         //                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: values.codingPath, debugDescription: "Not a JSON"))
         //            }
     
-    
-//    enum DescriptionField: Codable {
-//        case string(String)
-//        case double(DoubleThingy)
-//
-//        init(from decoder: Decoder) throws {
-//            let container = try decoder.singleValueContainer()
-//            if let x = try? container.decode(String.self) {
-//                self = .string(x)
-//                return
-//            }
-//            if let x = try? container.decode(DoubleThingy.self) {
-//                self = .double(x)
-//                return
-//            }
-//            throw DecodingError.typeMismatch(DescriptionField.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Description"))
-//        }
-//
-//        func encode(to encoder: Encoder) throws {
-//            var container = encoder.singleValueContainer()
-//            switch self {
-//            case .string(let x):
-//                try container.encode(x)
-//            case .double(let x):
-//                try container.encode(x)
-//            }
-//        }
-//
-//        struct DoubleThingy: Codable{
-//            let descriptionField: Double?
-//        }
-//    }
 }

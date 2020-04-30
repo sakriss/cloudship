@@ -62,7 +62,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         super.viewDidLoad()
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
-
+        
         var units = defaults.string(forKey: "Units")
         
         searchTableView.tableFooterView = UIView()
@@ -74,14 +74,14 @@ class ViewController: UIViewController, UISearchBarDelegate {
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//        locationManager.requestWhenInUseAuthorization()
-         let authStatus = CLLocationManager.authorizationStatus()
-               
-               if authStatus == .notDetermined {
-                   locationManager.requestWhenInUseAuthorization()
-               } else {
-                   locationManager.requestLocation()
-               }
+        //        locationManager.requestWhenInUseAuthorization()
+        let authStatus = CLLocationManager.authorizationStatus()
+        
+        if authStatus == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        } else {
+            locationManager.requestLocation()
+        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFetched) , name: WeatherController.weatherDataParseComplete, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(weatherDataFailed) , name: WeatherController.weatherDataParseFailed, object: nil)
@@ -129,7 +129,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
             guide.leftAnchor.constraint(equalTo: bannerView.leftAnchor),
             guide.rightAnchor.constraint(equalTo: bannerView.rightAnchor),
             guide.bottomAnchor.constraint(equalTo: bannerView.bottomAnchor)
-            ])
+        ])
     }
     
     func positionBannerViewFullWidthAtBottomOfView(_ bannerView: UIView) {
@@ -160,11 +160,11 @@ class ViewController: UIViewController, UISearchBarDelegate {
         clearSearchResults()
     }
     
-//    func handleTap(gestureRecognizer: UIGestureRecognizer) {
-//        let alertController = UIAlertController(title: nil, message: "You tapped at \(gestureRecognizer.location(in: self.view))", preferredStyle: .alert)
-//        alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { _ in }))
-//        self.present(alertController, animated: true, completion: nil)
-//    }
+    //    func handleTap(gestureRecognizer: UIGestureRecognizer) {
+    //        let alertController = UIAlertController(title: nil, message: "You tapped at \(gestureRecognizer.location(in: self.view))", preferredStyle: .alert)
+    //        alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: { _ in }))
+    //        self.present(alertController, animated: true, completion: nil)
+    //    }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let searchRequest = MKLocalSearch.Request()
@@ -213,23 +213,23 @@ class ViewController: UIViewController, UISearchBarDelegate {
             }else {
                 let latitude = response?.boundingRegion.center.latitude
                 let longitude = response?.boundingRegion.center.longitude
-
-//                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
+                
+                //                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
                 WeatherController.shared.fetchWeatherInfo(latitude: latitude!, longitude: longitude!, units: units!)
                 //self.navigationItem.title = searchBar.text
-
+                
                 let geoCoder = CLGeocoder()
                 let location = CLLocation(latitude: latitude!, longitude: longitude!)
                 geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
-
+                    
                     if let placemarks = placemarks {
                         for placemark in placemarks {
                             var addressString = placemark.locality ?? ""
                             addressString.append(", ")
                             addressString.append(placemark.administrativeArea ?? "")
-
+                            
                             self.navigationItem.title = addressString
-
+                            
                         }
                     }
                 })
@@ -262,7 +262,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
             self.refreshControl.beginRefreshing()
         }
         locationManager.requestLocation()
-
+        
     }
     
     @objc func weatherDataFetched () {
@@ -273,60 +273,59 @@ class ViewController: UIViewController, UISearchBarDelegate {
             self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
                 $0.removeFromSuperview()
             }
-//            self.activityIndicator.removeFromSuperview()
+            //            self.activityIndicator.removeFromSuperview()
             self.currentlyTableView.reloadData()
-
+            
             self.refreshControl.endRefreshing()
         }
         
-        let dataPoint = WeatherController.shared.weather
         let dataPointCurrent = WeatherController.shared.weatherbitWeatherCurrent
         
-        if let currentTemp = dataPoint?.currently?.temperature {
-            let formattedTemp = String(format: "%.0f", currentTemp)
-            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
-        }
+        //        if let currentTemp = dataPoint?.currently?.temperature {
+        //            let formattedTemp = String(format: "%.0f", currentTemp)
+        //            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
+        //        }
+        //
+        //        if let currentSummary = dataPoint?.minutely?.summary {
+        //            sharedDefaults?.set(currentSummary, forKey: "currentSummary")
+        //        }
+        //
+        //        let conditionIcon = dataPoint?.currently?.icon
+        //        switch conditionIcon {
+        //        case "partly-cloudy-day":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "partly-cloudy-night":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "cloudy":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "clear-day":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "clear-night":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "rain":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "snow":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "sleet":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "wind":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        case "fog":
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //
+        //        default:
+        //            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
+        //        }
         
-        if let currentSummary = dataPoint?.minutely?.summary {
-            sharedDefaults?.set(currentSummary, forKey: "currentSummary")
-        }
-        
-        let conditionIcon = dataPoint?.currently?.icon
-        switch conditionIcon {
-        case "partly-cloudy-day":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "partly-cloudy-night":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "cloudy":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "clear-day":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "clear-night":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "rain":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "snow":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "sleet":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "wind":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "fog":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        default:
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-        }
-            
         
         if let nearestStormDistance = WeatherController.shared.weather?.currently?.nearestStormDistance {
             nearestStorm = nearestStormDistance
@@ -349,11 +348,11 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
                         $0.removeFromSuperview()
                     }
-
+                    
                     //initiate the refreshdata call and start the animation
                     self.refreshData(sender: AnyObject.self as AnyObject)
                     self.loadingDataAnimation()
-
+                    
                     print("default")
                     
                 case .cancel:
@@ -365,10 +364,10 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     
                 }}))
             self.present(alert, animated: true, completion: nil)
-//            self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
-//                $0.removeFromSuperview()
-//            }
-
+            //            self.view.subviews.compactMap {  $0 as? UIVisualEffectView }.forEach {
+            //                $0.removeFromSuperview()
+            //            }
+            
             self.currentlyTableView.reloadData()
             
             self.refreshControl.endRefreshing()
@@ -398,7 +397,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
         navigationController?.isNavigationBarHidden = false
         searchTableView.isHidden = true
-
+        
     }
 }
 
@@ -437,12 +436,12 @@ extension ViewController: CLLocationManagerDelegate {
                         addressString.append(placemark.thoroughfare ?? "")
                         addressString.append(", ")
                         addressString.append(placemark.locality ?? "")
-//                        addressString.append(", ")
-//                        addressString.append(placemark.administrativeArea ?? "")
+                        //                        addressString.append(", ")
+                        //                        addressString.append(placemark.administrativeArea ?? "")
                         
                         self.navigationItem.title = addressString
                         self.lastLocationString = addressString
-
+                        
                     }
                 }
             }
@@ -484,7 +483,7 @@ extension ViewController: UITableViewDelegate {
                 let lastLoc = CLLocation(latitude: latitude, longitude: longitude)
                 chosenLocation = lastLoc
             }else {
-
+                
                 latitude = (lastLocation?.coordinate.latitude)!
                 longitude = (lastLocation?.coordinate.longitude)!
                 let lastLoc = CLLocation(latitude: latitude, longitude: longitude)
@@ -512,17 +511,6 @@ extension ViewController: UITableViewDelegate {
             
         }
     }
-    
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if searchTableView == tableView {
-//            return "Last Location " + lastLocationString
-//        }
-//        else{
-//            return nil
-//        }
-//    }
-    
-
 }
 
 //--------------------------------------------------------------------------
@@ -544,121 +532,96 @@ extension ViewController: UITableViewDataSource {
         var returnedCell = UITableViewCell()
         
         if tableView == currentlyTableView {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
-            return UITableViewCell()
-        }
-        cell.alertViewContainer.isHidden = true
-        
-        let dataPoint = WeatherController.shared.weather
-        let dataPointCurrent = WeatherController.shared.weatherbitWeatherCurrent
-        let dataPointDaily = WeatherController.shared.weatherbitWeatherDaily
-        let dataPointHourly = WeatherController.shared.weatherbitWeatherHourly
-        let dataPointAlert = WeatherController.shared.weatherbitWeatherAlerts
-        
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.alertViewContainer.isHidden = true
+            
+            let dataPointCurrent = WeatherController.shared.weatherbitWeatherCurrent
+            let dataPointDaily = WeatherController.shared.weatherbitWeatherDaily
+            let dataPointHourly = WeatherController.shared.weatherbitWeatherHourly
+            let dataPointAlert = WeatherController.shared.weatherbitWeatherAlerts
+            
             if let currentTemp = dataPointCurrent?.data?[0].app_temp {
-            let newCurrentTemp = String(format: "%.0f", currentTemp)
+                let newCurrentTemp = String(format: "%.0f", currentTemp)
                 cell.currentTempLabel.text = newCurrentTemp
-        }
-        
+            }
+            
             if let currentCondition = dataPointCurrent?.data?[0].weather?.descriptionField {
                 cell.currentConditionLabel.text = String(currentCondition)
-        }
-        
+            }
+            
             if let highTemp = dataPointDaily?.data?[0].appMaxTemp {
-            let newHighTemp = String(format: "%.0f", highTemp)
+                let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
-        }
-        
+            }
+            
             if let lowTemp = dataPointDaily?.data?[0].appMinTemp {
-            let newLowTemp = String(format: "%.0f", lowTemp)
+                let newLowTemp = String(format: "%.0f", lowTemp)
                 cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
-        }
-        
-        if let currentSummary = dataPoint?.daily?.data?[indexPath.row].summary {
-                cell.minutelyLookingAheadLabel.text = String(currentSummary)
-        }
-        
-        if let lookingAhead = dataPoint?.minutely?.summary {
-            cell.currentSummaryLabel.text = lookingAhead
-        }
+            }
+            
+            //        if let currentSummary = dataPoint?.daily?.data?[indexPath.row].summary {
+            //                cell.minutelyLookingAheadLabel.text = String(currentSummary)
+            //        }
+            //
+            //        if let lookingAhead = dataPoint?.minutely?.summary {
+            //            cell.currentSummaryLabel.text = lookingAhead
+            //        }
             let alertsCount = dataPointAlert?.alerts?.count ?? 0
             if alertsCount >= 1 {
                 cell.alertViewContainer.isHidden = false
             }
-//            if let alertsActive = dataPointAlert?.alerts?[0].descriptionField {
-//            print(alertsActive)
-//                cell.alertViewContainer.isHidden = false
-//        }
-        
-        //load animated gif
-        //TODO: load animation based on current weather conditions
-        //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
-        let conditionIcon = dataPointCurrent?.data?[indexPath.row].weather?.icon
-        switch conditionIcon {
-        case "t01d", "t02d", "t03d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "t01n","t02n", "t03n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "t04d","t05d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "t04n","t05n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "d01d","d02d", "d03d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "d01n","d02n", "d03n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "r01d","r02d", "r03d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "r01n","r02n", "r03n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "f01d","r04d","r05d","r06d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "f01n","r04n","r05n","r06n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "s01d","s02d","s03d","s04d","s05d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-         case "s01n","s02n","s03n","s04n","s05n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-         case "a01d","a02d","a03d","a04d","a05d", "a06d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-        case "a01n","a02n","a03n","a04n","a05n", "a06n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-        case "c01d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "c02d","c03d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
-        case "c04d":
-            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
-        case "c01n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "c02n","c03n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "c04n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        default:
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
             
-//        case "partly-cloudy-day":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-//        case "partly-cloudy-night":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-//        case "clear-day":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-//        case "clear-night":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
-//        case "rain":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-//        case "snow":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-//        case "sleet":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-//        case "wind":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
-//        case "fog":
-//            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-//        default:
-//            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        }
+            //load animated gif
+            //TODO: load animation based on current weather conditions
+            //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
+            let conditionIcon = dataPointCurrent?.data?[indexPath.row].weather?.icon
+            switch conditionIcon {
+            case "t01d", "t02d", "t03d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
+            case "t01n","t02n", "t03n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+            case "t04d","t05d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
+            case "t04n","t05n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+            case "d01d","d02d", "d03d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "d01n","d02n", "d03n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "r01d","r02d", "r03d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "r01n","r02n", "r03n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "f01d","r04d","r05d","r06d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "f01n","r04n","r05n","r06n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+            case "s01d","s02d","s03d","s04d","s05d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+            case "s01n","s02n","s03n","s04n","s05n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+            case "a01d","a02d","a03d","a04d","a05d", "a06d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+            case "a01n","a02n","a03n","a04n","a05n", "a06n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+            case "c01d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+            case "c02d","c03d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
+            case "c04d":
+                cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
+            case "c01n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+            case "c02n","c03n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+            case "c04n":
+                cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+            default:
+                cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
+                
+            }
             
             cell.dailyButton.layer.cornerRadius = 7
             cell.dailyButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
@@ -672,9 +635,9 @@ extension ViewController: UITableViewDataSource {
             cell.radarButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
             cell.radarButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
             
-        cell.lookingAheadCollectionView.reloadData()
+            cell.lookingAheadCollectionView.reloadData()
             
-        returnedCell = cell
+            returnedCell = cell
         }else if tableView == searchTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "SearchTableViewCell", for: indexPath) as? SearchTableViewCell else {
                 return UITableViewCell()
@@ -686,13 +649,13 @@ extension ViewController: UITableViewDataSource {
             }else {
                 cell.searchTitleLabel.attributedText = homeLocationTitle
                 cell.searchDetailsLabel.text = lastLocationString
-//                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
+                //                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
             }
             returnedCell = cell
         }
         return returnedCell
     }
-
+    
     
 }
 
@@ -717,9 +680,9 @@ extension ViewController: UICollectionViewDataSource {
         let dataPointHourly = WeatherController.shared.weatherbitWeatherHourly
         
         if let hourTime = dataPointHourly?.data?[indexPath.row].timestampLocal {
-//            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
+            //            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
             
-//            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
+            //            let dailyHourString = "\(hourlyTime)" // the date string to be parsed
             let df3 = DateFormatter()
             df3.locale = Locale(identifier: "en_US")
             df3.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -765,9 +728,9 @@ extension ViewController: UICollectionViewDataSource {
             cell.lookingAheadConditionImage.image = UIImage(named: "f01n")
         case "s01d","s02d","s03d","s04d","s05d":
             cell.lookingAheadConditionImage.image = UIImage(named: "s01d")
-         case "s01n","s02n","s03n","s04n","s05n":
+        case "s01n","s02n","s03n","s04n","s05n":
             cell.lookingAheadConditionImage.image = UIImage(named: "s01n")
-         case "a01d","a02d","a03d","a04d","a05d", "a06d":
+        case "a01d","a02d","a03d","a04d","a05d", "a06d":
             cell.lookingAheadConditionImage.image = UIImage(named: "a01d")
         case "a01n","a02n","a03n","a04n","a05n", "a06n":
             cell.lookingAheadConditionImage.image = UIImage(named: "a01n")
