@@ -124,10 +124,18 @@ extension HourlyViewController: UITableViewDataSource {
             cell.conditionIconImage.image = UIImage(named: "a01d")
         case "a01n","a02n","a03n","a04n","a05n", "a06n":
             cell.conditionIconImage.image = UIImage(named: "a01n")
-        case "c01d","c02d","c03d","c04d":
+        case "c01d":
             cell.conditionIconImage.image = UIImage(named: "c01d")
-        case "c01n","c02n","c03n","c04n":
+        case "c02d","c03d":
+            cell.conditionIconImage.image = UIImage(named: "c02d")
+        case "c04d":
+            cell.conditionIconImage.image = UIImage(named: "c04d")
+        case "c01n":
             cell.conditionIconImage.image = UIImage(named: "c01n")
+        case "c02n","c03n":
+            cell.conditionIconImage.image = UIImage(named: "c02n")
+        case "c04n":
+            cell.conditionIconImage.image = UIImage(named: "c04n")
         default:
             cell.conditionIconImage.image = UIImage(named: "c01d")
         }

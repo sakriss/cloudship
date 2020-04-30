@@ -623,10 +623,18 @@ extension ViewController: UITableViewDataSource {
             cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
         case "a01n","a02n","a03n","a04n","a05n", "a06n":
             cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-        case "c01d","c02d","c03d","c04d":
+        case "c01d":
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "c01n","c02n","c03n","c04n":
-            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
+        case "c02d","c03d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
+        case "c04d":
+            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
+        case "c01n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+        case "c02n","c03n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
+        case "c04n":
+            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
             
@@ -763,10 +771,18 @@ extension ViewController: UICollectionViewDataSource {
             cell.lookingAheadConditionImage.image = UIImage(named: "a01d")
         case "a01n","a02n","a03n","a04n","a05n", "a06n":
             cell.lookingAheadConditionImage.image = UIImage(named: "a01n")
-        case "c01d","c02d","c03d","c04d":
+        case "c01d":
             cell.lookingAheadConditionImage.image = UIImage(named: "c01d")
-        case "c01n","c02n","c03n","c04n":
+        case "c02d","c03d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c02d")
+        case "c04d":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c04d")
+        case "c01n":
             cell.lookingAheadConditionImage.image = UIImage(named: "c01n")
+        case "c02n","c03n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c02n")
+        case "c04n":
+            cell.lookingAheadConditionImage.image = UIImage(named: "c04n")
         default:
             cell.lookingAheadConditionImage.image = UIImage(named: "c01d")
         }
@@ -775,7 +791,15 @@ extension ViewController: UICollectionViewDataSource {
         percentFormatter.numberStyle = .percent
         
         if let precipChance = dataPointHourly?.data?[indexPath.row].precip {
-            cell.lookingAheadPrecipLabel.text = percentFormatter.string(from: precipChance as NSNumber)
+            let precipFormatted = String(format: "%.2f", precipChance)
+            let precipUnits: String
+            if defaults.string(forKey: "Units") == "units=i" {
+                precipUnits = "in"
+            } else {
+                precipUnits = "mm"
+            }
+            
+            cell.lookingAheadPrecipLabel.text = "\(precipFormatted)\(precipUnits)"
         }
         
         return cell
