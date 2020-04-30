@@ -40,6 +40,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     let alertTimePicker = UIDatePicker()
     var alertHour = 0
     var alertMin = 0
+    var selectedPickerUnits = [0]
     
     //--------------------------------------------------------------------------
     // MARK: - Actions
@@ -126,13 +127,19 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
             
         }
         
+//        if defaults.string(forKey: "Units") == "units=i" {
+//            picker.selectedRow(inComponent: 1)
+//        } else {
+//            picker.selectedRow(inComponent: 2)
+//        }
+        
         picker.isHidden = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(InfoViewController.tapFunction))
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
         
-        setUpAlertPicker()
-        registerLocal()
+//        setUpAlertPicker()
+//        registerLocal()
     }
     
     //--------------------------------------------------------------------------
@@ -279,11 +286,11 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func unitsToDisplay() {
         print(UserDefaults.standard.string(forKey: "Units")!)
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
-            if userDef == "units=S" {
+            if userDef == "units=i" {
                 unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
             }
             
-            if userDef == "units=I" {
+            if userDef == "units=m" {
                 unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
             }
         }
@@ -296,6 +303,16 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     //--------------------------------------------------------------------------
     
     @objc func tapFunction() {
+        print(defaults.string(forKey: "Units"))
+        print(picker.selectedRow(inComponent: 0))
+        
+        if defaults.string(forKey: "Units") == "units=i"
+        {
+            picker.selectRow(0, inComponent: 0, animated: true)
+        } else {
+            picker.selectRow(1, inComponent: 0, animated: true)
+        }
+        
         picker.isHidden = false
         view.addSubview(picker)
         unitsLabel.isUserInteractionEnabled = true
@@ -323,15 +340,16 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedPickerUnits = [row]
         let selectedRow = [row]
         
         if selectedRow == [0] {
             print("Selected row 0 - US")
-            defaults.set("units=us", forKey: "Units")
+            defaults.set("units=i", forKey: "Units")
             unitsLabel.text = "   Units \n   USA (Fahenheit, miles, mph)"
         } else{
             print("Selected row 1 - SI")
-            defaults.set("units=si", forKey: "Units")
+            defaults.set("units=m", forKey: "Units")
             unitsLabel.text = "   Units \n   SI (Celsius, km, m/s)"
         }
 

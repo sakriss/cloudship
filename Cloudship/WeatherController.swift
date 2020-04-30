@@ -46,7 +46,7 @@ class WeatherController: Codable {
         
         //        "https://api.weatherbit.io/v2.0/current?lat=47.1980208&lon=-122.1630685&units=I&key=fce7e60991d64234bfc549f55b96de21"
         let tempUnits = "units=I"
-        URLSession.shared.dataTask(with: URL(string: baseURL + ("lat=\(latitude)&lon=\(longitude)&\(tempUnits)&\(key)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
+        URLSession.shared.dataTask(with: URL(string: baseURL + ("lat=\(latitude)&lon=\(longitude)&\(units)&\(key)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
             print(baseURL + ("\(latitude),\(longitude)&\(units)&\(key)"))
             if let data = data {
                 let dataString = String(data: data, encoding: .utf8)
@@ -65,7 +65,7 @@ class WeatherController: Codable {
         
         //        "https://api.weatherbit.io/v2.0/current?lat=47.1980208&lon=-122.1630685&units=I&key=fce7e60991d64234bfc549f55b96de21"
         let tempDailyUnits = "units=I"
-        URLSession.shared.dataTask(with: URL(string: baseURLDaily + ("lat=\(latitude)&lon=\(longitude)&\(tempDailyUnits)&\(key)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
+        URLSession.shared.dataTask(with: URL(string: baseURLDaily + ("lat=\(latitude)&lon=\(longitude)&\(units)&\(key)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
             print(baseURLDaily + ("\(latitude),\(longitude)&\(units)&\(key)"))
             if let data = data {
                 let dataString = String(data: data, encoding: .utf8)
@@ -85,7 +85,7 @@ class WeatherController: Codable {
         //        "https://api.weatherbit.io/v2.0/current?lat=47.1980208&lon=-122.1630685&units=I&key=fce7e60991d64234bfc549f55b96de21"
         let tempHourlyUnits = "units=I"
         let hoursToReturn = "&hours=24"
-        URLSession.shared.dataTask(with: URL(string: baseURLHourly + ("lat=\(latitude)&lon=\(longitude)&\(tempHourlyUnits)&\(key)\(hoursToReturn)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
+        URLSession.shared.dataTask(with: URL(string: baseURLHourly + ("lat=\(latitude)&lon=\(longitude)&\(units)&\(key)\(hoursToReturn)"))!) { (data:Data?, response:URLResponse?, error:Error?) in
             print(baseURLHourly + ("lat=\(latitude)&lon=\(longitude)&\(tempHourlyUnits)&\(key)\(hoursToReturn)"))
             if let data = data {
                 let dataString = String(data: data, encoding: .utf8)
