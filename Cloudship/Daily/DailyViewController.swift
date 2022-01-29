@@ -185,6 +185,7 @@ extension DailyViewController: UITableViewDataSource {
                 let format = "h:mma"
                 let df4 = DateFormatter()
                 df4.dateFormat = format
+                df4.timeZone = TimeZone(identifier: dataPoint?.timezone ?? "")
                 df4.amSymbol = "AM"
                 df4.pmSymbol = "PM"
                 let string = df4.string(from: hour)
@@ -199,10 +200,12 @@ extension DailyViewController: UITableViewDataSource {
         let df5 = DateFormatter()
         df5.locale = Locale(identifier: "en_US")
         df5.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+        df5.timeZone = TimeZone(identifier: dataPoint?.timezone ?? "")
         if let hour = df5.date(from: dailySunsetString) {
             let format = "h:mma"
             let df6 = DateFormatter()
             df6.dateFormat = format
+            df6.timeZone = TimeZone(identifier: dataPoint?.timezone ?? "")
             df6.amSymbol = "AM"
             df6.pmSymbol = "PM"
             let string = df6.string(from: hour)
