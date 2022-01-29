@@ -131,8 +131,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
         
-        setUpAlertPicker()
-        registerLocal()
+//        setUpAlertPicker()
+//        registerLocal()
     }
     
     //--------------------------------------------------------------------------
@@ -279,11 +279,11 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func unitsToDisplay() {
         print(UserDefaults.standard.string(forKey: "Units")!)
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
-            if userDef == "units_system=us" {
+            if userDef == "units=us" {
                 unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
             }
             
-            if userDef == "units_system=si" {
+            if userDef == "units=si" {
                 unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
             }
         }
@@ -296,9 +296,23 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     //--------------------------------------------------------------------------
     
     @objc func tapFunction() {
-        picker.isHidden = false
-        view.addSubview(picker)
-        unitsLabel.isUserInteractionEnabled = true
+//        picker.isHidden = false
+//        view.addSubview(picker)
+//        unitsLabel.isUserInteractionEnabled = true
+        
+        print(defaults.string(forKey: "Units"))
+                print(picker.selectedRow(inComponent: 0))
+                
+                if defaults.string(forKey: "Units") == "units=i"
+                {
+                    picker.selectRow(0, inComponent: 0, animated: true)
+                } else {
+                    picker.selectRow(1, inComponent: 0, animated: true)
+                }
+                
+                picker.isHidden = false
+                view.addSubview(picker)
+                unitsLabel.isUserInteractionEnabled = true
     }
     
 //    @objc func alertTapFunction() {

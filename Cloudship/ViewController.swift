@@ -282,6 +282,8 @@ class ViewController: UIViewController, UISearchBarDelegate {
         let dataPoint = WeatherController.shared.weather
         let dataPointDaily = WeatherController.shared.climacellDailyWeather
         let dataPointHourly = WeatherController.shared.climacellHourlyWeather
+        let dataPointV4 = WeatherController.shared.climacellV4Weather
+        
         
         if let blah = dataPointHourly?[0].temp?.value{
             print("REALTIME WEATHER IS: \(blah)")
@@ -368,7 +370,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     
                 case .destructive:
                     print("destructive")
-                    
                     
                 }}))
             self.present(alert, animated: true, completion: nil)
@@ -559,8 +560,9 @@ extension ViewController: UITableViewDataSource {
         let dataPoint = WeatherController.shared.weather
         let dataPointHourly = WeatherController.shared.climacellHourlyWeather
         let dataPointDaily = WeatherController.shared.climacellDailyWeather
+            let dataPointV4 = WeatherController.shared.climacellV4Weather?.data?.timelines
         
-            if let currentTemp = dataPointHourly?[0].temp?.value {
+            if let currentTemp = dataPointV4?[0].intervals?[0].values?.temperature {
             let newCurrentTemp = String(format: "%.0f", currentTemp)
                 cell.currentTempLabel.text = newCurrentTemp
         }
@@ -569,7 +571,7 @@ extension ViewController: UITableViewDataSource {
                 cell.currentConditionLabel.text = currentCondition
         }
         
-            if let highTemp = dataPointDaily?[0].temp?[1].max?.value {
+            if let highTemp = dataPointV4?[0].intervals?[0].values?.temperature {
             let newHighTemp = String(format: "%.0f", highTemp)
                 cell.highTempLabel.text = newHighTemp + "\u{00B0}"
         }
@@ -595,27 +597,53 @@ extension ViewController: UITableViewDataSource {
         //load animated gif
         //TODO: load animation based on current weather conditions
         //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
-        let conditionIcon = dataPoint?.hourly?.data?[indexPath.item].icon
+        let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
         switch conditionIcon {
         case "cloudy":
             cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
-        case "partly-cloudy-day":
+        case "partly_cloudy":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "partly-cloudy-night":
+        case "mostly_cloudy":
             cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "clear-day":
+        case "clear":
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "clear-night":
-            cell.backgroundAnimatedImage.image = UIImage(named: "clearnightbackground")
+        case "mostly_clear":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
         case "rain":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "rain_light":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "rain_heavy":
+            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
+        case "drizzle":
             cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
         case "snow":
             cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "sleet":
+        case "snow_light":
+            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+        case "flurries":
+            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+        case "snow_heavy":
+            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
+        case "freezing_rain_heavy":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "freezing_rain":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "freezing_rain_light":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "freezing_drizzle":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "ice_pellets_heavy":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "ice_pellets":
+            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
+        case "ice_pellets_light":
             cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
         case "wind":
             cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
         case "fog":
+            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
+        case "fog_light":
             cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
         default:
             cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")

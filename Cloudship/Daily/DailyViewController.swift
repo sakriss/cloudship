@@ -22,6 +22,7 @@ class DailyViewController: UIViewController {
     var selectedRowIndex: NSIndexPath = NSIndexPath(row: -1, section: 0)
     let dataPoint = WeatherController.shared.weather?.daily
     let dataPointDaily = WeatherController.shared.climacellDailyWeather
+    let dataPointHourly = WeatherController.shared.climacellHourlyWeather
     var isExpanded = false
     
     //--------------------------------------------------------------------------
@@ -221,8 +222,10 @@ extension DailyViewController: UITableViewDataSource {
             print("Unable to parse date string")
         }
         
-        if let dailyCloudCover = dataPoint?.daily?.data?[indexPath.row].cloudCover {
-            cell.dailyCloudCoverLabel.text = percentFormatter.string(from: dailyCloudCover as NSNumber)
+        if let dailyCloudCover = dataPointHourly?[indexPath.row].cloud_cover?.value {
+            let newCloudCover = String(format: "%.0f", dailyCloudCover)
+//            cell.dailyCloudCoverLabel.text = percentFormatter.string(from: dailyCloudCover as NSNumber)
+            cell.dailyCloudCoverLabel.text = newCloudCover + "%"
         }
         
         return cell

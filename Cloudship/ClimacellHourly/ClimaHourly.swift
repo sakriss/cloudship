@@ -16,5 +16,6 @@ class ClimaHourly: Codable {
     let temp : Temp?
     let weather_code : WeatherCode?
     let wind_direction : WindDirection?
+    let cloud_cover : CloudCover?
     let wind_speed : WindSpeed?
 }

@@ -43,6 +43,7 @@
 		16D5C11620C6E83F00B5F44B /* CurrentlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */; };
 		16F5BD832100010600A93A03 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16F5BD822100010600A93A03 /* Settings.bundle */; };
 		37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */; };
+		D21908FA26278F5B00FFB366 /* ClimacellV4.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21908F926278F5B00FFB366 /* ClimacellV4.swift */; };
 		D21926532441346B005184BF /* ClimacellDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926522441346A005184BF /* ClimacellDaily.swift */; };
 		D21926562444D4DD005184BF /* ClimaDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926552444D4DC005184BF /* ClimaDaily.swift */; };
 		D21926582444D554005184BF /* Humidity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21926572444D554005184BF /* Humidity.swift */; };
@@ -63,6 +64,7 @@
 		D22606E92440DAF100F7A01C /* RealTime2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606E82440DAF100F7A01C /* RealTime2.swift */; };
 		D22606EB2440DB7300F7A01C /* Temp2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606EA2440DB7300F7A01C /* Temp2.swift */; };
 		D22606ED2440DBAC00F7A01C /* ObservationTime2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22606EC2440DBAC00F7A01C /* ObservationTime2.swift */; };
+		D24911ED2581DE07006606AB /* CloudCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24911EC2581DE07006606AB /* CloudCover.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -122,6 +124,7 @@
 		16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlyTableViewCell.swift; sourceTree = "<group>"; };
 		16F5BD822100010600A93A03 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.debug.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.debug.xcconfig"; sourceTree = "<group>"; };
+		D21908F926278F5B00FFB366 /* ClimacellV4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimacellV4.swift; sourceTree = "<group>"; };
 		D21926522441346A005184BF /* ClimacellDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimacellDaily.swift; sourceTree = "<group>"; };
 		D21926552444D4DC005184BF /* ClimaDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimaDaily.swift; sourceTree = "<group>"; };
 		D21926572444D554005184BF /* Humidity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Humidity.swift; sourceTree = "<group>"; };
@@ -142,6 +145,7 @@
 		D22606E82440DAF100F7A01C /* RealTime2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime2.swift; sourceTree = "<group>"; };
 		D22606EA2440DB7300F7A01C /* Temp2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Temp2.swift; sourceTree = "<group>"; };
 		D22606EC2440DBAC00F7A01C /* ObservationTime2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationTime2.swift; sourceTree = "<group>"; };
+		D24911EC2581DE07006606AB /* CloudCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudCover.swift; sourceTree = "<group>"; };
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -193,6 +197,7 @@
 		162DC6032020FAAB00C19DCE /* Cloudship */ = {
 			isa = PBXGroup;
 			children = (
+				D21908F826278F0100FFB366 /* Tomorrow.io */,
 				D219266E2444DD51005184BF /* ClimacellHourly */,
 				D21926592444D605005184BF /* CommonData */,
 				D21926542444D48F005184BF /* ClimacellDaily */,
@@ -309,6 +314,14 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		D21908F826278F0100FFB366 /* Tomorrow.io */ = {
+			isa = PBXGroup;
+			children = (
+				D21908F926278F5B00FFB366 /* ClimacellV4.swift */,
+			);
+			path = Tomorrow.io;
+			sourceTree = "<group>";
+		};
 		D21926542444D48F005184BF /* ClimacellDaily */ = {
 			isa = PBXGroup;
 			children = (
@@ -334,6 +347,7 @@
 				D21926712444E14B005184BF /* Temp.swift */,
 				D21926732444E6B5005184BF /* WindSpeed.swift */,
 				D21926752444E6EF005184BF /* WindDirection.swift */,
+				D24911EC2581DE07006606AB /* CloudCover.swift */,
 			);
 			path = CommonData;
 			sourceTree = "<group>";
@@ -526,11 +540,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D21908FA26278F5B00FFB366 /* ClimacellV4.swift in Sources */,
 				D21926672444D79B005184BF /* WindDirectionDaily.swift in Sources */,
 				1620610420AF6462004E00BD /* HourlyData.swift in Sources */,
 				D21926612444D72A005184BF /* Sunset.swift in Sources */,
 				1620611020AF6770004E00BD /* Alerts.swift in Sources */,
 				1620610620AF652D004E00BD /* Daily.swift in Sources */,
+				D24911ED2581DE07006606AB /* CloudCover.swift in Sources */,
 				D219265D2444D6C5005184BF /* PrecipitationProbability.swift in Sources */,
 				1620611220AF679A004E00BD /* Flags.swift in Sources */,
 				D21926742444E6B5005184BF /* WindSpeed.swift in Sources */,

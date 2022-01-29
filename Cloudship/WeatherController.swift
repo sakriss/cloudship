@@ -21,6 +21,7 @@ class WeatherController: Codable {
     //    var climacellDailyWeather: [ClimaWeatherDailyElement]?
     var climacellDailyWeather: [ClimaDaily]?
     var climacellHourlyWeather: [ClimaHourly]?
+    var climacellV4Weather: ClimacellV4?
     
     //    func fetchWeatherInfo(latitude: Double, longitude: Double, units: String) {
     //        //let units = "units=us"
@@ -72,73 +73,135 @@ class WeatherController: Codable {
     func fetchWeatherInfo(lat: Double, lon: Double, units: String) {
         //let units = "units=us"
         // MARK: Hourly Call
-        var baseHourlyURL = "https://api.climacell.co/v3/weather/forecast/hourly?"
-        let sessionHourly = URLSession.shared
-        baseHourlyURL.append("lat=\(lat)")
-        baseHourlyURL.append("&lon=\(lon)")
-        baseHourlyURL.append("&unit_system=us")
-        baseHourlyURL.append("&fields=")
-        baseHourlyURL.append("precipitation_probability")
-        baseHourlyURL.append(",temp")
-        baseHourlyURL.append(",wind_speed")
-        baseHourlyURL.append(",wind_direction")
-        baseHourlyURL.append(",weather_code")
-        baseHourlyURL.append("&start_time=now")
+//        var baseHourlyURL = "https://api.climacell.co/v3/weather/forecast/hourly?"
+//        let sessionHourly = URLSession.shared
+//        baseHourlyURL.append("lat=\(lat)")
+//        baseHourlyURL.append("&lon=\(lon)")
+//        baseHourlyURL.append("&unit_system=us")
+//        baseHourlyURL.append("&fields=")
+//        baseHourlyURL.append("precipitation_probability")
+//        baseHourlyURL.append(",temp")
+//        baseHourlyURL.append(",wind_speed")
+//        baseHourlyURL.append(",wind_direction")
+//        baseHourlyURL.append(",weather_code")
+//        baseHourlyURL.append(",cloud_cover")
+//        baseHourlyURL.append("&start_time=now")
+//
+//        let urlHourly = URL(string: baseHourlyURL)!
+//        var requestHourly = URLRequest(url: urlHourly)
+//        let headers = [
+//            "apikey": "tahOlvrTehJfjz8fwsY0BJ0O9dOuKxzn"
+//        ]
+//        requestHourly.allHTTPHeaderFields = headers
+//        print("REQUEST : \(requestHourly)")
+//
+//        // Hourly
+//        sessionHourly.dataTask(with: requestHourly, completionHandler: { (data:Data?, response:URLResponse?, error:Error?) in
+//            print(baseHourlyURL + ("\(lat),\(lon)"))
+//            print(requestHourly)
+//            if let data = data {
+//                let dataString = String(data: data, encoding: .utf8)
+//                print(dataString ?? "")
+//                self.climacellHourlyWeather = ( try! JSONDecoder().decode([ClimaHourly].self, from: data))
+//                NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
+//            }else {
+//                print("ERROR: \(error!)")
+//                NotificationCenter.default.post(name: WeatherController.weatherDataParseFailed, object: nil)
+//            }
+//        }).resume()
+//
+//        // MARK: Daily Call
+//        var baseDailyURL = "https://api.climacell.co/v3/weather/forecast/daily?"
+//        let session = URLSession.shared
+//        baseDailyURL.append("lat=\(lat)")
+//        baseDailyURL.append("&lon=\(lon)")
+//        baseDailyURL.append("&start_time=now")
+//        baseDailyURL.append("&unit_system=us")
+//        baseDailyURL.append("&fields=temp%3AF")
+//
+//        baseDailyURL.append(",wind_speed")
+//        baseDailyURL.append(",wind_direction")
+//        baseDailyURL.append(",precipitation_probability")
+//        baseDailyURL.append(",humidity")
+//        baseDailyURL.append(",sunrise")
+//        baseDailyURL.append(",sunset")
+//        baseDailyURL.append(",weather_code")
+//        //        baseURL.append("\(lat),\(lon)?\(units)")
+//        let urlDaily = URL(string: baseDailyURL)!
+//        var requestDaily = URLRequest(url: urlDaily)
+//
+//        requestDaily.allHTTPHeaderFields = headers
+//        print("REQUEST : \(requestDaily)")
+//
+//        // Hourly
+//        session.dataTask(with: requestDaily, completionHandler: { (data:Data?, response:URLResponse?, error:Error?) in
+//            print(baseDailyURL + ("\(lat),\(lon)"))
+//            print(requestDaily)
+//            if let data = data {
+//                let dataString = String(data: data, encoding: .utf8)
+//                print(dataString ?? "")
+//                self.climacellDailyWeather = ( try! JSONDecoder().decode([ClimaDaily].self, from: data))
+//                NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
+//            }else {
+//                print("ERROR: \(error!)")
+//                NotificationCenter.default.post(name: WeatherController.weatherDataParseFailed, object: nil)
+//            }
+//        }).resume()
         
-        let urlHourly = URL(string: baseHourlyURL)!
-        var requestHourly = URLRequest(url: urlHourly)
-        let headers = [
-            "apikey": "tahOlvrTehJfjz8fwsY0BJ0O9dOuKxzn"
-        ]
-        requestHourly.allHTTPHeaderFields = headers
-        print("REQUEST : \(requestHourly)")
+        // MARK: Tomorrow V4 Call
+//        let timeNow: Date = Date()
+        let date = Date()
+        let modifiedDate = Calendar.current.date(byAdding: .day, value: 1, to: date)!
+        let formatter = DateFormatter()
+        formatter.timeZone = NSTimeZone(abbreviation: "UTC")! as TimeZone
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.string(from: date)
+        let dateFormatted = formatter.string(from: date)
+        let tomorrowFormatted = formatter.string(from: modifiedDate)
+        
+//        let timeString = String(timeNow)
+        var tomorrowURL = "https://api.tomorrow.io/v4/timelines?"
+        let sessionTomorrow = URLSession.shared
+        tomorrowURL.append("location=\(lat)")
+        tomorrowURL.append(",\(lon)")
+        tomorrowURL.append("&fields=")
+        tomorrowURL.append("precipitationIntensity")
+        tomorrowURL.append(",temperature")
+        tomorrowURL.append(",windSpeed")
+        tomorrowURL.append(",windDirection")
+        tomorrowURL.append(",precipitationProbability")
+        tomorrowURL.append(",precipitationType")
+        tomorrowURL.append(",humidity")
+        tomorrowURL.append(",sunsetTime")
+        tomorrowURL.append(",sunriseTime")
+        tomorrowURL.append(",weatherCode")
+        tomorrowURL.append(",cloudCover")
+        tomorrowURL.append("&startTime=")
+        tomorrowURL.append(dateFormatted)
+        tomorrowURL.append("&endTime=")
+        tomorrowURL.append(tomorrowFormatted)
+        tomorrowURL.append("&timesteps=1d")
+        tomorrowURL.append("&units=imperial")
+        tomorrowURL.append("&timezone=UTC")
+        tomorrowURL.append("&apikey=KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM")
+        
+        let urlTomorrow = URL(string: tomorrowURL)!
+        var requestTomorrow = URLRequest(url: urlTomorrow)
+//        let headers = [
+//            "apikey": "tahOlvrTehJfjz8fwsY0BJ0O9dOuKxzn"
+//        ]
+        //requestTomorrow.allHTTPHeaderFields = headers
+        requestTomorrow.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        print("REQUEST : \(requestTomorrow)")
         
         // Hourly
-        sessionHourly.dataTask(with: requestHourly, completionHandler: { (data:Data?, response:URLResponse?, error:Error?) in
-            print(baseHourlyURL + ("\(lat),\(lon)"))
-            print(requestHourly)
+        sessionTomorrow.dataTask(with: requestTomorrow, completionHandler: { (data:Data?, response:URLResponse?, error:Error?) in
+            //print(baseHourlyURL + ("\(lat),\(lon)"))
+            print(requestTomorrow)
             if let data = data {
                 let dataString = String(data: data, encoding: .utf8)
                 print(dataString ?? "")
-                self.climacellHourlyWeather = ( try! JSONDecoder().decode([ClimaHourly].self, from: data))
-                NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
-            }else {
-                print("ERROR: \(error!)")
-                NotificationCenter.default.post(name: WeatherController.weatherDataParseFailed, object: nil)
-            }
-        }).resume()
-        
-        // MARK: Daily Call
-        var baseDailyURL = "https://api.climacell.co/v3/weather/forecast/daily?"
-        let session = URLSession.shared
-        baseDailyURL.append("lat=\(lat)")
-        baseDailyURL.append("&lon=\(lon)")
-        baseDailyURL.append("&start_time=now")
-        baseDailyURL.append("&unit_system=us")
-        baseDailyURL.append("&fields=temp%3AF")
-        
-        baseDailyURL.append(",wind_speed")
-        baseDailyURL.append(",wind_direction")
-        baseDailyURL.append(",precipitation_probability")
-        baseDailyURL.append(",humidity")
-        baseDailyURL.append(",sunrise")
-        baseDailyURL.append(",sunset")
-        baseDailyURL.append(",weather_code")
-        //        baseURL.append("\(lat),\(lon)?\(units)")
-        let urlDaily = URL(string: baseDailyURL)!
-        var requestDaily = URLRequest(url: urlDaily)
-        
-        requestDaily.allHTTPHeaderFields = headers
-        print("REQUEST : \(requestDaily)")
-        
-        // Hourly
-        session.dataTask(with: requestDaily, completionHandler: { (data:Data?, response:URLResponse?, error:Error?) in
-            print(baseDailyURL + ("\(lat),\(lon)"))
-            print(requestDaily)
-            if let data = data {
-                let dataString = String(data: data, encoding: .utf8)
-                print(dataString ?? "")
-                self.climacellDailyWeather = ( try! JSONDecoder().decode([ClimaDaily].self, from: data))
+                self.climacellV4Weather = ( try! JSONDecoder().decode(ClimacellV4.self, from: data))
                 NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
             }else {
                 print("ERROR: \(error!)")

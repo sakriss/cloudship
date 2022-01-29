@@ -19,5 +19,6 @@ class ClimaDaily: Codable {
     let temp : [DailyTemp]?
     let weather_code : WeatherCode?
     let wind_direction : [WindDirectionDaily]?
+    let cloud_cover : [CloudCover]?
     let wind_speed : [WindSpeedDaily]?
 }
