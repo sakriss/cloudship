@@ -78,7 +78,7 @@ extension DailyViewController: UITableViewDelegate {
 
 extension DailyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (dataPointDaily?.count)!
+        return dataPointDaily?.count ?? 0
         
     }
     

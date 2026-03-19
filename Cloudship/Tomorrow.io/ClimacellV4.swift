@@ -7,72 +7,105 @@
 //
 
 import Foundation
-
 import UIKit
 
 // MARK: - ClimacellV4
-class ClimacellV4: Codable {
-    let data: DataClass?
+//struct ClimacellV4: Codable {
+//    let data: DataClass?
+//}
+//
+//// MARK: - DataClass
+//struct DataClass: Codable {
+//    let timelines: [Timeline]?
+//}
+//
+//// MARK: - Timeline
+//struct Timeline: Codable {
+//    let timestep: String?
+//    let startTime, endTime: String?
+//    let intervals: [Interval]?
+//}
+//
+//// MARK: - Interval
+//struct Interval: Codable {
+//    let startTime: String?
+//    let values: Values?
+//}
+//
+//// MARK: - Values
+//struct Values: Codable {
+//    let precipitationIntensity: Double?
+//    let temperature,temperatureMax, temperatureMin, humidity, windSpeed, windDirection: Double?
+//    let precipitationProbability, precipitationType: Double?
+//    let sunriseTime, sunsetTime: String?
+//    let cloudCover: Double?
+//    let weatherCode: Int?
+//}
 
-    init(data: DataClass?) {
-        self.data = data
+struct ClimacellV4: Codable {
+    let realtime: RealtimeWeather?
+    let forecast: ForecastResponse? // Add the forecast property here
+
+    struct RealtimeWeather: Codable {
+        let time: String
+        let values: RealtimeValues
+        let location: Location
     }
-}
 
-// MARK: - DataClass
-class DataClass: Codable {
-    let timelines: [Timeline]?
-
-    init(timelines: [Timeline]?) {
-        self.timelines = timelines
+    struct ForecastResponse: Codable {
+        let time: String
+        let values: ForecastValues
+        let location: Location
     }
-}
 
-// MARK: - Timeline
-class Timeline: Codable {
-    let timestep: String?
-    let startTime, endTime: String?
-    let intervals: [Interval]?
-
-    init(timestep: String?, startTime: String?, endTime: String?, intervals: [Interval]?) {
-        self.timestep = timestep
-        self.startTime = startTime
-        self.endTime = endTime
-        self.intervals = intervals
+    struct RealtimeValues: Codable {
+        let cloudBase: Double?
+        let cloudCeiling: Double?
+        let cloudCover: Int?
+        let dewPoint: Double?
+        let freezingRainIntensity: Double?
+        let humidity: Int?
+        let precipitationProbability: Int?
+        let pressureSurfaceLevel: Double?
+        let rainIntensity: Double?
+        let sleetIntensity: Double?
+        let snowIntensity: Double?
+        let temperature: Double?
+        let temperatureApparent: Double?
+        let uvHealthConcern: Int?
+        let uvIndex: Int?
+        let visibility: Double?
+        let weatherCode: Int?
+        let windDirection: Double?
+        let windGust: Double?
+        let windSpeed: Double?
     }
-}
 
-// MARK: - Interval
-class Interval: Codable {
-    let startTime: String?
-    let values: Values?
-
-    init(startTime: String?, values: Values?) {
-        self.startTime = startTime
-        self.values = values
+    struct ForecastValues: Codable {
+        let cloudBase: Double
+        let cloudCeiling: Double
+        let cloudCover: Int
+        let dewPoint: Double
+        let freezingRainIntensity: Double
+        let humidity: Int
+        let precipitationProbability: Int
+        let pressureSurfaceLevel: Double
+        let rainIntensity: Double
+        let sleetIntensity: Double
+        let snowIntensity: Double
+        let temperature: Double
+        let temperatureApparent: Double
+        let uvHealthConcern: Int
+        let uvIndex: Int
+        let visibility: Double
+        let weatherCode: Int
+        let windDirection: Double
+        let windGust: Double
+        let windSpeed: Double
     }
-}
 
-// MARK: - Values
-class Values: Codable {
-    let precipitationIntensity: Double?
-    let temperature, humidity, windSpeed, windDirection: Double?
-    let precipitationProbability, precipitationType: Double?
-    let sunriseTime, sunsetTime: String?
-    let cloudCover: Double?
-    let weatherCode: Int?
-
-    init(precipitationIntensity: Double?, temperature: Double?, humidity: Double?, windSpeed: Double?, windDirection: Double?, precipitationProbability: Double?, precipitationType: Double?, sunriseTime: String?, sunsetTime: String?, cloudCover: Double?, weatherCode: Int?) {
-        self.precipitationIntensity = precipitationIntensity
-        self.temperature = temperature
-        self.humidity = humidity
-        self.windSpeed = windSpeed
-        self.windDirection = windDirection
-        self.precipitationProbability = precipitationProbability
-        self.precipitationType = precipitationType
-        self.sunriseTime = sunriseTime
-        self.sunsetTime = sunsetTime
-        self.cloudCover = cloudCover
-        self.weatherCode = weatherCode
+    struct Location: Codable {
+        let lat: Double
+        let lon: Double
     }
 }

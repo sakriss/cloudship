@@ -44,7 +44,7 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - AerisWeather
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
@@ -58,6 +58,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: 6481e6318c5fcabaaa8513ef8120f329055d7c10
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
 
-PODFILE CHECKSUM: 7ca3a7b777a90a5d5579dcf225b0a766192dfab5
+PODFILE CHECKSUM: 2f0e4fc847facd03cdcef72b91ce25301887a987
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.4

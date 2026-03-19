@@ -215,7 +215,15 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let longitude = response?.boundingRegion.center.longitude
 
 //                let coordinate:CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitude!, longitude!)
-                WeatherController.shared.fetchWeatherInfo(lat: latitude!, lon: longitude!, units: units!)
+                Task{
+                    do {
+                        // Await the asynchronous function call
+                        try await WeatherController.shared.fetchWeatherInfo(lat: latitude!, lon: longitude!, units: units!)
+                    } catch {
+                        // Handle the error
+                        print("Error fetching weather info: \(error)")
+                    }
+                }
                 //self.navigationItem.title = searchBar.text
 
                 let geoCoder = CLGeocoder()
@@ -430,7 +438,15 @@ extension ViewController: CLLocationManagerDelegate {
             
             lastLocation = location
             chosenLocation = location
-            WeatherController.shared.fetchWeatherInfo(lat: location.coordinate.latitude, lon:location.coordinate.longitude, units: units!)
+            Task{
+                do {
+                    // Await the asynchronous function call
+                    try await WeatherController.shared.fetchWeatherInfo(lat: location.coordinate.latitude, lon: location.coordinate.longitude, units: units!)
+                } catch {
+                    // Handle the error
+                    print("Error fetching weather info: \(error)")
+                }
+            }
             
             let geocoder = CLGeocoder()
             geocoder.reverseGeocodeLocation(location) { (placemarks:[CLPlacemark]?, error: Error?) in
@@ -499,7 +515,15 @@ extension ViewController: UITableViewDelegate {
                 chosenLocation = lastLoc
             }
             
-            WeatherController.shared.fetchWeatherInfo(lat: latitude, lon: longitude, units: units!)
+            Task{
+                do {
+                    // Await the asynchronous function call
+                    try await WeatherController.shared.fetchWeatherInfo(lat: latitude, lon: longitude, units: units!)
+                } catch {
+                    // Handle the error
+                    print("Error fetching weather info: \(error)")
+                }
+            }
             
             let geoCoder = CLGeocoder()
             let location = CLLocation(latitude: latitude, longitude: longitude)
@@ -549,106 +573,69 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var returnedCell = UITableViewCell()
-        
         if tableView == currentlyTableView {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
-            return UITableViewCell()
-        }
-        cell.alertViewContainer.isHidden = true
-        
-        let dataPoint = WeatherController.shared.weather
-        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
-        let dataPointDaily = WeatherController.shared.climacellDailyWeather
-            let dataPointV4 = WeatherController.shared.climacellV4Weather?.data?.timelines
-        
-            if let currentTemp = dataPointV4?[0].intervals?[0].values?.temperature {
-            let newCurrentTemp = String(format: "%.0f", currentTemp)
-                cell.currentTempLabel.text = newCurrentTemp
-        }
-        
-            if let currentCondition = dataPointHourly?[0].weather_code?.value {
-                cell.currentConditionLabel.text = currentCondition
-        }
-        
-            if let highTemp = dataPointV4?[0].intervals?[0].values?.temperature {
-            let newHighTemp = String(format: "%.0f", highTemp)
-                cell.highTempLabel.text = newHighTemp + "\u{00B0}"
-        }
-        
-        if let lowTemp = dataPointDaily?[0].temp?[0].min?.value {
-            let newLowTemp = String(format: "%.0f", lowTemp)
-                cell.lowTempLabel.text = newLowTemp + "\u{00B0}"
-        }
-        
-        if let currentSummary = dataPoint?.daily?.data?[indexPath.row].summary {
-                cell.minutelyLookingAheadLabel.text = String(currentSummary)
-        }
-        
-        if let lookingAhead = dataPoint?.minutely?.summary {
-                cell.currentSummaryLabel.text = lookingAhead
-        }
-
-        if let alertsActive = dataPoint?.alerts?[indexPath.row] {
-            print(alertsActive)
-                cell.alertViewContainer.isHidden = false
-        }
-        
-        //load animated gif
-        //TODO: load animation based on current weather conditions
-        //cell.backgroundAnimatedImage.loadGif(asset: "cloudygif")
-        let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
-        switch conditionIcon {
-        case "cloudy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "mostlycloudybackground")
-        case "partly_cloudy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudybackground")
-        case "mostly_cloudy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "partlycloudynightbackground")
-        case "clear":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "mostly_clear":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        case "rain":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "rain_light":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "rain_heavy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "drizzle":
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainbackground")
-        case "snow":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "snow_light":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "flurries":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "snow_heavy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "snowbackground")
-        case "freezing_rain_heavy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "freezing_rain":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "freezing_rain_light":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "freezing_drizzle":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "ice_pellets_heavy":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "ice_pellets":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "ice_pellets_light":
-            cell.backgroundAnimatedImage.image = UIImage(named: "sleetbackground")
-        case "wind":
-            cell.backgroundAnimatedImage.image = UIImage(named: "windybackground")
-        case "fog":
-            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-        case "fog_light":
-            cell.backgroundAnimatedImage.image = UIImage(named: "fogbackground")
-        default:
-            cell.backgroundAnimatedImage.image = UIImage(named: "rainierbackground")
-        }
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentlyTableViewCell", for: indexPath) as? CurrentlyTableViewCell else {
+                return UITableViewCell() // Return a default cell if dequeue fails
+            }
             
+            // Hide alert view container initially
+            cell.alertViewContainer.isHidden = true
+            print("GIVE ME THE TEMPERATURE PLEASE 1st")
+//            let weatherData = try await fetchCurrentWeather(lat: lat, lon: lon, units: units)
+            print(WeatherController.shared.climacellV4Weather?.realtime?.values)
+            print(WeatherController.shared.climacellV4Weather?.forecast?.values)
+            // Access weather data
+            guard let realtime = WeatherController.shared.climacellV4Weather?.realtime?.values.temperature else {
+                            cell.currentTempLabel.text = "--"
+                            return cell
+                        }
+            print("GIVE ME THE TEMPERATURE PLEASE 2nd")
+            print(WeatherController.shared.climacellV4Weather?.realtime?.values.temperature)
+            // Set current temperature
+            if let forecastData = WeatherController.shared.climacellV4Weather?.realtime?.values,
+               let currentWeather =  forecastData.temperature {
+                        // Set current temperature
+                let currentTemperature = forecastData.temperature
+                let currentNewTemp = String(format: "%.0f", currentTemperature!)
+                        cell.currentTempLabel.text = "\(currentNewTemp)°"
+                    } else {
+                        cell.currentTempLabel.text = "--"
+                    }
+                
+            
+            // Set high and low temperatures
+//            if let dailyWeather = timelines.daily?.first {
+//                            if let highTemperature = dailyWeather.values?.temperatureMax,
+//                               let lowTemperature = dailyWeather.values?.temperatureMin {
+//                                print("High Temp: \(highTemperature), Low Temp: \(lowTemperature)")
+//                                cell.highTempLabel.text = String(format: "%.0f", highTemperature) + "°"
+//                                cell.lowTempLabel.text = String(format: "%.0f", lowTemperature) + "°"
+//                            } else {
+//                                cell.highTempLabel.text = "--"
+//                                cell.lowTempLabel.text = "--"
+//                            }
+//                        }
+            
+            // Set current condition and summary
+            if let currentCondition = WeatherController.shared.climacellHourlyWeather?.first?.weather_code?.value {
+                cell.currentConditionLabel.text = currentCondition
+            }
+            
+            if let currentSummary = WeatherController.shared.weather?.daily?.data?[indexPath.row].summary {
+                cell.minutelyLookingAheadLabel.text = currentSummary
+            }
+            
+            if let lookingAhead = WeatherController.shared.weather?.minutely?.summary {
+                cell.currentSummaryLabel.text = lookingAhead
+            }
+            
+            // Set alerts
+            if let alertsActive = WeatherController.shared.weather?.alerts?[indexPath.row] {
+                print(alertsActive)
+                cell.alertViewContainer.isHidden = false
+            }
+            
+            // Style buttons
             cell.dailyButton.layer.cornerRadius = 7
             cell.dailyButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
             cell.dailyButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
@@ -661,141 +648,143 @@ extension ViewController: UITableViewDataSource {
             cell.radarButton.layer.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.25).cgColor
             cell.radarButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10)
             
-        cell.lookingAheadCollectionView.reloadData()
+            cell.lookingAheadCollectionView.reloadData()
             
-        returnedCell = cell
-        }else if tableView == searchTableView {
+            return cell
+        } else if tableView == searchTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "SearchTableViewCell", for: indexPath) as? SearchTableViewCell else {
-                return UITableViewCell()
+                return UITableViewCell() // Return a default cell if dequeue fails
             }
             if indexPath.row < matchingItems.count {
                 let selectedItem = matchingItems[indexPath.row].placemark
                 cell.searchTitleLabel?.text = selectedItem.name
                 cell.searchDetailsLabel?.text = selectedItem.title
-            }else {
+            } else {
                 cell.searchTitleLabel.attributedText = homeLocationTitle
                 cell.searchDetailsLabel.text = lastLocationString
-//                cell.backgroundColor = UIColor(red: 22/255, green: 41/255, blue: 85/255, alpha: 1)
             }
-            returnedCell = cell
+            return cell
         }
-        return returnedCell
+        
+        // Default return value for safety
+        return UITableViewCell()
     }
-
-    
 }
 
-//--------------------------------------------------------------------------
-// MARK: - Collection View Data Source
-//--------------------------------------------------------------------------
-extension ViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
-    }
+        
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
-            return UICollectionViewCell()
+    //--------------------------------------------------------------------------
+    // MARK: - Collection View Data Source
+    //--------------------------------------------------------------------------
+    extension ViewController: UICollectionViewDataSource {
+        func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+            return 7
         }
-        cell.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.35)
-        cell.layer.borderColor = UIColor.white.cgColor
-        cell.layer.cornerRadius = 5.0
-        cell.layer.borderWidth = 0.5
         
-        let dataPoint = WeatherController.shared.weather
-        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
-        
-        if let hourTime = dataPointHourly?[indexPath.item].observation_time {
-//            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
-            
-            let dailyHourString = "\(hourTime)" // the date string to be parsed
-            let df3 = DateFormatter()
-            df3.locale = Locale(identifier: "en_US")
-            df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            if let hour = df3.date(from: dailyHourString) {
-                let format = "ha"
-                let df4 = DateFormatter()
-                df4.dateFormat = format
-                df4.amSymbol = "AM"
-                df4.pmSymbol = "PM"
-                let string = df4.string(from: hour)
-                cell.lookingAheadHourLabel.text = string
-            } else {
-                print("Unable to parse date string")
+        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LookingAheadCollectionViewCell", for: indexPath) as? LookingAheadCollectionViewCell else {
+                return UICollectionViewCell()
             }
+            cell.backgroundColor = UIColor(red: 79/255, green: 98/255, blue: 142/255, alpha: 0.35)
+            cell.layer.borderColor = UIColor.white.cgColor
+            cell.layer.cornerRadius = 5.0
+            cell.layer.borderWidth = 0.5
+            
+            let dataPoint = WeatherController.shared.weather
+            let dataPointHourly = WeatherController.shared.climacellHourlyWeather
+            
+            if let hourTime = dataPointHourly?[indexPath.item].observation_time {
+                //            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
+                
+                let dailyHourString = "\(hourTime)" // the date string to be parsed
+                let df3 = DateFormatter()
+                df3.locale = Locale(identifier: "en_US")
+                df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+                if let hour = df3.date(from: dailyHourString) {
+                    let format = "ha"
+                    let df4 = DateFormatter()
+                    df4.dateFormat = format
+                    df4.amSymbol = "AM"
+                    df4.pmSymbol = "PM"
+                    let string = df4.string(from: hour)
+                    cell.lookingAheadHourLabel.text = string
+                } else {
+                    print("Unable to parse date string")
+                }
+            }
+            
+            if let hourlyTemp = dataPointHourly?[indexPath.item].temp?.value {
+                let newHighTemp = String(format: "%.0f", hourlyTemp)
+                cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
+            }
+            
+            let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
+            switch conditionIcon {
+            case "partly_cloudy":
+                cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
+                
+            case "mostly_cloudy":
+                cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
+                
+            case "cloudy":
+                cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
+                
+            case "clear":
+                cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
+                
+            case "mostly_clear":
+                cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
+                
+            case "clear-night":
+                cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
+                
+            case "rain":
+                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+                
+            case "rain_light":
+                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+                
+            case "rain_heavy":
+                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+                
+            case "drizzle":
+                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
+                
+            case "snow_light":
+                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+                
+            case "snow":
+                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+                
+            case "snow_heavy":
+                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+                
+            case "flurries":
+                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
+                
+            case "freezing_rain":
+                cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
+                
+            case "wind":
+                cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
+                
+            case "fog":
+                cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
+                
+            case "fog_light":
+                cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
+                
+            default:
+                cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
+                
+            }
+            
+            if let precipChance = dataPointHourly?[indexPath.item].precipitation_probability?.value {
+                let newPrecip = String(format: "%.0f", precipChance)
+                cell.lookingAheadPrecipLabel.text = newPrecip + "%"
+            }
+            
+            return cell
         }
-        
-        if let hourlyTemp = dataPointHourly?[indexPath.item].temp?.value {
-            let newHighTemp = String(format: "%.0f", hourlyTemp)
-            cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
-        }
-        
-        let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
-        switch conditionIcon {
-        case "partly_cloudy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-            
-        case "mostly_cloudy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-            
-        case "cloudy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
-            
-        case "clear":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-        
-        case "mostly_clear":
-        cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-            
-        case "clear-night":
-            cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
-            
-        case "rain":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
-        case "rain_light":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
-        case "rain_heavy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
-        case "drizzle":
-            cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-            
-        case "snow_light":
-            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
-        case "snow":
-            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
-        case "snow_heavy":
-            cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
-        case "flurries":
-        cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-            
-        case "freezing_rain":
-            cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
-            
-        case "wind":
-            cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
-            
-        case "fog":
-            cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-        
-        case "fog_light":
-        cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-            
-        default:
-            cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
-            
-        }
-        
-        if let precipChance = dataPointHourly?[indexPath.item].precipitation_probability?.value {
-            let newPrecip = String(format: "%.0f", precipChance)
-            cell.lookingAheadPrecipLabel.text = newPrecip + "%"
-        }
-        
-        return cell
     }
-}
+
