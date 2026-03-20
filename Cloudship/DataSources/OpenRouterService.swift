@@ -29,10 +29,19 @@ final class OpenRouterService {
     private init() {}
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 🔑 Replace with your OpenRouter API key from https://openrouter.ai/keys
-    // Free tier — no credit card required.
+    // 🔑 API key is read from Info.plist → Secrets.xcconfig (gitignored).
+    // Copy Secrets.xcconfig.example → Secrets.xcconfig and add your key.
+    // Free tier — no credit card required: https://openrouter.ai/keys
     // ─────────────────────────────────────────────────────────────────────────
-    private let apiKey = "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"
+    private let apiKey: String = {
+        guard let key = Bundle.main.infoDictionary?["OpenRouterAPIKey"] as? String,
+              !key.isEmpty,
+              key != "your-openrouter-api-key-here" else {
+            print("⚠️ OpenRouter API key not configured. See Secrets.xcconfig.example")
+            return ""
+        }
+        return key
+    }()
 
     /// Models to try in order — if the first provider errors, fall through to the next.
     private let models = [

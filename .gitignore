@@ -56,6 +56,9 @@ playground.xcworkspace
 
 Carthage/Build
 
+# Secrets (API keys — never commit)
+Secrets.xcconfig
+
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
