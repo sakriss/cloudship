@@ -68,6 +68,7 @@ private class MinutelyChartView: UIView {
 class MinutelyCardView: CardView {
 
     private let chartView = MinutelyChartView()
+    private var titleLabel: UILabel!
     private let emptyLabel: UILabel = {
         let l = UILabel()
         l.text = "No precipitation expected"
@@ -126,7 +127,7 @@ class MinutelyCardView: CardView {
         noSourceLabel.isHidden = true
 
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "Next Hour")
+        titleLabel = makeTitleLabel(text: "Precipitation")
         addSubview(titleLabel)
 
         chartView.translatesAutoresizingMaskIntoConstraints = false
@@ -175,6 +176,19 @@ class MinutelyCardView: CardView {
 
         if hasData {
             chartView.entries = minutely
+
+            // Determine interval: if entries are ~15 min apart, show "Next 2 Hours"
+            if minutely.count >= 2 {
+                let interval = minutely[1].time.timeIntervalSince(minutely[0].time)
+                if interval > 600 {
+                    // 15-minute intervals (Open-Meteo)
+                    let totalMinutes = Int(interval / 60) * minutely.count
+                    endLabel.text = "+\(totalMinutes) min"
+                } else {
+                    // 1-minute intervals (Tomorrow.io)
+                    endLabel.text = "+60 min"
+                }
+            }
         }
     }
 }

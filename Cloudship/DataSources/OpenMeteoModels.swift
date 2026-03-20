@@ -15,9 +15,20 @@ struct OpenMeteoForecastResponse: Codable {
     let current: OpenMeteoCurrent?
     let hourly: OpenMeteoHourly?
     let daily: OpenMeteoDaily?
+    let minutely15: OpenMeteoMinutely15?
 
     enum CodingKeys: String, CodingKey {
         case current, hourly, daily
+        case minutely15 = "minutely_15"
+    }
+}
+
+struct OpenMeteoMinutely15: Codable {
+    let time: [String]?
+    let precipitation: [Double?]?
+
+    enum CodingKeys: String, CodingKey {
+        case time, precipitation
     }
 }
 

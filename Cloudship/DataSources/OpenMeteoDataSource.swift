@@ -50,6 +50,8 @@ class OpenMeteoDataSource: WeatherDataSource {
             // moon_phase is not a valid Open-Meteo forecast variable
         ].joined(separator: ",")
 
+        let minutely15Vars = "precipitation"
+
         var comps = URLComponents(string: "https://api.open-meteo.com/v1/forecast")!
         comps.queryItems = [
             .init(name: "latitude",           value: String(format: "%.4f", lat)),
@@ -57,6 +59,7 @@ class OpenMeteoDataSource: WeatherDataSource {
             .init(name: "current",            value: currentVars),
             .init(name: "hourly",             value: hourlyVars),
             .init(name: "daily",              value: dailyVars),
+            .init(name: "minutely_15",        value: minutely15Vars),
             .init(name: "timezone",           value: "auto"),
             .init(name: "temperature_unit",   value: tempUnit),
             .init(name: "wind_speed_unit",    value: windUnit),
@@ -89,18 +92,19 @@ class OpenMeteoDataSource: WeatherDataSource {
                                airQuality: OpenMeteoAirQualityResponse,
                                imperial: Bool) -> UnifiedWeatherData {
 
-        let current  = buildCurrent(forecast.current, imperial: imperial)
-        let hourly   = buildHourly(forecast.hourly)
-        let daily    = buildDaily(forecast.daily)
-        let aq       = buildAirQuality(airQuality)
-        let pollen   = buildPollen(airQuality.hourly)
+        let current   = buildCurrent(forecast.current, imperial: imperial)
+        let hourly    = buildHourly(forecast.hourly)
+        let daily     = buildDaily(forecast.daily)
+        let minutely  = buildMinutely15(forecast.minutely15)
+        let aq        = buildAirQuality(airQuality)
+        let pollen    = buildPollen(airQuality.hourly)
 
         return UnifiedWeatherData(
             locationName: nil,
             current:      current,
             hourly:       hourly,
             daily:        daily,
-            minutely:     [],   // Open-Meteo doesn't provide minutely
+            minutely:     minutely,
             alerts:       [],   // populated by WeatherDataSourceManager
             airQuality:   aq,
             pollen:       pollen
@@ -160,6 +164,26 @@ class OpenMeteoDataSource: WeatherDataSource {
                 precipChance:  (h.precipitationProbability?[safe: i] ?? nil).map(Double.init),
                 windGust:      h.windGusts10m?[safe: i] ?? nil,
                 windDirection: h.windDirection10m?[safe: i] ?? nil
+            )
+        }
+    }
+
+    // MARK: - Minutely (15-min intervals)
+
+    private func buildMinutely15(_ m: OpenMeteoMinutely15?) -> [MinutelyEntry] {
+        guard let m = m, let times = m.time else { return [] }
+
+        let now = Date().addingTimeInterval(-900) // 15-min tolerance
+        var count = 0
+        // Take the next ~2 hours of 15-min intervals (8 entries)
+        return times.enumerated().compactMap { i, timeStr -> MinutelyEntry? in
+            guard count < 8 else { return nil }
+            guard let date = parseDate(timeStr) ?? parseLocalDateTime(timeStr) else { return nil }
+            guard date >= now else { return nil }
+            count += 1
+            return MinutelyEntry(
+                time: date,
+                precipIntensity: m.precipitation?[safe: i] ?? nil
             )
         }
     }

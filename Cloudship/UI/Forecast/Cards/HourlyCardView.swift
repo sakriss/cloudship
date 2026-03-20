@@ -124,17 +124,27 @@ private class HourlyItemCell: UICollectionViewCell {
         return l
     }()
 
+    private let precipLabel: UILabel = {
+        let l = UILabel()
+        l.font = .systemFont(ofSize: 10, weight: .medium)
+        l.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
+        l.textAlignment = .center
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        let stack = UIStackView(arrangedSubviews: [hourLabel, iconView, tempLabel])
+        let stack = UIStackView(arrangedSubviews: [hourLabel, iconView, precipLabel, tempLabel])
         stack.axis = .vertical
-        stack.spacing = 4
+        stack.spacing = 2
         stack.alignment = .center
         stack.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stack)
         NSLayoutConstraint.activate([
             iconView.heightAnchor.constraint(equalToConstant: 24),
             iconView.widthAnchor.constraint(equalToConstant: 24),
+            precipLabel.heightAnchor.constraint(equalToConstant: 14),
             stack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             stack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -149,6 +159,14 @@ private class HourlyItemCell: UICollectionViewCell {
         tempLabel.text = TemperatureFormatter.format(entry.temp)
         iconView.image = UIImage(named: WeatherCodeMapper.iconName(for: entry.condition,
                                                                     isNight: WeatherCodeMapper.isNighttime()))
+        // Show precip chance only when > 0%
+        if let chance = entry.precipChance, chance > 0 {
+            precipLabel.text = "\(Int(chance.rounded()))%"
+            precipLabel.isHidden = false
+        } else {
+            precipLabel.text = nil
+            precipLabel.isHidden = true
+        }
     }
 }
 
@@ -177,7 +195,7 @@ class HourlyCardView: CardView {
 
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 64, height: 90)
+        layout.itemSize = CGSize(width: 64, height: 100)
         layout.minimumInteritemSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: p, bottom: 0, right: p)
 
@@ -201,7 +219,7 @@ class HourlyCardView: CardView {
             collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: 90),
+            collectionView.heightAnchor.constraint(equalToConstant: 100),
 
             curveView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 4),
             curveView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),
