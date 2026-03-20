@@ -10,39 +10,6 @@ import Foundation
 import UIKit
 
 // MARK: - ClimacellV4
-//struct ClimacellV4: Codable {
-//    let data: DataClass?
-//}
-//
-//// MARK: - DataClass
-//struct DataClass: Codable {
-//    let timelines: [Timeline]?
-//}
-//
-//// MARK: - Timeline
-//struct Timeline: Codable {
-//    let timestep: String?
-//    let startTime, endTime: String?
-//    let intervals: [Interval]?
-//}
-//
-//// MARK: - Interval
-//struct Interval: Codable {
-//    let startTime: String?
-//    let values: Values?
-//}
-//
-//// MARK: - Values
-//struct Values: Codable {
-//    let precipitationIntensity: Double?
-//    let temperature,temperatureMax, temperatureMin, humidity, windSpeed, windDirection: Double?
-//    let precipitationProbability, precipitationType: Double?
-//    let sunriseTime, sunsetTime: String?
-//    let cloudCover: Double?
-//    let weatherCode: Int?
-//}
-
-// Realtime endpoint: { "data": { "time": ..., "values": ... }, "location": { ... } }
 struct ClimacellV4: Codable {
     let data: RealtimeWeather?
     let location: Location?
@@ -55,7 +22,6 @@ struct ClimacellV4: Codable {
         let values: RealtimeValues
     }
 
-    // Forecast endpoint: { "timelines": { "hourly": [...], "daily": [...] }, "location": { ... } }
     struct ForecastResponse: Codable {
         let timelines: ForecastTimelines?
         let location: Location?

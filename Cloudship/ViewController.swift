@@ -537,20 +537,6 @@ extension ViewController: UITableViewDataSource {
                     } else {
                         cell.currentTempLabel.text = "--"
                     }
-                
-            
-            // Set high and low temperatures
-//            if let dailyWeather = timelines.daily?.first {
-//                            if let highTemperature = dailyWeather.values?.temperatureMax,
-//                               let lowTemperature = dailyWeather.values?.temperatureMin {
-//                                print("High Temp: \(highTemperature), Low Temp: \(lowTemperature)")
-//                                cell.highTempLabel.text = String(format: "%.0f", highTemperature) + "°"
-//                                cell.lowTempLabel.text = String(format: "%.0f", lowTemperature) + "°"
-//                            } else {
-//                                cell.highTempLabel.text = "--"
-//                                cell.lowTempLabel.text = "--"
-//                            }
-//                        }
             
             // Set alerts
             cell.alertViewContainer.isHidden = true
