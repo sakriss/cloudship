@@ -161,18 +161,10 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisCore.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisCoreUI.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisWeatherKit.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisCore.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisCoreUI.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisWeatherKit.framework"
-  install_framework "${PODS_ROOT}/AerisWeather/lib/AerisMapKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework"
 fi

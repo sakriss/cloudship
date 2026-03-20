@@ -287,67 +287,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
             self.refreshControl.endRefreshing()
         }
         
-        let dataPoint = WeatherController.shared.weather
-        let dataPointDaily = WeatherController.shared.climacellDailyWeather
-        let dataPointHourly = WeatherController.shared.climacellHourlyWeather
         let dataPointV4 = WeatherController.shared.climacellV4Weather
-        
-        
-        if let blah = dataPointHourly?[0].temp?.value{
-            print("REALTIME WEATHER IS: \(blah)")
-            let formattedTemp = String(format: "%.0f", blah)
-            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
-        }
-        
-        if let currentTemp = dataPoint?.currently?.temperature {
-            let formattedTemp = String(format: "%.0f", currentTemp)
-            sharedDefaults?.set(formattedTemp, forKey: "currentTemp")
-        }
-        
-        if let currentSummary = dataPoint?.minutely?.summary {
-            sharedDefaults?.set(currentSummary, forKey: "currentSummary")
-        }
-        
-        let conditionIcon = dataPoint?.currently?.icon
-        switch conditionIcon {
-        case "partly-cloudy-day":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "partly-cloudy-night":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "cloudy":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "clear-day":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "clear-night":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "rain":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "snow":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "sleet":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "wind":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        case "fog":
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-            
-        default:
-            sharedDefaults?.set(conditionIcon, forKey: "currentIcon")
-        }
-            
-        
-        if let nearestStormDistance = WeatherController.shared.weather?.currently?.nearestStormDistance {
-            nearestStorm = nearestStormDistance
-        }
     }
     
     @objc func weatherDataFailed () {
@@ -392,11 +332,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "currentlyToRadarSegue", let vc = segue.destination as? RadarViewController {
-            if let userLoc = chosenLocation {
-                vc.userLocation = userLoc
-            }
-        }
+        // Legacy segue handling removed – radar is now in its own tab
     }
     
     @objc func handleTap(gestureRecognizer: UIGestureRecognizer)
@@ -583,7 +519,7 @@ extension ViewController: UITableViewDataSource {
             print("GIVE ME THE TEMPERATURE PLEASE 1st")
 //            let weatherData = try await fetchCurrentWeather(lat: lat, lon: lon, units: units)
             print(WeatherController.shared.climacellV4Weather?.realtime?.values)
-            print(WeatherController.shared.climacellV4Weather?.forecast?.values)
+            print(WeatherController.shared.forecastWeather?.timelines?.hourly?.first?.values)
             // Access weather data
             guard let realtime = WeatherController.shared.climacellV4Weather?.realtime?.values.temperature else {
                             cell.currentTempLabel.text = "--"
@@ -616,24 +552,8 @@ extension ViewController: UITableViewDataSource {
 //                            }
 //                        }
             
-            // Set current condition and summary
-            if let currentCondition = WeatherController.shared.climacellHourlyWeather?.first?.weather_code?.value {
-                cell.currentConditionLabel.text = currentCondition
-            }
-            
-            if let currentSummary = WeatherController.shared.weather?.daily?.data?[indexPath.row].summary {
-                cell.minutelyLookingAheadLabel.text = currentSummary
-            }
-            
-            if let lookingAhead = WeatherController.shared.weather?.minutely?.summary {
-                cell.currentSummaryLabel.text = lookingAhead
-            }
-            
             // Set alerts
-            if let alertsActive = WeatherController.shared.weather?.alerts?[indexPath.row] {
-                print(alertsActive)
-                cell.alertViewContainer.isHidden = false
-            }
+            cell.alertViewContainer.isHidden = true
             
             // Style buttons
             cell.dailyButton.layer.cornerRadius = 7
@@ -689,100 +609,6 @@ extension ViewController: UITableViewDataSource {
             cell.layer.borderColor = UIColor.white.cgColor
             cell.layer.cornerRadius = 5.0
             cell.layer.borderWidth = 0.5
-            
-            let dataPoint = WeatherController.shared.weather
-            let dataPointHourly = WeatherController.shared.climacellHourlyWeather
-            
-            if let hourTime = dataPointHourly?[indexPath.item].observation_time {
-                //            let hourlyTime = NSDate(timeIntervalSince1970: (hourTime))
-                
-                let dailyHourString = "\(hourTime)" // the date string to be parsed
-                let df3 = DateFormatter()
-                df3.locale = Locale(identifier: "en_US")
-                df3.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-                if let hour = df3.date(from: dailyHourString) {
-                    let format = "ha"
-                    let df4 = DateFormatter()
-                    df4.dateFormat = format
-                    df4.amSymbol = "AM"
-                    df4.pmSymbol = "PM"
-                    let string = df4.string(from: hour)
-                    cell.lookingAheadHourLabel.text = string
-                } else {
-                    print("Unable to parse date string")
-                }
-            }
-            
-            if let hourlyTemp = dataPointHourly?[indexPath.item].temp?.value {
-                let newHighTemp = String(format: "%.0f", hourlyTemp)
-                cell.lookingAheadTempLabel.text = newHighTemp + "\u{00B0}"
-            }
-            
-            let conditionIcon = dataPointHourly?[indexPath.item].weather_code?.value
-            switch conditionIcon {
-            case "partly_cloudy":
-                cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-                
-            case "mostly_cloudy":
-                cell.lookingAheadConditionImage.image = UIImage(named: "mostlycloudy.png")
-                
-            case "cloudy":
-                cell.lookingAheadConditionImage.image = UIImage(named: "cloudy.png")
-                
-            case "clear":
-                cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-                
-            case "mostly_clear":
-                cell.lookingAheadConditionImage.image = UIImage(named: "sunny.png")
-                
-            case "clear-night":
-                cell.lookingAheadConditionImage.image = UIImage(named: "clearnight.png")
-                
-            case "rain":
-                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-                
-            case "rain_light":
-                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-                
-            case "rain_heavy":
-                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-                
-            case "drizzle":
-                cell.lookingAheadConditionImage.image = UIImage(named: "rain.png")
-                
-            case "snow_light":
-                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-                
-            case "snow":
-                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-                
-            case "snow_heavy":
-                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-                
-            case "flurries":
-                cell.lookingAheadConditionImage.image = UIImage(named: "snow.png")
-                
-            case "freezing_rain":
-                cell.lookingAheadConditionImage.image = UIImage(named: "sleet.png")
-                
-            case "wind":
-                cell.lookingAheadConditionImage.image = UIImage(named: "wind.png")
-                
-            case "fog":
-                cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-                
-            case "fog_light":
-                cell.lookingAheadConditionImage.image = UIImage(named: "fog.png")
-                
-            default:
-                cell.lookingAheadConditionImage.image = UIImage(named: "default.png")
-                
-            }
-            
-            if let precipChance = dataPointHourly?[indexPath.item].precipitation_probability?.value {
-                let newPrecip = String(format: "%.0f", precipChance)
-                cell.lookingAheadPrecipLabel.text = newPrecip + "%"
-            }
             
             return cell
         }

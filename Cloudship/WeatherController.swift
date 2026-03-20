@@ -242,21 +242,23 @@ class WeatherController {
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
     static let weatherDataParseFailed = Notification.Name("weatherDataParseFailed")
     
-    var weather: Weather?
-    var climacellDailyWeather: [ClimaDaily]?
-    var climacellHourlyWeather: [ClimaHourly]?
     var climacellV4Weather: ClimacellV4?
+    var forecastWeather: ClimacellV4.ForecastResponse?
     
     func fetchWeatherInfo(lat: Double, lon: Double, units: String) async {
         do {
-            // Fetch current weather
+            // Realtime is required — failure shows the error alert
             try await fetchCurrentWeather(lat: lat, lon: lon, units: units)
-            
-            // Fetch forecast data
+        } catch {
+            print("Error fetching current weather: \(error)")
+            return
+        }
+
+        do {
+            // Forecast is supplementary — failure just logs, doesn't show alert
             try await fetchForecast(lat: lat, lon: lon, units: units)
         } catch {
-            // Handle the error, such as showing an error message
-            print("Error fetching weather information: \(error)")
+            print("Error fetching forecast (non-fatal): \(error)")
         }
     }
     
@@ -329,23 +331,16 @@ class WeatherController {
             let (data, _) = try await URLSession.shared.data(for: request)
             print("****FORECAST:****")
             print(String(decoding: data, as: UTF8.self))
-            // Decode the response into the updated model
-            let decoder = JSONDecoder()
-//            let forecastResponse = try decoder.decode(ForecastResponse.self, from: data)
-            let climacell = try decoder.decode(ClimacellV4.self, from: data)
-//            WeatherController.shared.forecastData = forecastResponse
-            
-            // Handle the response data
-//            print("Minutely forecast data: \(climacell.timelines?.minutely ?? [])")
-//            print("Hourly forecast data: \(forecastResponse.timelines?.hourly ?? [])")
-//            print("Daily forecast data: \(forecastResponse.timelines?.daily ?? [])")
 
-            // Post notification or update UI as needed
+            let forecastResponse = try JSONDecoder().decode(ClimacellV4.ForecastResponse.self, from: data)
+            // Merge forecast into the existing climacellV4Weather object via a wrapper
+            WeatherController.shared.forecastWeather = forecastResponse
+            print("Forecast timelines - hourly count: \(forecastResponse.timelines?.hourly?.count ?? 0), daily count: \(forecastResponse.timelines?.daily?.count ?? 0)")
+
             NotificationCenter.default.post(name: WeatherController.weatherDataParseComplete, object: nil)
         } catch {
-            // Handle any errors
+            // Forecast failure is non-fatal — just log and rethrow so caller can handle quietly
             print("Error fetching forecast data: \(error)")
-            NotificationCenter.default.post(name: WeatherController.weatherDataParseFailed, object: nil)
             throw error
         }
     }

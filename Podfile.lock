@@ -1,13 +1,4 @@
 PODS:
-  - AerisWeather (3.1.1):
-    - AerisWeather/Data (= 3.1.1)
-  - AerisWeather/Core (3.1.1)
-  - AerisWeather/CoreUI (3.1.1):
-    - AerisWeather/Core
-  - AerisWeather/Data (3.1.1):
-    - AerisWeather/CoreUI
-  - AerisWeather/Maps (3.1.1):
-    - AerisWeather/Data
   - Google-Mobile-Ads-SDK (7.42.0):
     - GoogleAppMeasurement (~> 5.7)
   - GoogleAppMeasurement (5.8.0):
@@ -39,25 +30,21 @@ PODS:
   - nanopb/encode (0.3.901)
 
 DEPENDENCIES:
-  - AerisWeather
-  - AerisWeather/Maps
   - Google-Mobile-Ads-SDK
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - AerisWeather
     - Google-Mobile-Ads-SDK
     - GoogleAppMeasurement
     - GoogleUtilities
     - nanopb
 
 SPEC CHECKSUMS:
-  AerisWeather: 50d2503f75373eba1d87e33d501ed22dffa73a97
   Google-Mobile-Ads-SDK: c7bec408202526ec4e9ccd025c00f9f30e9f8807
   GoogleAppMeasurement: 1624046ab1bcc5e170061a56ef5679000b079c8e
   GoogleUtilities: 6481e6318c5fcabaaa8513ef8120f329055d7c10
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
 
-PODFILE CHECKSUM: 2f0e4fc847facd03cdcef72b91ce25301887a987
+PODFILE CHECKSUM: 590ffb28d1dc213b2615b62b6cecc0d6af72e991
 
 COCOAPODS: 1.8.4

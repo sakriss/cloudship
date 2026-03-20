@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AerisMapKit
 import GoogleMobileAds
 
 @UIApplicationMain
@@ -17,34 +16,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-//        let launchedBefore = UserDefaults.standard.bool(forKey: "Units")
-//        if launchedBefore
-//        {
-//            print("Not first launch.")
-//        }
-//        else
-//        {
-//            print("First launch")
-//            UserDefaults.standard.set("units=us", forKey: "Units")
-//        }
-        AerisWeather.start(withApiKey: "V76MVdozyJuAsvAg1Ogmf", secret: "aKDurkVGGnltWLVvniCSBSD9cFWIxlyaCD03YC0i")
-        
-//        window = UIWindow(frame: UIScreen.main.bounds)
-//        window?.backgroundColor = UIColor.white
-//        window?.makeKeyAndVisible()
-        
-        UIApplication.shared.statusBarStyle = .lightContent
-        
-        GADMobileAds.sharedInstance().start(completionHandler: nil)
-        
-                if UserDefaults.standard.string(forKey: "Units") != nil {
-                    print("already have a default")
-                } else {
-                    UserDefaults.standard.set("units=us", forKey: "Units")
-                }
 
-        
-        
+        // Migrate legacy units key format ("units=us" → "imperial", "units=si" → "metric")
+        if let existing = UserDefaults.standard.string(forKey: "Units") {
+            if existing == "units=us" {
+                UserDefaults.standard.set("imperial", forKey: "Units")
+            } else if existing == "units=si" {
+                UserDefaults.standard.set("metric", forKey: "Units")
+            }
+        } else {
+            UserDefaults.standard.set("imperial", forKey: "Units")
+        }
+
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
+
+        // Programmatic window setup — no storyboard
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = MainTabBarController()
+
+        // Restore appearance override if saved
+        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
+        let styles: [UIUserInterfaceStyle] = [.unspecified, .light, .dark]
+        window?.overrideUserInterfaceStyle = appearanceIdx < styles.count ? styles[appearanceIdx] : .unspecified
+
+        window?.makeKeyAndVisible()
         return true
     }
 

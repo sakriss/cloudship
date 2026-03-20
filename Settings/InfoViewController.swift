@@ -202,19 +202,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func scheduleLocal() {
         center.removeAllPendingNotificationRequests()
         let content = UNMutableNotificationContent()
-        let dataPoint = WeatherController.shared.weather
-        let dailyTemp = String(format: "%.0f", (dataPoint?.daily?.data?[0].temperatureMax)!)
-        let currentTemp = String(format: "%.0f", (dataPoint?.currently?.temperature)!)
-        let dailyOutlook = dataPoint?.daily?.data?[0].summary
-        var forcastString = "Currently: "
-        forcastString.append(String(currentTemp))
-        forcastString.append(". High Temp: ")
-        forcastString.append(String(dailyTemp))
-        forcastString.append(". ")
-        forcastString.append(dailyOutlook!)
-        
+
         content.title = "Daily Forecast"
-        content.body = forcastString
+        content.body = "Check Cloudship for today's forecast."
         content.categoryIdentifier = "DailyAlert"
         content.sound = UNNotificationSound.default
 
@@ -223,8 +213,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         dateComponents.minute = alertMin
         print(dateComponents)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
-        
+
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         center.add(request)
     }

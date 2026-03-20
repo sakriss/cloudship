@@ -41,31 +41,10 @@ class AlertsViewController: UIViewController {
 //--------------------------------------------------------------------------
 extension AlertsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (WeatherController.shared.weather?.alerts?.count)!
-        
+        return 0
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AlertsTableViewCell", for: indexPath) as? AlertsTableViewCell else {
-            return UITableViewCell()
-        }
-        
-        let dataPoint = WeatherController.shared.weather
-        
-        if let alertsTitle = dataPoint?.alerts?[indexPath.row].title {
-            cell.alertTitleLabel.text = ("\u{26A0} ") + String(alertsTitle.uppercased()) + (" \u{26A0}")
-
-        }
-        
-        if let alertsSeverity = dataPoint?.alerts?[indexPath.row].severity {
-            cell.alertSeverityLabel.text = String(alertsSeverity.uppercased())
-        }
-        
-        if let alertsDescription = dataPoint?.alerts?[indexPath.row].description {
-            let formattedDescription = alertsDescription.replacingOccurrences(of: "*", with: "\n\n*")
-            cell.alertDescriptionLabel.text = String(formattedDescription)
-        }
-
-        return cell
+        return UITableViewCell()
     }
 }
