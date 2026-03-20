@@ -18,6 +18,7 @@ class MainForecastViewController: UIViewController {
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
     private var currentLocation: CLLocation?
+    private var isShowingGPSLocation = false
     private var bannerView: GADBannerView?
 
     // MARK: - UI
@@ -372,8 +373,9 @@ class MainForecastViewController: UIViewController {
         locationManager.startUpdatingLocation()
     }
 
-    private func fetchWeather(for location: CLLocation) {
+    private func fetchWeather(for location: CLLocation, isGPSLocation: Bool = false) {
         currentLocation = location
+        isShowingGPSLocation = isGPSLocation
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
 
@@ -390,7 +392,8 @@ class MainForecastViewController: UIViewController {
         }
 
         Task {
-            await WeatherDataSourceManager.shared.fetchWeather(lat: lat, lon: lon)
+            await WeatherDataSourceManager.shared.fetchWeather(lat: lat, lon: lon,
+                                                               updateWidget: isGPSLocation)
         }
     }
 
@@ -487,6 +490,13 @@ class MainForecastViewController: UIViewController {
     }
 
     private func fetchAISummary(for data: UnifiedWeatherData) {
+        // Show cached summary immediately — no loading spinner needed
+        if let cached = AISummaryService.shared.cachedSummary(for: data) {
+            aiSummaryCard.state = .loaded(cached)
+            return
+        }
+
+        // No valid cache — show spinner and fetch
         aiSummaryCard.state = .loading
         Task { [weak self] in
             do {
@@ -560,7 +570,8 @@ class MainForecastViewController: UIViewController {
             await WeatherDataSourceManager.shared.fetchWeather(
                 lat: loc.coordinate.latitude,
                 lon: loc.coordinate.longitude,
-                forceRefresh: true
+                forceRefresh: true,
+                updateWidget: isShowingGPSLocation
             )
         }
     }
@@ -633,7 +644,7 @@ extension MainForecastViewController: CLLocationManagerDelegate {
         manager.stopUpdatingLocation()
         // Update the "Current Location" search row with the real GPS fix (only from here)
         updateGPSLocationInSearch(loc)
-        fetchWeather(for: loc)
+        fetchWeather(for: loc, isGPSLocation: true)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -645,11 +656,14 @@ extension MainForecastViewController: CLLocationManagerDelegate {
 // MARK: - Search delegate
 
 extension MainForecastViewController: SearchResultsDelegate {
-    func didSelectLocation(_ location: CLLocation, name: String) {
+    func didSelectLocation(_ location: CLLocation, name: String, saveToRecents: Bool) {
         searchController.isActive = false
         navigationItem.title = name
         WeatherDataSourceManager.shared.locationName = name
         activityIndicator.startAnimating()
+        if saveToRecents {
+            RecentSearchStore.shared.add(name: name, location: location)
+        }
         fetchWeather(for: location)
     }
 }
@@ -657,21 +671,69 @@ extension MainForecastViewController: SearchResultsDelegate {
 // MARK: - Search Results VC
 
 protocol SearchResultsDelegate: AnyObject {
-    func didSelectLocation(_ location: CLLocation, name: String)
+    func didSelectLocation(_ location: CLLocation, name: String, saveToRecents: Bool)
 }
+
+// MARK: - Recent search store
+
+struct RecentSearch {
+    let name: String
+    let latitude: Double
+    let longitude: Double
+    var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
+}
+
+final class RecentSearchStore {
+    static let shared = RecentSearchStore()
+    private init() {}
+
+    private let key = "recentSearches_v1"
+    private let maxCount = 5
+
+    var searches: [RecentSearch] {
+        guard let arr = UserDefaults.standard.array(forKey: key) as? [[String: Any]] else { return [] }
+        return arr.compactMap { dict in
+            guard let name = dict["name"] as? String,
+                  let lat  = dict["lat"]  as? Double,
+                  let lon  = dict["lon"]  as? Double else { return nil }
+            return RecentSearch(name: name, latitude: lat, longitude: lon)
+        }
+    }
+
+    func add(name: String, location: CLLocation) {
+        var current = searches.filter { $0.name != name } // deduplicate
+        current.insert(RecentSearch(name: name,
+                                    latitude: location.coordinate.latitude,
+                                    longitude: location.coordinate.longitude), at: 0)
+        let trimmed = Array(current.prefix(maxCount))
+        UserDefaults.standard.set(trimmed.map { ["name": $0.name, "lat": $0.latitude, "lon": $0.longitude] },
+                                  forKey: key)
+    }
+
+    func remove(at index: Int) {
+        var current = searches
+        guard index < current.count else { return }
+        current.remove(at: index)
+        UserDefaults.standard.set(current.map { ["name": $0.name, "lat": $0.latitude, "lon": $0.longitude] },
+                                  forKey: key)
+    }
+}
+
+// MARK: - Search results view controller
 
 class SearchResultsViewController: UITableViewController, UISearchResultsUpdating {
 
     weak var delegate: SearchResultsDelegate?
     private var results: [MKMapItem] = []
+    private var isSearching = false
 
-    /// Set by MainForecastViewController when GPS location is obtained.
     var gpsLocation: CLLocation?
     var gpsLocationName: String = "Current Location"
 
     private enum Section: Int, CaseIterable {
         case currentLocation = 0
-        case searchResults   = 1
+        case recents         = 1
+        case searchResults   = 2
     }
 
     override func viewDidLoad() {
@@ -680,11 +742,15 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
     }
 
     func updateSearchResults(for searchController: UISearchController) {
-        guard let query = searchController.searchBar.text, !query.isEmpty else {
+        let query = searchController.searchBar.text ?? ""
+        isSearching = !query.isEmpty
+
+        if query.isEmpty {
             results = []
             tableView.reloadData()
             return
         }
+
         let req = MKLocalSearch.Request()
         req.naturalLanguageQuery = query
         req.resultTypes = .address
@@ -696,15 +762,24 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         }
     }
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        Section.allCases.count
-    }
+    override func numberOfSections(in tableView: UITableView) -> Int { Section.allCases.count }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .currentLocation: return gpsLocation != nil ? 1 : 0
-        case .searchResults:   return results.count
+        case .recents:         return isSearching ? 0 : RecentSearchStore.shared.searches.count
+        case .searchResults:   return isSearching ? results.count : 0
         default:               return 0
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        switch Section(rawValue: section) {
+        case .recents:
+            return (!isSearching && !RecentSearchStore.shared.searches.isEmpty) ? "Recent" : nil
+        case .searchResults:
+            return (isSearching && !results.isEmpty) ? "Results" : nil
+        default: return nil
         }
     }
 
@@ -719,6 +794,12 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
             config.image = UIImage(systemName: "location.fill")
             config.imageProperties.tintColor = .systemBlue
 
+        case .recents:
+            let recent = RecentSearchStore.shared.searches[indexPath.row]
+            config.text = recent.name
+            config.image = UIImage(systemName: "clock.arrow.circlepath")
+            config.imageProperties.tintColor = .secondaryLabel
+
         case .searchResults:
             let item = results[indexPath.row]
             config.text = item.name
@@ -729,8 +810,7 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
             config.image = UIImage(systemName: "mappin.circle.fill")
             config.imageProperties.tintColor = .secondaryLabel
 
-        default:
-            break
+        default: break
         }
 
         cell.contentConfiguration = config
@@ -741,16 +821,32 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         switch Section(rawValue: indexPath.section) {
         case .currentLocation:
             guard let loc = gpsLocation else { return }
-            delegate?.didSelectLocation(loc, name: gpsLocationName)
+            delegate?.didSelectLocation(loc, name: gpsLocationName, saveToRecents: false)
+
+        case .recents:
+            let recent = RecentSearchStore.shared.searches[indexPath.row]
+            delegate?.didSelectLocation(recent.location, name: recent.name, saveToRecents: false)
 
         case .searchResults:
             let item = results[indexPath.row]
             guard let loc = item.placemark.location else { return }
             let name = item.name ?? item.placemark.locality ?? "Unknown"
-            delegate?.didSelectLocation(loc, name: name)
+            delegate?.didSelectLocation(loc, name: name, saveToRecents: true)
 
-        default:
-            break
+        default: break
+        }
+    }
+
+    // Swipe to delete recent searches
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        Section(rawValue: indexPath.section) == .recents
+    }
+
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
+                             forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete, Section(rawValue: indexPath.section) == .recents {
+            RecentSearchStore.shared.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
 }

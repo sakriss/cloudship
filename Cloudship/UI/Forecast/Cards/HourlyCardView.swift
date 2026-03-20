@@ -87,7 +87,8 @@ enum HourlyMetric: String, CaseIterable {
 
 private class HourlyCurveView: UIView {
 
-    var values: [Double] = [] { didSet { setNeedsDisplay() } }
+    /// One optional value per hourly column. Nil = no data for that column.
+    var values: [Double?] = [] { didSet { setNeedsDisplay() } }
     var color: UIColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1) { didSet { setNeedsDisplay() } }
 
     override init(frame: CGRect) { super.init(frame: frame); backgroundColor = .clear }
@@ -99,64 +100,89 @@ private class HourlyCurveView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        guard values.count >= 2, let ctx = UIGraphicsGetCurrentContext() else { return }
-        let minV = values.min()!
-        let maxV = values.max()!
-        let range = maxV - minV
+        let nonNil = values.compactMap { $0 }
+        guard nonNil.count >= 2, let ctx = UIGraphicsGetCurrentContext() else { return }
+
         let n = values.count
-        let step = rect.width / CGFloat(n - 1)
+        let minV = nonNil.min()!
+        let maxV = nonNil.max()!
+        let range = maxV - minV
+        // Each column is evenly spaced — step matches itemWidth so dots align with columns
+        let step = n > 1 ? rect.width / CGFloat(n - 1) : rect.width
 
-        func point(at i: Int) -> CGPoint {
-            let x = CGFloat(i) * step
-            let y: CGFloat
+        func yPos(_ v: Double) -> CGFloat {
             if range > 0 {
-                y = rect.height - CGFloat((values[i] - minV) / range) * rect.height * 0.8 - rect.height * 0.1
-            } else {
-                y = rect.height * 0.5
+                return rect.height - CGFloat((v - minV) / range) * rect.height * 0.8 - rect.height * 0.1
             }
-            return CGPoint(x: x, y: y)
+            return rect.height * 0.5
         }
 
-        let path = UIBezierPath()
-        path.move(to: point(at: 0))
-        for i in 1..<n {
-            let prev = point(at: i - 1)
-            let curr = point(at: i)
-            let cp1  = CGPoint(x: prev.x + step * 0.4, y: prev.y)
-            let cp2  = CGPoint(x: curr.x - step * 0.4, y: curr.y)
-            path.addCurve(to: curr, controlPoint1: cp1, controlPoint2: cp2)
-        }
-
-        // Gradient fill
-        let fillPath = path.copy() as! UIBezierPath
-        fillPath.addLine(to: CGPoint(x: rect.width, y: rect.height))
-        fillPath.addLine(to: CGPoint(x: 0, y: rect.height))
-        fillPath.close()
-
-        ctx.saveGState()
-        fillPath.addClip()
-        let gradColors = [color.withAlphaComponent(0.35).cgColor,
-                          color.withAlphaComponent(0.00).cgColor] as CFArray
-        if let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
-                                     colors: gradColors, locations: [0, 1]) {
-            ctx.drawLinearGradient(gradient,
-                                   start: CGPoint(x: 0, y: 0),
-                                   end:   CGPoint(x: 0, y: rect.height),
-                                   options: [])
-        }
-        ctx.restoreGState()
-
-        // Stroke
-        color.setStroke()
-        path.lineWidth = 2
-        path.stroke()
-
-        // Dots
+        // Build segments: consecutive runs of non-nil values share a path
+        var segments: [[Int]] = []
+        var current: [Int] = []
         for i in 0..<n {
-            let p = point(at: i)
-            let dot = UIBezierPath(arcCenter: p, radius: 3, startAngle: 0, endAngle: .pi * 2, clockwise: true)
-            color.setFill()
-            dot.fill()
+            if values[i] != nil {
+                current.append(i)
+            } else {
+                if current.count >= 2 { segments.append(current) }
+                current = []
+            }
+        }
+        if current.count >= 2 { segments.append(current) }
+
+        // Draw each segment
+        for seg in segments {
+            let path = UIBezierPath()
+            for (j, i) in seg.enumerated() {
+                let x = CGFloat(i) * step
+                let y = yPos(values[i]!)
+                let pt = CGPoint(x: x, y: y)
+                if j == 0 {
+                    path.move(to: pt)
+                } else {
+                    let prevI = seg[j - 1]
+                    let prevX = CGFloat(prevI) * step
+                    let prevY = yPos(values[prevI]!)
+                    let prev = CGPoint(x: prevX, y: prevY)
+                    let cp1 = CGPoint(x: prev.x + step * 0.4, y: prev.y)
+                    let cp2 = CGPoint(x: pt.x  - step * 0.4, y: pt.y)
+                    path.addCurve(to: pt, controlPoint1: cp1, controlPoint2: cp2)
+                }
+            }
+
+            // Gradient fill under each segment
+            let fillPath = path.copy() as! UIBezierPath
+            let lastI = seg.last!
+            fillPath.addLine(to: CGPoint(x: CGFloat(lastI) * step, y: rect.height))
+            fillPath.addLine(to: CGPoint(x: CGFloat(seg.first!) * step, y: rect.height))
+            fillPath.close()
+
+            ctx.saveGState()
+            fillPath.addClip()
+            let gradColors = [color.withAlphaComponent(0.35).cgColor,
+                              color.withAlphaComponent(0.00).cgColor] as CFArray
+            if let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                         colors: gradColors, locations: [0, 1]) {
+                ctx.drawLinearGradient(gradient,
+                                       start: CGPoint(x: 0, y: 0),
+                                       end:   CGPoint(x: 0, y: rect.height),
+                                       options: [])
+            }
+            ctx.restoreGState()
+
+            color.setStroke()
+            path.lineWidth = 2
+            path.stroke()
+
+            // Dots at each data point in this segment
+            for i in seg {
+                let x = CGFloat(i) * step
+                let y = yPos(values[i]!)
+                let dot = UIBezierPath(arcCenter: CGPoint(x: x, y: y),
+                                       radius: 3, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+                color.setFill()
+                dot.fill()
+            }
         }
     }
 }
@@ -310,6 +336,9 @@ class HourlyCardView: CardView {
         setupLayout()
     }
 
+    private static let itemWidth: CGFloat = 64
+    private static let curveHeight: CGFloat = 54
+
     private func setupLayout() {
         let p = CardView.padding
         let titleLabel = makeTitleLabel(text: "Hourly Forecast")
@@ -325,7 +354,6 @@ class HourlyCardView: CardView {
         pillStack.translatesAutoresizingMaskIntoConstraints = false
         pillScrollView.addSubview(pillStack)
 
-        // Build all pills (hidden until configure() reveals only those with data)
         for metric in HourlyMetric.allCases {
             let btn = MetricPillButton(metric: metric)
             btn.isHidden = true
@@ -334,10 +362,11 @@ class HourlyCardView: CardView {
             pillButtons.append(btn)
         }
 
-        // Collection view
+        // Collection view — taller to contain the scrolling curve below cells
+        let totalCellHeight: CGFloat = 100
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 64, height: 100)
+        layout.itemSize = CGSize(width: Self.itemWidth, height: totalCellHeight)
         layout.minimumInteritemSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: p, bottom: 0, right: p)
 
@@ -347,13 +376,15 @@ class HourlyCardView: CardView {
         collectionView.dataSource = self
         collectionView.register(HourlyItemCell.self, forCellWithReuseIdentifier: HourlyItemCell.reuseID)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        // Extra height for the curve that sits below cells but inside the scroll view
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: Self.curveHeight, right: 0)
 
-        curveView.translatesAutoresizingMaskIntoConstraints = false
+        // Curve lives inside the collection view's scroll area so it scrolls with it
+        collectionView.addSubview(curveView)
 
         addSubview(titleLabel)
         addSubview(pillScrollView)
         addSubview(collectionView)
-        addSubview(curveView)
 
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: p),
@@ -373,13 +404,8 @@ class HourlyCardView: CardView {
             collectionView.topAnchor.constraint(equalTo: pillScrollView.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: 100),
-
-            curveView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 4),
-            curveView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),
-            curveView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -p),
-            curveView.heightAnchor.constraint(equalToConstant: 50),
-            curveView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -p)
+            collectionView.heightAnchor.constraint(equalToConstant: totalCellHeight + Self.curveHeight),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -p)
         ])
     }
 
@@ -414,9 +440,20 @@ class HourlyCardView: CardView {
     }
 
     private func updateCurve() {
-        let vals = entries.compactMap { activeMetric.value(from: $0) }
+        // Use map (not compactMap) so each value aligns with its column index
+        let vals = entries.map { activeMetric.value(from: $0) }
         curveView.values = vals
         curveView.color = activeMetric.accentColor
+
+        // Position curve below the cells, spanning the full scrollable content width
+        let p = CardView.padding
+        let contentWidth = CGFloat(entries.count) * Self.itemWidth + p * 2
+        curveView.frame = CGRect(
+            x: p,
+            y: 100 + 4,
+            width: max(contentWidth - p * 2, 0),
+            height: Self.curveHeight - 4
+        )
     }
 
     @objc private func pillTapped(_ sender: MetricPillButton) {

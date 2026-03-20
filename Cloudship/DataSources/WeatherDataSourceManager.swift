@@ -56,7 +56,7 @@ class WeatherDataSourceManager: NSObject {
 
     // MARK: - Fetch
 
-    func fetchWeather(lat: Double, lon: Double, forceRefresh: Bool = false) async {
+    func fetchWeather(lat: Double, lon: Double, forceRefresh: Bool = false, updateWidget: Bool = false) async {
         let units = TemperatureFormatter.apiUnits
 
         // Return cached data if it is fresh, same location, and same source
@@ -95,8 +95,8 @@ class WeatherDataSourceManager: NSObject {
                 sourceName: activeSource.name
             ))
 
-            // Update widget shared data
-            WidgetDataWriter.shared.write(data)
+            // Update widget shared data only for GPS/home location fetches
+            if updateWidget { WidgetDataWriter.shared.write(data) }
 
             await MainActor.run {
                 NotificationCenter.default.post(name: WeatherDataSourceManager.weatherDataParseComplete, object: nil)
