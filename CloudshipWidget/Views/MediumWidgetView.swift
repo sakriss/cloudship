@@ -52,8 +52,10 @@ struct MediumWidgetView: View {
                         let hour = data.hourlyForecast[i]
                         VStack(spacing: 6) {
                             Text(hourLabel(hour.time))
-                                .font(.caption2)
+                                .font(.system(size: 10))
                                 .foregroundColor(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
 
                             Image(systemName: WidgetConditionIcon.symbolName(for: hour.conditionRaw))
                                 .font(.caption)
@@ -93,7 +95,7 @@ struct MediumWidgetView: View {
 
     private func hourLabel(_ date: Date) -> String {
         let fmt = DateFormatter()
-        fmt.dateFormat = "h a"
+        fmt.dateFormat = "ha"
         return fmt.string(from: date).lowercased()
     }
 }
