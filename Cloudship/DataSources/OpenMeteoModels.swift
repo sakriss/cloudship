@@ -61,6 +61,7 @@ struct OpenMeteoHourly: Codable {
     let precipitationProbability: [Int?]?
     let weatherCode: [Int?]?
     let windGusts10m: [Double?]?
+    let windDirection10m: [Double?]?
 
     enum CodingKeys: String, CodingKey {
         case time
@@ -68,6 +69,7 @@ struct OpenMeteoHourly: Codable {
         case precipitationProbability  = "precipitation_probability"
         case weatherCode               = "weather_code"
         case windGusts10m              = "wind_gusts_10m"
+        case windDirection10m          = "wind_direction_10m"
     }
 }
 

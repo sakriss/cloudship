@@ -216,27 +216,33 @@ private class ControlCell: UITableViewCell {
     }()
 
     private var embeddedControl: UIView?
+    private var controlConstraints: [NSLayoutConstraint] = []
 
     func configure(label: String, control: UIView) {
         nameLabel.text = label
         selectionStyle = .none
         control.translatesAutoresizingMaskIntoConstraints = false
 
-        // Remove old control if any
+        // Remove old control and constraints
+        NSLayoutConstraint.deactivate(controlConstraints)
         embeddedControl?.removeFromSuperview()
+        nameLabel.removeFromSuperview()
+
         contentView.addSubview(nameLabel)
         contentView.addSubview(control)
         embeddedControl = control
 
-        NSLayoutConstraint.activate([
+        // Stack label above control so nothing gets truncated
+        controlConstraints = [
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            nameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
 
+            control.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            control.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             control.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            control.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            control.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8),
-
-            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 52)
-        ])
+            control.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+        ]
+        NSLayoutConstraint.activate(controlConstraints)
     }
 }

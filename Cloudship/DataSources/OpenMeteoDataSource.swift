@@ -40,7 +40,7 @@ class OpenMeteoDataSource: WeatherDataSource {
             "uv_index", "surface_pressure", "visibility", "dew_point_2m"
         ].joined(separator: ",")
 
-        let hourlyVars = "temperature_2m,precipitation_probability,weather_code,wind_gusts_10m"
+        let hourlyVars = "temperature_2m,precipitation_probability,weather_code,wind_gusts_10m,wind_direction_10m"
 
         let dailyVars = [
             "weather_code", "temperature_2m_max", "temperature_2m_min",
@@ -154,11 +154,12 @@ class OpenMeteoDataSource: WeatherDataSource {
             guard date >= now else { return nil }
             count += 1
             return HourlyEntry(
-                time:         date,
-                temp:         h.temperature2m?[safe: i] ?? nil,
-                condition:    WeatherCodeMapper.condition(fromWMOCode: h.weatherCode?[safe: i] ?? nil),
-                precipChance: (h.precipitationProbability?[safe: i] ?? nil).map(Double.init),
-                windGust:     h.windGusts10m?[safe: i] ?? nil
+                time:          date,
+                temp:          h.temperature2m?[safe: i] ?? nil,
+                condition:     WeatherCodeMapper.condition(fromWMOCode: h.weatherCode?[safe: i] ?? nil),
+                precipChance:  (h.precipitationProbability?[safe: i] ?? nil).map(Double.init),
+                windGust:      h.windGusts10m?[safe: i] ?? nil,
+                windDirection: h.windDirection10m?[safe: i] ?? nil
             )
         }
     }

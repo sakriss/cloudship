@@ -44,10 +44,12 @@ final class OpenRouterService {
     }()
 
     /// Models to try in order — if the first provider errors, fall through to the next.
+    /// Google and Nvidia models are currently the most reliable on the free tier.
     private let models = [
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "mistralai/mistral-small-3.1-24b-instruct:free",
-        "google/gemma-3-12b-it:free"
+        "google/gemma-3-27b-it:free",
+        "google/gemma-3-12b-it:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "meta-llama/llama-3.3-70b-instruct:free"
     ]
     private let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
 
@@ -99,6 +101,43 @@ final class OpenRouterService {
         return prompt
     }
 
+    // MARK: - Brief
+
+    /// Generate a concise 2-3 sentence daily weather brief.
+    func sendBrief(weatherData: UnifiedWeatherData) async throws -> String {
+        let location = weatherData.locationName ?? "your location"
+        let unitSystem = TemperatureFormatter.apiUnits == "imperial" ? "imperial (°F, mph)" : "metric (°C, km/h)"
+
+        let briefSystemPrompt = """
+        You are a concise weather briefing assistant. Generate a 2-3 sentence weather brief \
+        for today at \(location). Be specific about times and temperatures. Focus on what \
+        matters most: precipitation timing, best time to go outside, what to wear. \
+        Be conversational and helpful, not clinical. Use the \(unitSystem) system. \
+        Do not use emojis.
+        """
+
+        let weatherContext = systemPrompt(from: weatherData)
+        let messages = [
+            ChatMessage(role: .system, content: briefSystemPrompt),
+            ChatMessage(role: .user, content: weatherContext + "\n\nGenerate today's weather brief.")
+        ]
+
+        // Try each model with shorter output
+        var lastError: Error?
+        for model in models {
+            do {
+                let reply = try await callModel(model, messages: messages, maxTokens: 150)
+                return reply
+            } catch {
+                print("OpenRouter brief: \(model) failed — \(error.localizedDescription). Trying next…")
+                lastError = error
+            }
+        }
+
+        throw lastError ?? NSError(domain: "OpenRouter", code: -1,
+                                    userInfo: [NSLocalizedDescriptionKey: "All models unavailable"])
+    }
+
     // MARK: - Send
 
     /// Send the full conversation history to OpenRouter and return the assistant's reply.
@@ -125,11 +164,11 @@ final class OpenRouterService {
                                     userInfo: [NSLocalizedDescriptionKey: "All models unavailable"])
     }
 
-    private func callModel(_ model: String, messages: [ChatMessage]) async throws -> String {
+    private func callModel(_ model: String, messages: [ChatMessage], maxTokens: Int = 300) async throws -> String {
         let body: [String: Any] = [
             "model": model,
             "messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] },
-            "max_tokens": 300,
+            "max_tokens": maxTokens,
             "temperature": 0.7,
             "provider": ["allow_fallbacks": true]   // let OpenRouter try alternate providers
         ]
@@ -160,8 +199,8 @@ final class OpenRouterService {
                    let errorMsg  = errorDict["message"] as? String {
                     msg = errorMsg
                 }
-                // 502/503 are transient — retry; others are fatal
-                if http.statusCode == 502 || http.statusCode == 503 {
+                // 429/502/503 are transient — retry; others are fatal
+                if http.statusCode == 429 || http.statusCode == 502 || http.statusCode == 503 {
                     lastError = NSError(domain: "OpenRouter", code: http.statusCode,
                                         userInfo: [NSLocalizedDescriptionKey: msg])
                     continue

@@ -103,11 +103,12 @@ class TomorrowIODataSource: WeatherDataSource {
         let hourly: [HourlyEntry] = (forecast.timelines?.hourly ?? []).prefix(24).compactMap { entry in
             guard let time = DateFormatHelper.date(from: entry.time) else { return nil }
             return HourlyEntry(
-                time:         time,
-                temp:         entry.values?.temperature,
-                condition:    WeatherCodeMapper.condition(fromTomorrowCode: entry.values?.weatherCode),
-                precipChance: entry.values?.precipitationProbability,
-                windGust:     entry.values?.windGust
+                time:          time,
+                temp:          entry.values?.temperature,
+                condition:     WeatherCodeMapper.condition(fromTomorrowCode: entry.values?.weatherCode),
+                precipChance:  entry.values?.precipitationProbability,
+                windGust:      entry.values?.windGust,
+                windDirection: entry.values?.windDirection
             )
         }
 

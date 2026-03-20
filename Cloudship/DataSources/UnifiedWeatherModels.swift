@@ -152,6 +152,7 @@ struct HourlyEntry: Codable {
     var condition: WeatherCondition
     var precipChance: Double?
     var windGust: Double?
+    var windDirection: Double?   // degrees (0 = N, 90 = E, 180 = S, 270 = W)
 }
 
 struct DailyEntry: Codable {

@@ -79,6 +79,8 @@ class MainForecastViewController: UIViewController {
     private let windGustCard    = WindGustCardView()
     private let airQualityCard  = AirQualityCardView()
     private let pollenCard      = PollenCardView()
+    private let activityScoresCard = ActivityScoresCardView()
+    private let aiSummaryCard      = AISummaryCardView()
 
     /// Cards the user can reorder, in current display order.
     private var reorderableCards: [CardView] = []
@@ -117,6 +119,7 @@ class MainForecastViewController: UIViewController {
         setupBannerAd()
         setupAlertCard()
         setupDailyCard()
+        setupAISummaryCard()
         activityIndicator.startAnimating()
     }
 
@@ -174,7 +177,7 @@ class MainForecastViewController: UIViewController {
 
     private static let cardOrderKey = "cardOrder_v2"
 
-    private static let defaultCardIDs = ["hourly", "daily", "minutely", "details", "windGust", "airQuality", "pollen"]
+    private static let defaultCardIDs = ["aiSummary", "hourly", "daily", "minutely", "details", "windGust", "airQuality", "pollen", "activityScores"]
 
     private func setupReorderableCards() {
         // Map ID → card
@@ -184,8 +187,10 @@ class MainForecastViewController: UIViewController {
             "daily":      dailyCard,
             "details":    detailsCard,
             "windGust":   windGustCard,
-            "airQuality": airQualityCard,
-            "pollen":     pollenCard
+            "airQuality":     airQualityCard,
+            "pollen":         pollenCard,
+            "activityScores": activityScoresCard,
+            "aiSummary":      aiSummaryCard
         ]
 
         // Assign IDs
@@ -372,13 +377,14 @@ class MainForecastViewController: UIViewController {
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
 
-        // Reverse geocode for display name (nav bar title only — GPS name is set separately)
-        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
-            if let pm = placemarks?.first {
+        // Kick off geocode in parallel — don't block weather fetch
+        Task {
+            if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
+               let pm = placemarks.first {
                 let name = pm.locality ?? pm.name ?? pm.administrativeArea ?? "My Location"
                 WeatherDataSourceManager.shared.locationName = name
-                DispatchQueue.main.async {
-                    self?.navigationItem.title = name
+                await MainActor.run {
+                    self.navigationItem.title = name
                 }
             }
         }
@@ -473,6 +479,26 @@ class MainForecastViewController: UIViewController {
         }
     }
 
+    private func setupAISummaryCard() {
+        aiSummaryCard.onRetry = { [weak self] in
+            guard let data = WeatherDataSourceManager.shared.lastData else { return }
+            self?.fetchAISummary(for: data)
+        }
+    }
+
+    private func fetchAISummary(for data: UnifiedWeatherData) {
+        aiSummaryCard.state = .loading
+        Task { [weak self] in
+            do {
+                let summary = try await AISummaryService.shared.fetchSummary(for: data)
+                await MainActor.run { self?.aiSummaryCard.state = .loaded(summary) }
+            } catch {
+                print("AI Summary failed: \(error.localizedDescription)")
+                await MainActor.run { self?.aiSummaryCard.state = .error }
+            }
+        }
+    }
+
     private func showAlertDetail() {
         guard let alerts = WeatherDataSourceManager.shared.lastData?.alerts, !alerts.isEmpty else { return }
         let vc = AlertDetailViewController(alerts: alerts)
@@ -513,6 +539,12 @@ class MainForecastViewController: UIViewController {
         } else {
             pollenCard.isHidden = true
         }
+
+        // Activity scores — always available (computed from existing data)
+        activityScoresCard.configure(with: data)
+
+        // AI daily brief — async fetch with cache
+        fetchAISummary(for: data)
 
         scrollView.setContentOffset(.zero, animated: false)
     }

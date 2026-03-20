@@ -140,11 +140,12 @@ class NOAADataSource: WeatherDataSource {
             // NOAA hourly temp is already in the requested unit
             let tempConverted = convertPeriodTemp(temp, unit: period.temperatureUnit, targetImperial: useImperial)
             return HourlyEntry(
-                time:         time,
-                temp:         tempConverted,
-                condition:    WeatherCodeMapper.condition(fromNOAADescription: period.shortForecast),
-                precipChance: period.probabilityOfPrecipitation?.value,
-                windGust:     nil   // NOAA hourly doesn't give gust in structured form
+                time:          time,
+                temp:          tempConverted,
+                condition:     WeatherCodeMapper.condition(fromNOAADescription: period.shortForecast),
+                precipChance:  period.probabilityOfPrecipitation?.value,
+                windGust:      nil,  // NOAA hourly doesn't give gust in structured form
+                windDirection: Self.degreesFromCardinal(period.windDirection)
             )
         }
 
@@ -215,5 +216,17 @@ class NOAADataSource: WeatherDataSource {
         if targetImperial && !isF { return temp * 9/5 + 32 }
         if !targetImperial && isF { return (temp - 32) * 5/9 }
         return temp
+    }
+
+    /// Convert NOAA cardinal wind direction string ("NW", "SSE", etc.) to degrees.
+    private static func degreesFromCardinal(_ cardinal: String?) -> Double? {
+        guard let c = cardinal?.uppercased() else { return nil }
+        let map: [String: Double] = [
+            "N": 0, "NNE": 22.5, "NE": 45, "ENE": 67.5,
+            "E": 90, "ESE": 112.5, "SE": 135, "SSE": 157.5,
+            "S": 180, "SSW": 202.5, "SW": 225, "WSW": 247.5,
+            "W": 270, "WNW": 292.5, "NW": 315, "NNW": 337.5
+        ]
+        return map[c]
     }
 }

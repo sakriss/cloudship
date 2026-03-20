@@ -95,6 +95,9 @@ class WeatherDataSourceManager: NSObject {
                 sourceName: activeSource.name
             ))
 
+            // Update widget shared data
+            WidgetDataWriter.shared.write(data)
+
             await MainActor.run {
                 NotificationCenter.default.post(name: WeatherDataSourceManager.weatherDataParseComplete, object: nil)
             }
