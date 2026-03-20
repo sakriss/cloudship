@@ -142,10 +142,18 @@ class NOAADataSource: WeatherDataSource {
             return HourlyEntry(
                 time:          time,
                 temp:          tempConverted,
+                feelsLike:     nil,
                 condition:     WeatherCodeMapper.condition(fromNOAADescription: period.shortForecast),
                 precipChance:  period.probabilityOfPrecipitation?.value,
-                windGust:      nil,  // NOAA hourly doesn't give gust in structured form
-                windDirection: Self.degreesFromCardinal(period.windDirection)
+                precipAmount:  nil,
+                windSpeed:     nil,  // NOAA hourly wind is a string (e.g. "12 mph")
+                windGust:      nil,
+                windDirection: Self.degreesFromCardinal(period.windDirection),
+                uvIndex:       nil,
+                humidity:      nil,
+                cloudCover:    nil,
+                visibility:    nil,
+                pressure:      nil
             )
         }
 

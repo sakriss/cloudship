@@ -69,18 +69,34 @@ struct OpenMeteoCurrent: Codable {
 struct OpenMeteoHourly: Codable {
     let time: [String]?
     let temperature2m: [Double?]?
+    let apparentTemperature: [Double?]?
     let precipitationProbability: [Int?]?
+    let precipitation: [Double?]?
     let weatherCode: [Int?]?
+    let windSpeed10m: [Double?]?
     let windGusts10m: [Double?]?
     let windDirection10m: [Double?]?
+    let uvIndex: [Double?]?
+    let relativeHumidity2m: [Int?]?
+    let cloudCover: [Int?]?
+    let visibility: [Double?]?
+    let surfacePressure: [Double?]?
 
     enum CodingKeys: String, CodingKey {
         case time
         case temperature2m             = "temperature_2m"
+        case apparentTemperature       = "apparent_temperature"
         case precipitationProbability  = "precipitation_probability"
+        case precipitation
         case weatherCode               = "weather_code"
+        case windSpeed10m              = "wind_speed_10m"
         case windGusts10m              = "wind_gusts_10m"
         case windDirection10m          = "wind_direction_10m"
+        case uvIndex                   = "uv_index"
+        case relativeHumidity2m        = "relative_humidity_2m"
+        case cloudCover                = "cloud_cover"
+        case visibility
+        case surfacePressure           = "surface_pressure"
     }
 }
 

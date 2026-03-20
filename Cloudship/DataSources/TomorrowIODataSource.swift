@@ -102,13 +102,22 @@ class TomorrowIODataSource: WeatherDataSource {
 
         let hourly: [HourlyEntry] = (forecast.timelines?.hourly ?? []).prefix(24).compactMap { entry in
             guard let time = DateFormatHelper.date(from: entry.time) else { return nil }
+            let v = entry.values
             return HourlyEntry(
                 time:          time,
-                temp:          entry.values?.temperature,
-                condition:     WeatherCodeMapper.condition(fromTomorrowCode: entry.values?.weatherCode),
-                precipChance:  entry.values?.precipitationProbability,
-                windGust:      entry.values?.windGust,
-                windDirection: entry.values?.windDirection
+                temp:          v?.temperature,
+                feelsLike:     v?.temperatureApparent,
+                condition:     WeatherCodeMapper.condition(fromTomorrowCode: v?.weatherCode),
+                precipChance:  v?.precipitationProbability,
+                precipAmount:  nil, // Tomorrow.io hourly doesn't provide accumulation, only daily sum
+                windSpeed:     v?.windSpeed,
+                windGust:      v?.windGust,
+                windDirection: v?.windDirection,
+                uvIndex:       v?.uvIndex,
+                humidity:      v?.humidity,
+                cloudCover:    v?.cloudCover,
+                visibility:    v?.visibility,
+                pressure:      v?.pressureSurfaceLevel
             )
         }
 

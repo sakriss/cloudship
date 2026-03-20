@@ -40,7 +40,12 @@ class OpenMeteoDataSource: WeatherDataSource {
             "uv_index", "surface_pressure", "visibility", "dew_point_2m"
         ].joined(separator: ",")
 
-        let hourlyVars = "temperature_2m,precipitation_probability,weather_code,wind_gusts_10m,wind_direction_10m"
+        let hourlyVars = [
+            "temperature_2m", "apparent_temperature", "precipitation_probability",
+            "precipitation", "weather_code", "wind_speed_10m", "wind_gusts_10m",
+            "wind_direction_10m", "uv_index", "relative_humidity_2m",
+            "cloud_cover", "visibility", "surface_pressure"
+        ].joined(separator: ",")
 
         let dailyVars = [
             "weather_code", "temperature_2m_max", "temperature_2m_min",
@@ -93,7 +98,7 @@ class OpenMeteoDataSource: WeatherDataSource {
                                imperial: Bool) -> UnifiedWeatherData {
 
         let current   = buildCurrent(forecast.current, imperial: imperial)
-        let hourly    = buildHourly(forecast.hourly)
+        let hourly    = buildHourly(forecast.hourly, imperial: imperial)
         let daily     = buildDaily(forecast.daily)
         let minutely  = buildMinutely15(forecast.minutely15)
         let aq        = buildAirQuality(airQuality)
@@ -144,7 +149,7 @@ class OpenMeteoDataSource: WeatherDataSource {
 
     // MARK: - Hourly
 
-    private func buildHourly(_ h: OpenMeteoHourly?) -> [HourlyEntry] {
+    private func buildHourly(_ h: OpenMeteoHourly?, imperial: Bool = false) -> [HourlyEntry] {
         guard let h = h,
               let times = h.time else { return [] }
 
@@ -157,13 +162,22 @@ class OpenMeteoDataSource: WeatherDataSource {
             guard let date = parseDate(timeStr) else { return nil }
             guard date >= now else { return nil }
             count += 1
+            let pressure = h.surfacePressure?[safe: i] ?? nil
             return HourlyEntry(
                 time:          date,
                 temp:          h.temperature2m?[safe: i] ?? nil,
+                feelsLike:     h.apparentTemperature?[safe: i] ?? nil,
                 condition:     WeatherCodeMapper.condition(fromWMOCode: h.weatherCode?[safe: i] ?? nil),
                 precipChance:  (h.precipitationProbability?[safe: i] ?? nil).map(Double.init),
+                precipAmount:  h.precipitation?[safe: i] ?? nil,
+                windSpeed:     h.windSpeed10m?[safe: i] ?? nil,
                 windGust:      h.windGusts10m?[safe: i] ?? nil,
-                windDirection: h.windDirection10m?[safe: i] ?? nil
+                windDirection: h.windDirection10m?[safe: i] ?? nil,
+                uvIndex:       h.uvIndex?[safe: i] ?? nil,
+                humidity:      (h.relativeHumidity2m?[safe: i] ?? nil).map(Double.init),
+                cloudCover:    (h.cloudCover?[safe: i] ?? nil).map(Double.init),
+                visibility:    (h.visibility?[safe: i] ?? nil).map { imperial ? $0 / 5280.0 : $0 / 1000.0 },
+                pressure:      pressure.map { imperial ? $0 * 0.02953 : $0 }
             )
         }
     }
