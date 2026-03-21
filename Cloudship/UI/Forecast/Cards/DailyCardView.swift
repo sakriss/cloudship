@@ -181,8 +181,8 @@ private class DailyRowView: UIView {
 
 class DailyCardView: CardView {
 
-    // Callback fired with the tapped DailyEntry
-    var onDayTapped: ((DailyEntry) -> Void)?
+    // Callback fired with the tapped DailyEntry and its index
+    var onDayTapped: ((DailyEntry, Int) -> Void)?
 
     private var rowViews: [DailyRowView] = []
     private var dailyEntries: [DailyEntry] = []
@@ -254,6 +254,6 @@ class DailyCardView: CardView {
         UIView.animate(withDuration: 0.1, animations: { row.alpha = 0.5 }) { _ in
             UIView.animate(withDuration: 0.1) { row.alpha = 1 }
         }
-        onDayTapped?(dailyEntries[idx])
+        onDayTapped?(dailyEntries[idx], idx)
     }
 }

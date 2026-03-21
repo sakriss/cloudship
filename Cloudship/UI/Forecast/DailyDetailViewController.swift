@@ -2,8 +2,8 @@
 //  DailyDetailViewController.swift
 //  Cloudship
 //
-//  Pushed when the user taps a day in the 7-day forecast.
-//  Shows day/night conditions, an hourly icon strip, and detail tiles.
+//  Shows all 7 daily forecasts stacked vertically.
+//  Automatically scrolls to the day that was tapped.
 //
 
 import UIKit
@@ -12,54 +12,58 @@ class DailyDetailViewController: UIViewController {
 
     // MARK: - Data
 
-    private let entry: DailyEntry
-    private let hourly: [HourlyEntry]   // all hourly data — filtered to this day
-    private let units: String           // "imperial" or "metric"
+    private let entries: [DailyEntry]
+    private let selectedIndex: Int
+    private let allHourly: [HourlyEntry]
+    private let units: String
 
     // MARK: - UI
 
-    private lazy var scrollView: UIScrollView = {
+    private let scrollView: UIScrollView = {
         let sv = UIScrollView()
-        sv.translatesAutoresizingMaskIntoConstraints = false
         sv.alwaysBounceVertical = true
+        sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
 
-    private lazy var contentStack: UIStackView = {
+    private let contentStack: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
-        sv.spacing = 16
+        sv.spacing = 0
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
+
+    // Y offsets for each day section, set during layout
+    private var sectionOffsets: [CGFloat] = []
 
     // MARK: - Init
 
-    init(entry: DailyEntry, allHourly: [HourlyEntry]) {
-        self.entry  = entry
-        self.units  = UserDefaults.standard.string(forKey: "Units") ?? "imperial"
-        // Filter hourly entries that fall on the same calendar day as entry.time
-        let cal = Calendar.current
-        self.hourly = allHourly.filter { cal.isDate($0.time, inSameDayAs: entry.time) }
+    init(entries: [DailyEntry], selectedIndex: Int, allHourly: [HourlyEntry]) {
+        self.entries       = entries
+        self.selectedIndex = selectedIndex
+        self.allHourly     = allHourly
+        self.units         = UserDefaults.standard.string(forKey: "Units") ?? "imperial"
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) { fatalError("Use init(entry:allHourly:)") }
+    required init?(coder: NSCoder) { fatalError("Use init(entries:selectedIndex:allHourly:)") }
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-
-        // Title: "Saturday, March 21"
-        let df = DateFormatter()
-        df.dateFormat = "EEEE, MMMM d"
-        title = df.string(from: entry.time)
+        title = "7-Day Forecast"
         navigationItem.largeTitleDisplayMode = .never
 
         setupLayout()
-        buildContent()
+        buildAllDays()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        scrollToSelected()
     }
 
     // MARK: - Layout
@@ -74,51 +78,159 @@ class DailyDetailViewController: UIViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 
-            contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 16),
-            contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: 16),
-            contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -16),
-            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -16)
+            contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor),
+            contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor),
+            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
     }
 
-    // MARK: - Content
+    // MARK: - Build all day sections
 
-    private func buildContent() {
-        // 1. Day / Night condition card
-        contentStack.addArrangedSubview(makeDayNightCard())
+    private func buildAllDays() {
+        let cal = Calendar.current
 
-        // 2. Hourly icon strip (if we have hourly data for this day)
-        if !hourly.isEmpty {
-            contentStack.addArrangedSubview(makeHourlyStripCard())
+        for (i, entry) in entries.enumerated() {
+            // Day header
+            let header = makeDayHeader(entry: entry, index: i)
+            contentStack.addArrangedSubview(header)
+
+            // Inner padding container
+            let sectionStack = UIStackView()
+            sectionStack.axis = .vertical
+            sectionStack.spacing = 12
+            sectionStack.translatesAutoresizingMaskIntoConstraints = false
+
+            let padding = UIView()
+            padding.translatesAutoresizingMaskIntoConstraints = false
+            let innerStack = UIStackView(arrangedSubviews: [sectionStack])
+            innerStack.axis = .vertical
+            innerStack.translatesAutoresizingMaskIntoConstraints = false
+
+            let wrapper = UIView()
+            wrapper.translatesAutoresizingMaskIntoConstraints = false
+            wrapper.addSubview(sectionStack)
+            NSLayoutConstraint.activate([
+                sectionStack.topAnchor.constraint(equalTo: wrapper.topAnchor, constant: 12),
+                sectionStack.leadingAnchor.constraint(equalTo: wrapper.leadingAnchor, constant: 16),
+                sectionStack.trailingAnchor.constraint(equalTo: wrapper.trailingAnchor, constant: -16),
+                sectionStack.bottomAnchor.constraint(equalTo: wrapper.bottomAnchor, constant: -20)
+            ])
+            contentStack.addArrangedSubview(wrapper)
+
+            // Day/Night card
+            sectionStack.addArrangedSubview(makeDayNightCard(entry: entry))
+
+            // Hourly strip
+            let dayHourly = allHourly.filter { cal.isDate($0.time, inSameDayAs: entry.time) }
+            if !dayHourly.isEmpty {
+                sectionStack.addArrangedSubview(makeHourlyStripCard(hourly: dayHourly))
+            }
+
+            // Detail tiles
+            sectionStack.addArrangedSubview(makeDetailTilesCard(entry: entry))
+
+            // Separator between days (not after last)
+            if i < entries.count - 1 {
+                let sep = makeSectionSeparator()
+                contentStack.addArrangedSubview(sep)
+            }
+        }
+    }
+
+    private func scrollToSelected() {
+        guard selectedIndex > 0 else { return }
+
+        // Walk subviews to find the header for selectedIndex
+        // Each day = header + wrapper + (optional separator) = 2 or 3 arranged subviews
+        // Easier: collect all headers and wrappers, then scroll to the right header
+        let arrangedViews = contentStack.arrangedSubviews
+        // Pattern: [header0, wrapper0, sep0, header1, wrapper1, sep1, ..., headerN, wrapperN]
+        // Each day takes 3 subviews (header + wrapper + sep), except last (2 subviews)
+        let subviewsPerDay = entries.count > 1 ? 3 : 2
+        let targetSubviewIndex = selectedIndex * subviewsPerDay  // header of selected day
+        guard targetSubviewIndex < arrangedViews.count else { return }
+
+        let targetView = arrangedViews[targetSubviewIndex]
+        let targetY = targetView.frame.origin.y
+
+        let maxOffset = scrollView.contentSize.height - scrollView.bounds.height
+        let offset = CGPoint(x: 0, y: min(targetY, max(0, maxOffset)))
+        scrollView.setContentOffset(offset, animated: true)
+    }
+
+    // MARK: - Day header
+
+    private func makeDayHeader(entry: DailyEntry, index: Int) -> UIView {
+        let container = UIView()
+        container.backgroundColor = .systemGroupedBackground
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        let df = DateFormatter()
+        df.dateFormat = "EEEE, MMMM d"
+
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        // "Today", "Tomorrow", or day name
+        let cal = Calendar.current
+        let isToday    = cal.isDateInToday(entry.time)
+        let isTomorrow = cal.isDateInTomorrow(entry.time)
+
+        if isToday {
+            label.text = "Today — " + df.string(from: entry.time)
+        } else if isTomorrow {
+            label.text = "Tomorrow — " + df.string(from: entry.time)
+        } else {
+            label.text = df.string(from: entry.time)
         }
 
-        // 3. Detail tiles grid
-        contentStack.addArrangedSubview(makeDetailTilesCard())
+        label.font = .systemFont(ofSize: 15, weight: .bold)
+        label.textColor = index == selectedIndex
+            ? UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
+            : .secondaryLabel
+
+        // Selected day gets an accent indicator bar on the left
+        let accentBar = UIView()
+        accentBar.translatesAutoresizingMaskIntoConstraints = false
+        accentBar.backgroundColor = index == selectedIndex
+            ? UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
+            : .clear
+        accentBar.layer.cornerRadius = 2
+
+        container.addSubview(accentBar)
+        container.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            accentBar.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            accentBar.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
+            accentBar.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
+            accentBar.widthAnchor.constraint(equalToConstant: 4),
+
+            label.leadingAnchor.constraint(equalTo: accentBar.trailingAnchor, constant: 14),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
+            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
+        ])
+
+        return container
     }
 
     // MARK: - Day / Night card
 
-    private func makeDayNightCard() -> UIView {
+    private func makeDayNightCard(entry: DailyEntry) -> UIView {
         let card = roundedCard()
 
-        let iconDay = WeatherCodeMapper.iconName(for: entry.condition, isNight: false)
+        let iconDay   = WeatherCodeMapper.iconName(for: entry.condition, isNight: false)
         let iconNight = WeatherCodeMapper.iconName(for: entry.conditionNight, isNight: true)
 
-        let dayRow = makeConditionRow(
-            imageName: iconDay,
-            label: dayName(),
-            description: entry.dayDescription ?? entry.condition.description
-        )
-        let nightRow = makeConditionRow(
-            imageName: iconNight,
-            label: dayName() + " Night",
-            description: entry.nightDescription ?? entry.conditionNight.description
-        )
-
-        let divider = UIView()
-        divider.backgroundColor = .separator
-        divider.translatesAutoresizingMaskIntoConstraints = false
-        divider.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+        let dayRow   = makeConditionRow(imageName: iconDay,
+                                        label: dayName(entry.time),
+                                        description: entry.dayDescription ?? entry.condition.description)
+        let divider  = makeDivider()
+        let nightRow = makeConditionRow(imageName: iconNight,
+                                        label: dayName(entry.time) + " Night",
+                                        description: entry.nightDescription ?? entry.conditionNight.description)
 
         let stack = UIStackView(arrangedSubviews: [dayRow, divider, nightRow])
         stack.axis = .vertical
@@ -162,7 +274,6 @@ class DailyDetailViewController: UIViewController {
 
         container.addSubview(img)
         container.addSubview(textStack)
-
         NSLayoutConstraint.activate([
             img.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             img.topAnchor.constraint(equalTo: container.topAnchor),
@@ -173,15 +284,14 @@ class DailyDetailViewController: UIViewController {
             textStack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             textStack.topAnchor.constraint(equalTo: container.topAnchor),
             textStack.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-
             container.heightAnchor.constraint(greaterThanOrEqualToConstant: 36)
         ])
         return container
     }
 
-    // MARK: - Hourly icon strip
+    // MARK: - Hourly strip
 
-    private func makeHourlyStripCard() -> UIView {
+    private func makeHourlyStripCard(hourly: [HourlyEntry]) -> UIView {
         let card = roundedCard()
         let strip = DailyHourlyStripView(entries: hourly)
         strip.translatesAutoresizingMaskIntoConstraints = false
@@ -198,11 +308,10 @@ class DailyDetailViewController: UIViewController {
 
     // MARK: - Detail tiles
 
-    private func makeDetailTilesCard() -> UIView {
+    private func makeDetailTilesCard(entry: DailyEntry) -> UIView {
         let card = roundedCard()
         let isImperial = units == "imperial"
 
-        // Build tile data
         var tiles: [(icon: String, value: String, name: String)] = []
 
         if let tMax = entry.tempMax, let tMin = entry.tempMin {
@@ -228,23 +337,16 @@ class DailyDetailViewController: UIViewController {
             tiles.append(("moon.stars", entry.moonPhaseName, "Moon Phase"))
         }
 
-        // Layout tiles in a 2-column grid
         var rows: [UIView] = []
         var i = 0
         while i < tiles.count {
             let left  = makeTile(icon: tiles[i].icon, value: tiles[i].value, name: tiles[i].name)
-            var right: UIView
-            if i + 1 < tiles.count {
-                right = makeTile(icon: tiles[i+1].icon, value: tiles[i+1].value, name: tiles[i+1].name)
-            } else {
-                // Last tile alone — fill with empty spacer
-                right = UIView()
-            }
-
+            let right: UIView = i + 1 < tiles.count
+                ? makeTile(icon: tiles[i+1].icon, value: tiles[i+1].value, name: tiles[i+1].name)
+                : UIView()
             let row = UIStackView(arrangedSubviews: [left, right])
             row.axis = .horizontal
             row.distribution = .fillEqually
-            row.spacing = 0
             rows.append(row)
             i += 2
         }
@@ -268,7 +370,6 @@ class DailyDetailViewController: UIViewController {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
-        // Top separator
         let topLine = UIView()
         topLine.backgroundColor = .separator
         topLine.translatesAutoresizingMaskIntoConstraints = false
@@ -287,7 +388,6 @@ class DailyDetailViewController: UIViewController {
         let valueLabel = UILabel()
         valueLabel.text = value
         valueLabel.font = .systemFont(ofSize: 18, weight: .medium)
-        valueLabel.textColor = .label
         valueLabel.adjustsFontSizeToFitWidth = true
         valueLabel.minimumScaleFactor = 0.7
         valueLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -320,6 +420,33 @@ class DailyDetailViewController: UIViewController {
         return container
     }
 
+    // MARK: - Section separator
+
+    private func makeSectionSeparator() -> UIView {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        let line = UIView()
+        line.backgroundColor = .separator
+        line.translatesAutoresizingMaskIntoConstraints = false
+        v.addSubview(line)
+        NSLayoutConstraint.activate([
+            line.topAnchor.constraint(equalTo: v.topAnchor, constant: 8),
+            line.leadingAnchor.constraint(equalTo: v.leadingAnchor, constant: 16),
+            line.trailingAnchor.constraint(equalTo: v.trailingAnchor, constant: -16),
+            line.heightAnchor.constraint(equalToConstant: 0.5),
+            line.bottomAnchor.constraint(equalTo: v.bottomAnchor, constant: -8)
+        ])
+        return v
+    }
+
+    private func makeDivider() -> UIView {
+        let v = UIView()
+        v.backgroundColor = .separator
+        v.translatesAutoresizingMaskIntoConstraints = false
+        v.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+        return v
+    }
+
     // MARK: - Helpers
 
     private func roundedCard() -> UIView {
@@ -331,17 +458,15 @@ class DailyDetailViewController: UIViewController {
         return v
     }
 
-    private func dayName() -> String {
+    private func dayName(_ date: Date) -> String {
         let df = DateFormatter()
         df.dateFormat = "EEEE"
-        return df.string(from: entry.time)
+        return df.string(from: date)
     }
 
     private var degSymbol: String { "°" }
 
-    private func fmt(_ val: Double) -> String {
-        return "\(Int(val.rounded()))"
-    }
+    private func fmt(_ val: Double) -> String { "\(Int(val.rounded()))" }
 
     private func timeString(_ date: Date) -> String {
         let df = DateFormatter()
@@ -351,7 +476,7 @@ class DailyDetailViewController: UIViewController {
     }
 }
 
-// MARK: - Horizontal hourly icon strip (no temps, just icons + time labels)
+// MARK: - Horizontal hourly icon strip
 
 private class DailyHourlyStripView: UIScrollView {
 
@@ -366,13 +491,11 @@ private class DailyHourlyStripView: UIScrollView {
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
 
-        // Time formatter
         let df = DateFormatter()
         df.dateFormat = "ha"
 
         for entry in entries {
-            let cell = makeCell(entry: entry, df: df)
-            stack.addArrangedSubview(cell)
+            stack.addArrangedSubview(makeCell(entry: entry, df: df))
         }
 
         NSLayoutConstraint.activate([
@@ -405,11 +528,9 @@ private class DailyHourlyStripView: UIScrollView {
 
         container.addSubview(timeLabel)
         container.addSubview(iconView)
-
         NSLayoutConstraint.activate([
             timeLabel.topAnchor.constraint(equalTo: container.topAnchor),
             timeLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-
             iconView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
             iconView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             iconView.widthAnchor.constraint(equalToConstant: 28),

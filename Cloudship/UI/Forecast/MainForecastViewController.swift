@@ -82,6 +82,7 @@ class MainForecastViewController: UIViewController {
     private let pollenCard      = PollenCardView()
     private let activityScoresCard = ActivityScoresCardView()
     private let aiSummaryCard      = AISummaryCardView()
+    private let animationView      = WeatherAnimationView()
 
     /// Cards the user can reorder, in current display order.
     private var reorderableCards: [CardView] = []
@@ -227,7 +228,18 @@ class MainForecastViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = .systemBackground
 
+        // Animation view sits behind everything
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(animationView, at: 0)
+        NSLayoutConstraint.activate([
+            animationView.topAnchor.constraint(equalTo: view.topAnchor),
+            animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            animationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            animationView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
         view.addSubview(scrollView)
+        scrollView.backgroundColor = .clear
         scrollView.addSubview(stackView)
         scrollView.refreshControl = refreshControl
 
@@ -474,10 +486,14 @@ class MainForecastViewController: UIViewController {
     }
 
     private func setupDailyCard() {
-        dailyCard.onDayTapped = { [weak self] entry in
+        dailyCard.onDayTapped = { [weak self] entry, index in
             guard let self = self,
-                  let allHourly = WeatherDataSourceManager.shared.lastData?.hourly else { return }
-            let vc = DailyDetailViewController(entry: entry, allHourly: allHourly)
+                  let data = WeatherDataSourceManager.shared.lastData else { return }
+            let vc = DailyDetailViewController(
+                entries: data.daily,
+                selectedIndex: index,
+                allHourly: data.hourly
+            )
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -555,6 +571,9 @@ class MainForecastViewController: UIViewController {
 
         // AI daily brief — async fetch with cache
         fetchAISummary(for: data)
+
+        // Weather background animation
+        animationView.transition(to: data.current.condition)
 
         scrollView.setContentOffset(.zero, animated: false)
     }
