@@ -125,6 +125,15 @@ class MainForecastViewController: UIViewController {
         activityIndicator.startAnimating()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Keep scroll content inset in sync with the actual tab bar height
+        // so the last card is never obscured when scrolled to the bottom.
+        let tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
+        scrollView.contentInset.bottom = tabBarHeight
+        scrollView.verticalScrollIndicatorInsets.bottom = tabBarHeight
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -260,12 +269,12 @@ class MainForecastViewController: UIViewController {
             scrollView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
             stackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 16),
             stackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -16),
-            stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -16),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -8),
 
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
