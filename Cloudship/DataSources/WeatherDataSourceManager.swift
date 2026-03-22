@@ -26,6 +26,15 @@ class WeatherDataSourceManager: NSObject {
     /// Reverse-geocoded location name.
     var locationName: String?
 
+    /// Whether we're currently displaying historical data.
+    var isShowingHistorical: Bool = false
+
+    /// The historical date being displayed, if any.
+    var historicalDate: Date?
+
+    /// Historical data source (always Open-Meteo Archive API).
+    private let historicalSource = OpenMeteoHistoricalDataSource()
+
     /// The currently active data source.
     var activeSource: WeatherDataSource = TomorrowIODataSource() {
         didSet {
@@ -128,6 +137,30 @@ class WeatherDataSourceManager: NSObject {
         } catch {
             await postFailure(error: error)
         }
+    }
+
+    // MARK: - Historical fetch
+
+    func fetchHistoricalWeather(lat: Double, lon: Double, date: Date) async {
+        do {
+            var data = try await historicalSource.fetchWeather(lat: lat, lon: lon, date: date)
+            data.locationName = locationName
+            lastData = data
+            isShowingHistorical = true
+            historicalDate = date
+
+            await MainActor.run {
+                NotificationCenter.default.post(name: Self.weatherDataParseComplete, object: "historical")
+            }
+        } catch {
+            await postFailure(error: error)
+        }
+    }
+
+    /// Exit historical mode and clear state.
+    func exitHistoricalMode() {
+        isShowingHistorical = false
+        historicalDate = nil
     }
 
     // MARK: - NOAA Alerts (free, US-only, always fetched as a best-effort supplement)

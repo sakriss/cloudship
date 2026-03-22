@@ -344,9 +344,9 @@ class RadarViewController: UIViewController {
     private var currentIndex: Int = 0
     private var isPlaying = false
     private var animationTimer: Timer?
-    private var currentOverlay: MKTileOverlay?
     private let tileSize = 512
     private var tileHost = "https://tilecache.rainviewer.com"
+    private var currentOverlay: MKTileOverlay?
 
     // MARK: Lightning state
     private var lightningStrikes: [LightningStrike] = []
@@ -446,6 +446,9 @@ class RadarViewController: UIViewController {
         return b
     }()
 
+    /// Set by the tab bar controller to center on the forecast location instead of GPS.
+    var initialCoordinate: CLLocationCoordinate2D?
+
     private let locationManager = CLLocationManager()
     private var didCenterOnUser = false
     private var mapTypes: [MKMapType] = [.standard, .satellite, .hybrid]
@@ -489,6 +492,17 @@ class RadarViewController: UIViewController {
         locationManager.startUpdatingLocation()
 
         Task { await fetchRadarData() }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Re-center every time the tab appears if a forecast coordinate was provided
+        if let coord = initialCoordinate {
+            let region = MKCoordinateRegion(center: coord,
+                                            span: MKCoordinateSpan(latitudeDelta: 4.0, longitudeDelta: 4.0))
+            mapView.setRegion(region, animated: animated)
+            didCenterOnUser = true   // skip GPS centering since we have a coordinate
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -611,6 +625,8 @@ class RadarViewController: UIViewController {
     }
 
     private func reloadFrames() {
+        if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
+
         let frames = activeFrames
         guard !frames.isEmpty else {
             timeLabel.text = activeLayer == .satellite ? "Satellite unavailable" : "No data"
@@ -633,29 +649,44 @@ class RadarViewController: UIViewController {
 
     // MARK: - Frame display
 
+    private func overlayTemplate(for frame: RainViewerResponse.Frame) -> String? {
+        switch activeLayer {
+        case .precipitation:
+            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(colorScheme.rawValue)/1_1.png"
+        case .satellite:
+            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png"
+        case .lightning:
+            return nil
+        }
+    }
+
     private func showCurrentFrame() {
         let frames = activeFrames
         guard currentIndex < frames.count else { return }
         let frame = frames[currentIndex]
 
-        if let old = currentOverlay { mapView.removeOverlay(old) }
-
-        let template: String
-        switch activeLayer {
-        case .precipitation:
-            template = "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(colorScheme.rawValue)/1_1.png"
-        case .satellite:
-            template = "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png"
-        case .lightning:
-            currentOverlay = nil
+        guard let template = overlayTemplate(for: frame) else {
+            if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
+            updateTimeLabel(for: frame)
+            frameSlider.value = Float(currentIndex)
             return
         }
+
+        // Keep old overlay visible while new one loads (simple crossfade)
+        let oldOverlay = currentOverlay
 
         let overlay = MKTileOverlay(urlTemplate: template)
         overlay.canReplaceMapContent = false
         overlay.tileSize = CGSize(width: tileSize, height: tileSize)
         mapView.addOverlay(overlay, level: .aboveLabels)
         currentOverlay = overlay
+
+        // Remove old overlay after short delay so tiles have time to appear
+        if let old = oldOverlay {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                self?.mapView.removeOverlay(old)
+            }
+        }
 
         updateTimeLabel(for: frame)
         frameSlider.value = Float(currentIndex)
@@ -877,8 +908,10 @@ class RadarViewController: UIViewController {
         vc.radarOpacity   = radarOpacity
 
         vc.onColorSchemeChanged = { [weak self] scheme in
-            self?.colorScheme = scheme
-            self?.showCurrentFrame()
+            guard let self else { return }
+            self.colorScheme = scheme
+            // Color scheme changes the URL template, so rebuild all overlays
+            self.reloadFrames()
         }
         vc.onSpeedChanged = { [weak self] speed in
             self?.animationSpeed = speed
@@ -891,11 +924,12 @@ class RadarViewController: UIViewController {
             self.reloadFrames()
         }
         vc.onOpacityChanged = { [weak self] opacity in
-            self?.radarOpacity = opacity
-            // Update current overlay renderer opacity
-            if let overlay = self?.currentOverlay {
-                self?.mapView.removeOverlay(overlay)
-                self?.mapView.addOverlay(overlay, level: .aboveLabels)
+            guard let self else { return }
+            self.radarOpacity = opacity
+            // Re-add current overlay to pick up new opacity via rendererFor delegate
+            if let overlay = self.currentOverlay {
+                self.mapView.removeOverlay(overlay)
+                self.mapView.addOverlay(overlay, level: .aboveLabels)
             }
         }
 

@@ -30,6 +30,10 @@
 	<string>Cloudship needs your location for notifications and weather events are nearby</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Cloudship needs your location for hyperlocal weather data</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.cloudship.precipCheck</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

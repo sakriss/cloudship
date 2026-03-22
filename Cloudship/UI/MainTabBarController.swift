@@ -7,13 +7,31 @@
 //
 
 import UIKit
+import CoreLocation
 
-class MainTabBarController: UITabBarController {
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        delegate = self
         setupTabs()
         styleTabBar()
+    }
+
+    // MARK: - UITabBarControllerDelegate
+
+    func tabBarController(_ tabBarController: UITabBarController,
+                          shouldSelect viewController: UIViewController) -> Bool {
+        // Pass the forecast's current location to the radar tab before it appears
+        if let radarNav = viewController as? UINavigationController,
+           let radarVC = radarNav.viewControllers.first as? RadarViewController,
+           let forecastNav = viewControllers?.first as? UINavigationController,
+           let forecastVC = forecastNav.viewControllers.first as? MainForecastViewController {
+            if let loc = forecastVC.currentForecastLocation {
+                radarVC.initialCoordinate = loc.coordinate
+            }
+        }
+        return true
     }
 
     // MARK: - Tab setup

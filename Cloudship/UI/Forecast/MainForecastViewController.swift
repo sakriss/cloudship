@@ -18,8 +18,14 @@ class MainForecastViewController: UIViewController {
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
     private var currentLocation: CLLocation?
+
+    /// Exposes the location currently being shown in the forecast (for the radar tab).
+    var currentForecastLocation: CLLocation? { currentLocation }
     private var isShowingGPSLocation = false
     private var bannerView: GADBannerView?
+
+    // Time Machine (historical mode)
+    private var timeMachineBanner: TimeMachineBannerView?
 
     // MARK: - UI
 
@@ -109,6 +115,15 @@ class MainForecastViewController: UIViewController {
     private var searchController: UISearchController!
     private var searchResultsVC: SearchResultsViewController!
 
+    private lazy var inlineSearchBar: UISearchBar = {
+        let sb = UISearchBar()
+        sb.placeholder = "Search for a city"
+        sb.searchBarStyle = .minimal
+        sb.delegate = self
+        sb.translatesAutoresizingMaskIntoConstraints = false
+        return sb
+    }()
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -144,7 +159,7 @@ class MainForecastViewController: UIViewController {
         navigationItem.title = "Weather"
         navigationController?.navigationBar.prefersLargeTitles = false
 
-        // Search
+        // Search — controller used for results, presented on demand
         searchResultsVC = SearchResultsViewController()
         searchResultsVC.delegate = self
         searchController = UISearchController(searchResultsController: searchResultsVC)
@@ -152,11 +167,19 @@ class MainForecastViewController: UIViewController {
         searchController.searchBar.placeholder = "Search for a city"
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.showsSearchResultsController = true
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = true
         definesPresentationContext = true
+        // Search bar lives in scroll content — not the nav bar
 
-        // AI chat button
+        // Time Machine calendar button (left)
+        let calendarButton = UIBarButtonItem(
+            image: UIImage(systemName: "calendar"),
+            style: .plain,
+            target: self,
+            action: #selector(openTimeMachine)
+        )
+        navigationItem.leftBarButtonItem = calendarButton
+
+        // AI chat button (right)
         let aiButton = UIBarButtonItem(
             image: UIImage(systemName: "sparkles"),
             style: .plain,
@@ -182,6 +205,137 @@ class MainForecastViewController: UIViewController {
             sheet.preferredCornerRadius = 24
         }
         present(vc, animated: true)
+    }
+
+    // MARK: - Time Machine (Historical Weather)
+
+    @objc private func openTimeMachine() {
+        let alert = UIAlertController(title: "Time Machine",
+                                       message: "View historical weather for a past date",
+                                       preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Pick a Date", style: .default) { [weak self] _ in
+            self?.showDatePicker()
+        })
+
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            alert.addAction(UIAlertAction(title: "Back to Today", style: .destructive) { [weak self] _ in
+                self?.backToToday()
+            })
+        }
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        // iPad popover anchor
+        alert.popoverPresentationController?.barButtonItem = navigationItem.leftBarButtonItem
+
+        present(alert, animated: true)
+    }
+
+    private func showDatePicker() {
+        let picker = UIDatePicker()
+        picker.datePickerMode = .date
+        picker.preferredDatePickerStyle = .inline
+        picker.maximumDate = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        picker.minimumDate = {
+            var comps = DateComponents()
+            comps.year = 1940
+            comps.month = 1
+            comps.day = 1
+            return Calendar.current.date(from: comps)
+        }()
+
+        let vc = UIViewController()
+        vc.view = picker
+        vc.preferredContentSize = CGSize(width: 340, height: 400)
+
+        let nav = UINavigationController(rootViewController: vc)
+        vc.title = "Select Date"
+        vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Go", style: .done, target: nil, action: nil)
+        vc.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
+
+        vc.navigationItem.rightBarButtonItem?.primaryAction = UIAction { [weak self, weak picker, weak nav] _ in
+            guard let self = self, let date = picker?.date else { return }
+            nav?.dismiss(animated: true) {
+                self.fetchHistoricalWeather(for: date)
+            }
+        }
+        vc.navigationItem.leftBarButtonItem?.primaryAction = UIAction { [weak nav] _ in
+            nav?.dismiss(animated: true)
+        }
+
+        if let sheet = nav.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(nav, animated: true)
+    }
+
+    private func fetchHistoricalWeather(for date: Date) {
+        guard let location = currentLocation else { return }
+
+        activityIndicator.startAnimating()
+
+        Task {
+            await WeatherDataSourceManager.shared.fetchHistoricalWeather(
+                lat: location.coordinate.latitude,
+                lon: location.coordinate.longitude,
+                date: date
+            )
+        }
+    }
+
+    private func showTimeMachineBanner(for date: Date) {
+        // Remove existing banner if any
+        timeMachineBanner?.removeFromSuperview()
+
+        let banner = TimeMachineBannerView()
+        banner.translatesAutoresizingMaskIntoConstraints = false
+        banner.configure(date: date)
+        banner.onBackToToday = { [weak self] in
+            self?.backToToday()
+        }
+
+        // Insert banner after sourceLabel (index 1) or at top
+        let insertIndex = min(2, stackView.arrangedSubviews.count)
+        stackView.insertArrangedSubview(banner, at: insertIndex)
+
+        NSLayoutConstraint.activate([
+            banner.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 16),
+            banner.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -16)
+        ])
+
+        timeMachineBanner = banner
+    }
+
+    private func removeTimeMachineBanner() {
+        timeMachineBanner?.removeFromSuperview()
+        timeMachineBanner = nil
+    }
+
+    private func backToToday() {
+        WeatherDataSourceManager.shared.exitHistoricalMode()
+        removeTimeMachineBanner()
+
+        // Hide cards that were hidden during historical mode — restore all
+        minutelyCard.isHidden = false
+        aiSummaryCard.isHidden = false
+        airQualityCard.isHidden = false
+        pollenCard.isHidden = false
+        activityScoresCard.isHidden = false
+        alertBannerCard.isHidden = false
+
+        // Re-fetch current weather
+        guard let location = currentLocation else { return }
+        activityIndicator.startAnimating()
+        Task {
+            await WeatherDataSourceManager.shared.fetchWeather(
+                lat: location.coordinate.latitude,
+                lon: location.coordinate.longitude,
+                forceRefresh: true
+            )
+        }
     }
 
     // MARK: - Card Reordering Setup
@@ -251,6 +405,9 @@ class MainForecastViewController: UIViewController {
         scrollView.backgroundColor = .clear
         scrollView.addSubview(stackView)
         scrollView.refreshControl = refreshControl
+
+        // Inline search bar scrolls with content — disappears naturally when scrolling down
+        stackView.addArrangedSubview(inlineSearchBar)
 
         // Source label sits above the header card (not a CardView, so added separately)
         stackView.addArrangedSubview(sourceLabel)
@@ -551,12 +708,18 @@ class MainForecastViewController: UIViewController {
         headerCard.configure(with: data, todayDaily: todayDaily)
         alertBannerCard.configure(alerts: data.alerts)
 
-        minutelyCard.configure(minutely: data.minutely)
-        minutelyCard.isHidden = data.minutely.isEmpty
+        minutelyCard.configure(minutely: data.minutely,
+                               hourly: data.hourly,
+                               current: data.current)
+        // Show card even without minutely data if we have hourly (for the one-liner)
+        minutelyCard.isHidden = data.minutely.isEmpty && data.hourly.isEmpty
 
         hourlyCard.configure(hourly: data.hourly)
-        dailyCard.configure(daily: data.daily)
-        detailsCard.configure(with: data.current)
+        dailyCard.configure(daily: data.daily, currentTemp: data.current.temperature)
+        // Get today's sunrise/sunset from daily data
+        let todaySunrise = data.daily.first?.sunrise
+        let todaySunset = data.daily.first?.sunset
+        detailsCard.configure(with: data.current, sunrise: todaySunrise, sunset: todaySunset)
         windGustCard.configure(hourly: data.hourly)
 
         // Air quality — show card only when data is available
@@ -583,6 +746,18 @@ class MainForecastViewController: UIViewController {
 
         // Weather background animation
         animationView.transition(to: data.current.condition)
+
+        // Historical mode: show banner, hide irrelevant cards
+        let mgr = WeatherDataSourceManager.shared
+        if mgr.isShowingHistorical, let histDate = mgr.historicalDate {
+            showTimeMachineBanner(for: histDate)
+            minutelyCard.isHidden = true
+            aiSummaryCard.isHidden = true
+            alertBannerCard.isHidden = true
+            // Air quality / pollen / activity scores are already hidden if nil
+        } else {
+            removeTimeMachineBanner()
+        }
 
         scrollView.setContentOffset(.zero, animated: false)
     }
@@ -678,6 +853,16 @@ extension MainForecastViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error)")
         activityIndicator.stopAnimating()
+    }
+}
+
+// MARK: - Inline search bar delegate
+
+extension MainForecastViewController: UISearchBarDelegate {
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        // Hand off to the full search controller instead of editing inline
+        present(searchController, animated: true)
+        return false
     }
 }
 

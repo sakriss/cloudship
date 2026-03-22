@@ -15,6 +15,7 @@ private class DailyRangeBarView: UIView {
     var maxTemp: Double = 0
     var absMin: Double = 0
     var absMax: Double = 0
+    var currentTemp: Double?  // non-nil only for today's row
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -66,6 +67,21 @@ private class DailyRangeBarView: UIView {
             options: []
         )
         ctx.restoreGState()
+
+        // Current temperature dot (today only)
+        if let current = currentTemp {
+            let dotX = CGFloat((current - absMin) / range) * w
+            let dotRadius: CGFloat = 5
+            let dotRect = CGRect(x: dotX - dotRadius, y: h / 2 - dotRadius,
+                                 width: dotRadius * 2, height: dotRadius * 2)
+            let dotPath = UIBezierPath(ovalIn: dotRect)
+            UIColor.white.setFill()
+            dotPath.fill()
+            // Subtle shadow ring
+            UIColor.black.withAlphaComponent(0.15).setStroke()
+            dotPath.lineWidth = 1
+            dotPath.stroke()
+        }
     }
 }
 
@@ -161,7 +177,7 @@ private class DailyRowView: UIView {
 
     required init?(coder: NSCoder) { fatalError() }
 
-    func configure(entry: DailyEntry, absMin: Double, absMax: Double) {
+    func configure(entry: DailyEntry, absMin: Double, absMax: Double, currentTemp: Double? = nil) {
         dayLabel.text  = DateFormatHelper.dailyLabel(from: entry.time)
         iconView.image = UIImage(named: WeatherCodeMapper.iconName(for: entry.condition,
                                                                     isNight: false))
@@ -173,6 +189,7 @@ private class DailyRowView: UIView {
         rangeBar.absMax  = absMax
         rangeBar.minTemp = entry.tempMin ?? absMin
         rangeBar.maxTemp = entry.tempMax ?? absMax
+        rangeBar.currentTemp = currentTemp
         rangeBar.setNeedsDisplay()
     }
 }
@@ -226,7 +243,7 @@ class DailyCardView: CardView {
         ])
     }
 
-    func configure(daily: [DailyEntry]) {
+    func configure(daily: [DailyEntry], currentTemp: Double? = nil) {
         guard !daily.isEmpty else { return }
         dailyEntries = daily
         let allMins = daily.compactMap(\.tempMin)
@@ -234,10 +251,15 @@ class DailyCardView: CardView {
         let absMin = allMins.min() ?? 0
         let absMax = allMaxs.max() ?? 100
 
+        let todayStart = Calendar.current.startOfDay(for: Date())
+
         for (i, row) in rowViews.enumerated() {
             if i < daily.count {
                 row.isHidden = false
-                row.configure(entry: daily[i], absMin: absMin, absMax: absMax)
+                // Show current temp dot only on today's row
+                let isToday = Calendar.current.isDate(daily[i].time, inSameDayAs: todayStart)
+                row.configure(entry: daily[i], absMin: absMin, absMax: absMax,
+                              currentTemp: isToday ? currentTemp : nil)
                 row.tag = i
             } else {
                 row.isHidden = true

@@ -66,7 +66,7 @@ enum WeatherCodeMapper {
         case .clear, .mostlyClear:
             return isNight ? "clearnight" : "sunny"
         case .partlyCloudy:
-            return isNight ? "partlycloudynightbackground" : "partlycloudy"
+            return isNight ? "cloudynight" : "mostlycloudy"
         case .mostlyCloudy:
             return "mostlycloudy"
         case .cloudy:

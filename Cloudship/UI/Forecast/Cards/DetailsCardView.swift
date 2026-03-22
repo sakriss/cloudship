@@ -67,11 +67,138 @@ private class DetailTileView: UIView {
     }
 }
 
+// MARK: - Sun arc (sunrise/sunset)
+
+private class SunArcView: UIView {
+
+    var sunrise: Date?
+    var sunset: Date?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .clear
+    }
+    required init?(coder: NSCoder) { super.init(coder: coder)!; backgroundColor = .clear }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        setNeedsDisplay()
+    }
+
+    override func draw(_ rect: CGRect) {
+        guard let sunrise = sunrise, let sunset = sunset else { return }
+        guard let ctx = UIGraphicsGetCurrentContext() else { return }
+
+        let insetX: CGFloat = 24
+        let arcLeft = insetX
+        let arcRight = rect.width - insetX
+        let arcWidth = arcRight - arcLeft
+        let arcCenterX = rect.midX
+        let arcBottom: CGFloat = rect.height - 24  // space for labels
+        let arcHeight: CGFloat = arcBottom * 0.7
+
+        // Draw semicircular arc (sunrise left → sunset right)
+        let arcPath = UIBezierPath()
+        let steps = 60
+        for i in 0...steps {
+            let t = CGFloat(i) / CGFloat(steps)
+            let angle = CGFloat.pi * (1 - t)  // π → 0 (left to right semicircle)
+            let x = arcCenterX + (arcWidth / 2) * cos(angle)
+            let y = arcBottom - arcHeight * sin(angle)
+            if i == 0 {
+                arcPath.move(to: CGPoint(x: x, y: y))
+            } else {
+                arcPath.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+
+        // Dashed arc line
+        UIColor.secondaryLabel.withAlphaComponent(0.3).setStroke()
+        arcPath.lineWidth = 1.5
+        arcPath.setLineDash([4, 4], count: 2, phase: 0)
+        arcPath.stroke()
+
+        // Horizon line
+        let horizonPath = UIBezierPath()
+        horizonPath.move(to: CGPoint(x: arcLeft - 8, y: arcBottom))
+        horizonPath.addLine(to: CGPoint(x: arcRight + 8, y: arcBottom))
+        UIColor.separator.resolvedColor(with: traitCollection).setStroke()
+        horizonPath.lineWidth = 1
+        horizonPath.setLineDash([1], count: 0, phase: 0)  // solid
+        horizonPath.stroke()
+
+        // Current sun position
+        let now = Date()
+        let totalDaylight = sunset.timeIntervalSince(sunrise)
+        let elapsed = now.timeIntervalSince(sunrise)
+
+        if totalDaylight > 0 && elapsed >= 0 && elapsed <= totalDaylight {
+            let progress = CGFloat(elapsed / totalDaylight)
+            let angle = CGFloat.pi * (1 - progress)
+            let dotX = arcCenterX + (arcWidth / 2) * cos(angle)
+            let dotY = arcBottom - arcHeight * sin(angle)
+
+            // Solid arc up to current position
+            let solidPath = UIBezierPath()
+            let progressSteps = Int(Double(steps) * Double(progress))
+            for i in 0...max(progressSteps, 1) {
+                let t = CGFloat(i) / CGFloat(steps)
+                let a = CGFloat.pi * (1 - t)
+                let x = arcCenterX + (arcWidth / 2) * cos(a)
+                let y = arcBottom - arcHeight * sin(a)
+                if i == 0 {
+                    solidPath.move(to: CGPoint(x: x, y: y))
+                } else {
+                    solidPath.addLine(to: CGPoint(x: x, y: y))
+                }
+            }
+            UIColor(red: 1.0, green: 0.75, blue: 0.2, alpha: 0.8).setStroke()
+            solidPath.lineWidth = 2
+            solidPath.stroke()
+
+            // Sun dot
+            let dotRadius: CGFloat = 7
+            let dotRect = CGRect(x: dotX - dotRadius, y: dotY - dotRadius,
+                                 width: dotRadius * 2, height: dotRadius * 2)
+            ctx.saveGState()
+            // Glow
+            ctx.setShadow(offset: .zero, blur: 8,
+                          color: UIColor(red: 1.0, green: 0.8, blue: 0.2, alpha: 0.6).cgColor)
+            UIColor(red: 1.0, green: 0.75, blue: 0.2, alpha: 1.0).setFill()
+            UIBezierPath(ovalIn: dotRect).fill()
+            ctx.restoreGState()
+        }
+
+        // Sunrise label
+        let sunriseStr = timeString(from: sunrise)
+        let sunsetStr = timeString(from: sunset)
+
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 11, weight: .regular),
+            .foregroundColor: UIColor.secondaryLabel
+        ]
+        let riseSize = sunriseStr.size(withAttributes: attrs)
+        sunriseStr.draw(at: CGPoint(x: arcLeft - riseSize.width / 2,
+                                     y: arcBottom + 4), withAttributes: attrs)
+        let setSize = sunsetStr.size(withAttributes: attrs)
+        sunsetStr.draw(at: CGPoint(x: arcRight - setSize.width / 2,
+                                    y: arcBottom + 4), withAttributes: attrs)
+    }
+
+    private func timeString(from date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        return f.string(from: date)
+    }
+}
+
 // MARK: - Card
 
 class DetailsCardView: CardView {
 
     private var tiles: [DetailTileView] = []
+    private let sunArcView = SunArcView()
+    private var sunArcHeightConstraint: NSLayoutConstraint!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -160,7 +287,13 @@ class DetailsCardView: CardView {
             }
         }
 
+        // Sun arc view (sunrise/sunset visualization)
+        sunArcView.translatesAutoresizingMaskIntoConstraints = false
+        sunArcView.isHidden = true  // Hidden until sunrise/sunset data is available
+        sunArcHeightConstraint = sunArcView.heightAnchor.constraint(equalToConstant: 100)
+
         addSubview(outer)
+        addSubview(sunArcView)
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: p),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),
@@ -168,13 +301,30 @@ class DetailsCardView: CardView {
             outer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
             outer.leadingAnchor.constraint(equalTo: leadingAnchor),
             outer.trailingAnchor.constraint(equalTo: trailingAnchor),
-            outer.bottomAnchor.constraint(equalTo: bottomAnchor)
+
+            sunArcView.topAnchor.constraint(equalTo: outer.bottomAnchor, constant: 8),
+            sunArcView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),
+            sunArcView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -p),
+            sunArcHeightConstraint,
+            sunArcView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -p)
         ])
     }
 
     // MARK: - Configure
 
-    func configure(with current: CurrentConditions) {
+    func configure(with current: CurrentConditions, sunrise: Date? = nil, sunset: Date? = nil) {
+        // Update sun arc
+        if let rise = sunrise, let set = sunset {
+            sunArcView.sunrise = rise
+            sunArcView.sunset = set
+            sunArcView.isHidden = false
+            sunArcHeightConstraint.constant = 100
+            sunArcView.setNeedsDisplay()
+        } else {
+            sunArcView.isHidden = true
+            sunArcHeightConstraint.constant = 0
+        }
+
         let isMetric  = TemperatureFormatter.isMetric
         let speedUnit = isMetric ? "km/h" : "mph"
         let distUnit  = isMetric ? "km"   : "mi"

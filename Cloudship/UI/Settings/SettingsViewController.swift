@@ -18,10 +18,18 @@ class SettingsViewController: UITableViewController {
         case dataSource = 0
         case units
         case appearance
+        case notifications
         case about
     }
 
     // MARK: - Cached controls
+
+    private lazy var rainAlertsSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.isOn = UserDefaults.standard.bool(forKey: "RainAlertsEnabled")
+        sw.addTarget(self, action: #selector(rainAlertsChanged(_:)), for: .valueChanged)
+        return sw
+    }()
 
     private lazy var sourceControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["Tomorrow.io", "NOAA", "Open-Meteo"])
@@ -65,19 +73,21 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section)! {
-        case .dataSource:   return 1
-        case .units:        return 1
-        case .appearance:   return 1
-        case .about:        return 3
+        case .dataSource:     return 1
+        case .units:          return 1
+        case .appearance:     return 1
+        case .notifications:  return 2
+        case .about:          return 3
         }
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch Section(rawValue: section)! {
-        case .dataSource:  return "Data Source"
-        case .units:       return "Units"
-        case .appearance:  return "Appearance"
-        case .about:       return "About"
+        case .dataSource:     return "Data Source"
+        case .units:          return "Units"
+        case .appearance:     return "Appearance"
+        case .notifications:  return "Notifications"
+        case .about:          return "About"
         }
     }
 
@@ -104,6 +114,30 @@ class SettingsViewController: UITableViewController {
         case .appearance:
             let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
             cell.configure(label: "Theme", control: appearanceControl)
+            return cell
+
+        case .notifications:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            var config = cell.defaultContentConfiguration()
+            if indexPath.row == 0 {
+                config.text = "Rain Alerts"
+                config.secondaryText = "Get notified when rain is starting or stopping"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = rainAlertsSwitch
+                cell.accessoryType = .none
+                cell.selectionStyle = .none
+            } else {
+                config.text = "Manage Locations"
+                config.secondaryText = "Set up rain alerts for specific locations"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = nil
+                cell.accessoryType = .disclosureIndicator
+                cell.selectionStyle = .default
+            }
             return cell
 
         case .about:
@@ -133,6 +167,13 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+
+        if Section(rawValue: indexPath.section) == .notifications && indexPath.row == 1 {
+            let vc = ManageLocationsViewController(style: .grouped)
+            navigationController?.pushViewController(vc, animated: true)
+            return
+        }
+
         guard Section(rawValue: indexPath.section) == .about else { return }
         switch indexPath.row {
         case 1: sendFeedbackEmail()
@@ -156,6 +197,13 @@ class SettingsViewController: UITableViewController {
         let newUnits = sender.selectedSegmentIndex == 0 ? "imperial" : "metric"
         UserDefaults.standard.set(newUnits, forKey: "Units")
         triggerRefetch()
+    }
+
+    @objc private func rainAlertsChanged(_ sender: UISwitch) {
+        UserDefaults.standard.set(sender.isOn, forKey: "RainAlertsEnabled")
+        if sender.isOn {
+            BackgroundTaskManager.shared.scheduleNextRefresh()
+        }
     }
 
     @objc private func appearanceChanged(_ sender: UISegmentedControl) {

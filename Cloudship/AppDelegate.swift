@@ -8,6 +8,7 @@
 
 import UIKit
 import GoogleMobileAds
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -30,6 +31,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         GADMobileAds.sharedInstance().start(completionHandler: nil)
 
+        // Register background tasks for precipitation notifications
+        BackgroundTaskManager.shared.registerTasks()
+
+        // Request notification permission
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Notification auth error: \(error)")
+            }
+            print("Notification permission granted: \(granted)")
+        }
+
         // Programmatic window setup — no storyboard
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = MainTabBarController()
@@ -49,12 +61,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        // Schedule next background precipitation check
+        BackgroundTaskManager.shared.scheduleNextRefresh()
+
         let appState = UIApplication.shared.applicationState
         if appState == .background {
             print("App in Background")
-        }else if appState == .active {
+        } else if appState == .active {
             print("App in Foreground or Active")
         }
     }
