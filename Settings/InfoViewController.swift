@@ -131,7 +131,6 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
         
-        //removing these until I get the alerts fixed
 //        setUpAlertPicker()
 //        registerLocal()
     }
@@ -203,19 +202,9 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func scheduleLocal() {
         center.removeAllPendingNotificationRequests()
         let content = UNMutableNotificationContent()
-        let dataPoint = WeatherController.shared.weather
-        let dailyTemp = String(format: "%.0f", (dataPoint?.daily?.data?[0].temperatureMax)!)
-        let currentTemp = String(format: "%.0f", (dataPoint?.currently?.temperature)!)
-        let dailyOutlook = dataPoint?.daily?.data?[0].summary
-        var forcastString = "Currently: "
-        forcastString.append(String(currentTemp))
-        forcastString.append(". High Temp: ")
-        forcastString.append(String(dailyTemp))
-        forcastString.append(". ")
-        forcastString.append(dailyOutlook!)
-        
+
         content.title = "Daily Forecast"
-        content.body = forcastString
+        content.body = "Check Cloudship for today's forecast."
         content.categoryIdentifier = "DailyAlert"
         content.sound = UNNotificationSound.default
 
@@ -224,8 +213,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         dateComponents.minute = alertMin
         print(dateComponents)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
-        
+
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         center.add(request)
     }
@@ -282,14 +270,14 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         if let userDef = UserDefaults.standard.string(forKey: "Units") {
             if userDef == "units=us" {
                 unitsSelected = "   Units \n   USA (Fahenheit, miles, mph)"
-                picker.selectRow(0, inComponent: 0, animated: false)
             }
             
             if userDef == "units=si" {
                 unitsSelected = "   Units \n   SI (Celsius, km, m/s)"
-                picker.selectRow(1, inComponent: 0, animated: false)
             }
         }
+        
+        
     }
     
     //--------------------------------------------------------------------------
@@ -297,18 +285,23 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     //--------------------------------------------------------------------------
     
     @objc func tapFunction() {
-        picker.isHidden = false
-        if let userDef = UserDefaults.standard.string(forKey: "Units") {
-            if userDef == "units=us" {
-                picker.selectRow(0, inComponent: 0, animated: false)
-            }
-            
-            if userDef == "units=si" {
-                picker.selectRow(1, inComponent: 0, animated: false)
-            }
-        }
-        view.addSubview(picker)
-        unitsLabel.isUserInteractionEnabled = true
+//        picker.isHidden = false
+//        view.addSubview(picker)
+//        unitsLabel.isUserInteractionEnabled = true
+        
+        print(defaults.string(forKey: "Units"))
+                print(picker.selectedRow(inComponent: 0))
+                
+                if defaults.string(forKey: "Units") == "units=i"
+                {
+                    picker.selectRow(0, inComponent: 0, animated: true)
+                } else {
+                    picker.selectRow(1, inComponent: 0, animated: true)
+                }
+                
+                picker.isHidden = false
+                view.addSubview(picker)
+                unitsLabel.isUserInteractionEnabled = true
     }
     
 //    @objc func alertTapFunction() {
@@ -326,8 +319,10 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         return 2
     }
     
-    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        return NSAttributedString(string: units[row], attributes: [NSAttributedString.Key.foregroundColor : UIColor.darkText])
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        
+        return units[row]
+        
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {

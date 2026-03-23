@@ -28,7 +28,6 @@ class CurrentlyTableViewCell: UITableViewCell {
     
     @IBOutlet weak var currentConditionsContainerView: UIView!
     @IBOutlet weak var alertViewContainer: UIView!
-    @IBOutlet weak var alertHeaderLabel: UILabel!
     
     //--------------------------------------------------------------------------
     // MARK: - Actions
