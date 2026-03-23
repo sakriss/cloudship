@@ -32,13 +32,28 @@ class SettingsViewController: UITableViewController {
     }()
 
     private lazy var sourceControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["Tomorrow.io", "NOAA", "Open-Meteo"])
+        let sc = UISegmentedControl(items: ["Tomorrow.io", "NOAA", "Open-Meteo", "Pirate"])
         let active = WeatherDataSourceManager.shared.activeSource
-        if active is NOAADataSource           { sc.selectedSegmentIndex = 1 }
-        else if active is OpenMeteoDataSource { sc.selectedSegmentIndex = 2 }
-        else                                  { sc.selectedSegmentIndex = 0 }
+        if active is NOAADataSource              { sc.selectedSegmentIndex = 1 }
+        else if active is OpenMeteoDataSource    { sc.selectedSegmentIndex = 2 }
+        else if active is PirateWeatherDataSource { sc.selectedSegmentIndex = 3 }
+        else                                      { sc.selectedSegmentIndex = 0 }
         sc.addTarget(self, action: #selector(sourceChanged(_:)), for: .valueChanged)
         return sc
+    }()
+
+    private lazy var apiKeyField: UITextField = {
+        let tf = UITextField()
+        tf.placeholder = "Pirate Weather API Key"
+        tf.text = UserDefaults.standard.string(forKey: "PirateWeatherAPIKey")
+        tf.font = .systemFont(ofSize: 14)
+        tf.borderStyle = .roundedRect
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
+        tf.returnKeyType = .done
+        tf.addTarget(self, action: #selector(apiKeyChanged(_:)), for: .editingDidEnd)
+        tf.addTarget(self, action: #selector(apiKeyReturnPressed(_:)), for: .editingDidEndOnExit)
+        return tf
     }()
 
     private lazy var unitsControl: UISegmentedControl = {
@@ -73,7 +88,9 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section)! {
-        case .dataSource:     return 1
+        case .dataSource:
+            let isPirate = WeatherDataSourceManager.shared.activeSource is PirateWeatherDataSource
+            return isPirate ? 2 : 1
         case .units:          return 1
         case .appearance:     return 1
         case .notifications:  return 2
@@ -93,7 +110,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: Free, US-only. Open-Meteo: Free, global. Tomorrow.io: Global with API key."
+            return "NOAA: Free, US-only. Open-Meteo: Free, global. Tomorrow.io: Global with API key. Pirate Weather: Free (10k/mo), global, Dark Sky-style minutely data."
         }
         return nil
     }
@@ -102,9 +119,15 @@ class SettingsViewController: UITableViewController {
         switch Section(rawValue: indexPath.section)! {
 
         case .dataSource:
-            let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
-            cell.configure(label: "Weather Source", control: sourceControl)
-            return cell
+            if indexPath.row == 0 {
+                let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
+                cell.configure(label: "Weather Source", control: sourceControl)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
+                cell.configure(label: "API Key", control: apiKeyField)
+                return cell
+            }
 
         case .units:
             let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
@@ -188,9 +211,24 @@ class SettingsViewController: UITableViewController {
         switch sender.selectedSegmentIndex {
         case 1:  WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         case 2:  WeatherDataSourceManager.shared.activeSource = OpenMeteoDataSource()
+        case 3:  WeatherDataSourceManager.shared.activeSource = PirateWeatherDataSource()
         default: WeatherDataSourceManager.shared.activeSource = TomorrowIODataSource()
         }
+        // Show/hide API key row when switching to/from Pirate Weather
+        tableView.reloadSections(IndexSet(integer: Section.dataSource.rawValue), with: .automatic)
         triggerRefetch()
+    }
+
+    @objc private func apiKeyChanged(_ sender: UITextField) {
+        let key = sender.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        UserDefaults.standard.set(key, forKey: "PirateWeatherAPIKey")
+        if !key.isEmpty && WeatherDataSourceManager.shared.activeSource is PirateWeatherDataSource {
+            triggerRefetch()
+        }
+    }
+
+    @objc private func apiKeyReturnPressed(_ sender: UITextField) {
+        sender.resignFirstResponder()
     }
 
     @objc private func unitsChanged(_ sender: UISegmentedControl) {

@@ -24,7 +24,8 @@ protocol WeatherDataSource {
 // MARK: - Known source identifiers for UserDefaults persistence
 
 enum WeatherSourceID: String {
-    case tomorrowIO = "tomorrowIO"
-    case noaa       = "noaa"
-    case openMeteo  = "openMeteo"
+    case tomorrowIO    = "tomorrowIO"
+    case noaa          = "noaa"
+    case openMeteo     = "openMeteo"
+    case pirateWeather = "pirateWeather"
 }

@@ -716,10 +716,10 @@ class MainForecastViewController: UIViewController {
 
         hourlyCard.configure(hourly: data.hourly)
         dailyCard.configure(daily: data.daily, currentTemp: data.current.temperature)
-        // Get today's sunrise/sunset from daily data
-        let todaySunrise = data.daily.first?.sunrise
-        let todaySunset = data.daily.first?.sunset
-        detailsCard.configure(with: data.current, sunrise: todaySunrise, sunset: todaySunset)
+        // Get today's sunrise/sunset and dawn/dusk from daily data
+        detailsCard.configure(with: data.current,
+                              sunrise: todayDaily?.sunrise, sunset: todayDaily?.sunset,
+                              dawn: todayDaily?.dawnTime, dusk: todayDaily?.duskTime)
         windGustCard.configure(hourly: data.hourly)
 
         // Air quality — show card only when data is available

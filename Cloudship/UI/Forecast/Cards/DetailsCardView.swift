@@ -73,6 +73,8 @@ private class SunArcView: UIView {
 
     var sunrise: Date?
     var sunset: Date?
+    var dawn: Date?
+    var dusk: Date?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -183,6 +185,24 @@ private class SunArcView: UIView {
         let setSize = sunsetStr.size(withAttributes: attrs)
         sunsetStr.draw(at: CGPoint(x: arcRight - setSize.width / 2,
                                     y: arcBottom + 4), withAttributes: attrs)
+
+        // Dawn/dusk labels (Pirate Weather)
+        let dawnDuskAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 9, weight: .regular),
+            .foregroundColor: UIColor.tertiaryLabel
+        ]
+        if let dawn = dawn {
+            let dawnStr = "Dawn " + timeString(from: dawn)
+            let dawnSize = dawnStr.size(withAttributes: dawnDuskAttrs)
+            dawnStr.draw(at: CGPoint(x: arcLeft - dawnSize.width / 2,
+                                      y: arcBottom + 4 + riseSize.height + 1), withAttributes: dawnDuskAttrs)
+        }
+        if let dusk = dusk {
+            let duskStr = "Dusk " + timeString(from: dusk)
+            let duskSize = duskStr.size(withAttributes: dawnDuskAttrs)
+            duskStr.draw(at: CGPoint(x: arcRight - duskSize.width / 2,
+                                      y: arcBottom + 4 + setSize.height + 1), withAttributes: dawnDuskAttrs)
+        }
     }
 
     private func timeString(from date: Date) -> String {
@@ -312,13 +332,16 @@ class DetailsCardView: CardView {
 
     // MARK: - Configure
 
-    func configure(with current: CurrentConditions, sunrise: Date? = nil, sunset: Date? = nil) {
+    func configure(with current: CurrentConditions, sunrise: Date? = nil, sunset: Date? = nil,
+                   dawn: Date? = nil, dusk: Date? = nil) {
         // Update sun arc
         if let rise = sunrise, let set = sunset {
             sunArcView.sunrise = rise
             sunArcView.sunset = set
+            sunArcView.dawn = dawn
+            sunArcView.dusk = dusk
             sunArcView.isHidden = false
-            sunArcHeightConstraint.constant = 100
+            sunArcHeightConstraint.constant = (dawn != nil || dusk != nil) ? 114 : 100
             sunArcView.setNeedsDisplay()
         } else {
             sunArcView.isHidden = true

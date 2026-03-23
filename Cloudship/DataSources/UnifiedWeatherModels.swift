@@ -142,6 +142,12 @@ struct CurrentConditions: Codable {
     var pressure: Double?
     var dewPoint: Double?
     var cloudCover: Double?
+
+    // Pirate Weather unique fields
+    var nearestStormDistance: Double?    // miles or km to nearest storm
+    var nearestStormBearing: Double?    // compass degrees to nearest storm
+    var precipIntensity: Double?        // current precip intensity (in/hr or mm/hr)
+    var precipType: String?             // rain, snow, sleet, ice, mixed
 }
 
 // MARK: - Forecast entries
@@ -161,6 +167,12 @@ struct HourlyEntry: Codable {
     var cloudCover: Double?         // 0–100 %
     var visibility: Double?         // miles or km
     var pressure: Double?           // inHg or hPa
+
+    // Pirate Weather unique fields
+    var precipIntensityError: Double?   // uncertainty range for precip intensity
+    var precipType: String?             // rain, snow, sleet, ice, mixed
+    var snowAccumulation: Double?       // inches or cm
+    var iceAccumulation: Double?        // inches or cm
 }
 
 struct DailyEntry: Codable {
@@ -178,11 +190,21 @@ struct DailyEntry: Codable {
     var moonPhase: Double?          // 0–1: 0=new, 0.25=first quarter, 0.5=full, 0.75=last quarter
     var dayDescription: String?     // e.g. "Partly sunny"
     var nightDescription: String?   // e.g. "Partly cloudy and cold"
+
+    // Pirate Weather unique fields
+    var dawnTime: Date?             // civil dawn
+    var duskTime: Date?             // civil dusk
+    var snowAccumulation: Double?   // inches or cm
+    var iceAccumulation: Double?    // inches or cm
 }
 
 struct MinutelyEntry: Codable {
     var time: Date
     var precipIntensity: Double?
+
+    // Pirate Weather unique fields
+    var precipProbability: Double?  // 0–1 probability
+    var precipType: String?         // rain, snow, sleet, ice, mixed
 }
 
 // MARK: - Moon phase helper

@@ -102,6 +102,32 @@ enum WeatherCodeMapper {
         return hour >= 20 || hour < 6
     }
 
+    // MARK: - Dark Sky / Pirate Weather icon string → WeatherCondition
+
+    static func condition(fromDarkSkyIcon icon: String?) -> WeatherCondition {
+        guard let icon = icon else { return .unknown }
+        switch icon {
+        case "clear-day", "clear-night":                     return .clear
+        case "rain", "possible-rain-day", "possible-rain-night": return .rain
+        case "light-rain":                                   return .drizzle
+        case "heavy-rain":                                   return .heavyRain
+        case "drizzle":                                      return .drizzle
+        case "snow", "possible-snow-day", "possible-snow-night": return .snow
+        case "light-snow", "flurries":                       return .lightSnow
+        case "heavy-snow":                                   return .heavySnow
+        case "sleet", "possible-sleet-day", "possible-sleet-night": return .sleet
+        case "light-sleet", "heavy-sleet":                   return .sleet
+        case "wind", "breezy", "dangerous-wind":             return .windy
+        case "fog", "mist", "haze":                          return .fog
+        case "cloudy":                                       return .cloudy
+        case "partly-cloudy-day", "partly-cloudy-night":     return .partlyCloudy
+        case "thunderstorm":                                 return .thunderstorm
+        case "smoke":                                        return .fog
+        case "mixed":                                        return .sleet
+        default:                                             return .unknown
+        }
+    }
+
     // MARK: - WMO code (Open-Meteo) → WeatherCondition
 
     static func condition(fromWMOCode code: Int?) -> WeatherCondition {

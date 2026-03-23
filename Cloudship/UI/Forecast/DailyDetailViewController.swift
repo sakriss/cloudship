@@ -327,11 +327,25 @@ class DailyDetailViewController: UIViewController {
             let unit = isImperial ? "in" : "mm"
             tiles.append(("drop", String(format: "%.2f \(unit)", a), "Precip Amount"))
         }
+        if let snow = entry.snowAccumulation, snow > 0 {
+            let unit = isImperial ? "in" : "cm"
+            tiles.append(("snowflake", String(format: "%.1f \(unit)", snow), "Snow"))
+        }
+        if let ice = entry.iceAccumulation, ice > 0 {
+            let unit = isImperial ? "in" : "cm"
+            tiles.append(("thermometer.snowflake", String(format: "%.2f \(unit)", ice), "Ice"))
+        }
+        if let dawn = entry.dawnTime {
+            tiles.append(("sunrise", timeString(dawn), "Dawn"))
+        }
         if let sunrise = entry.sunrise {
             tiles.append(("sunrise", timeString(sunrise), "Sunrise"))
         }
         if let sunset = entry.sunset {
             tiles.append(("sunset", timeString(sunset), "Sunset"))
+        }
+        if let dusk = entry.duskTime {
+            tiles.append(("sunset", timeString(dusk), "Dusk"))
         }
         if !entry.moonPhaseName.isEmpty {
             tiles.append(("moon.stars", entry.moonPhaseName, "Moon Phase"))

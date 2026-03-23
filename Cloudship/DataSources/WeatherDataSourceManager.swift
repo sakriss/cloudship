@@ -39,9 +39,10 @@ class WeatherDataSourceManager: NSObject {
     var activeSource: WeatherDataSource = TomorrowIODataSource() {
         didSet {
             let id: WeatherSourceID
-            if activeSource is NOAADataSource           { id = .noaa }
-            else if activeSource is OpenMeteoDataSource { id = .openMeteo }
-            else                                        { id = .tomorrowIO }
+            if activeSource is NOAADataSource              { id = .noaa }
+            else if activeSource is OpenMeteoDataSource    { id = .openMeteo }
+            else if activeSource is PirateWeatherDataSource { id = .pirateWeather }
+            else                                            { id = .tomorrowIO }
             UserDefaults.standard.set(id.rawValue, forKey: "WeatherSource")
             WeatherCacheManager.shared.clear()
         }
@@ -57,9 +58,10 @@ class WeatherDataSourceManager: NSObject {
     private func restoreSelectedSource() {
         let raw = UserDefaults.standard.string(forKey: "WeatherSource") ?? WeatherSourceID.noaa.rawValue
         switch WeatherSourceID(rawValue: raw) {
-        case .noaa:      activeSource = NOAADataSource()
-        case .openMeteo: activeSource = OpenMeteoDataSource()
-        default:         activeSource = TomorrowIODataSource()
+        case .noaa:           activeSource = NOAADataSource()
+        case .openMeteo:      activeSource = OpenMeteoDataSource()
+        case .pirateWeather:  activeSource = PirateWeatherDataSource()
+        default:              activeSource = TomorrowIODataSource()
         }
     }
 

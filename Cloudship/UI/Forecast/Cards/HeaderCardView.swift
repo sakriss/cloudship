@@ -58,6 +58,15 @@ class HeaderCardView: CardView {
         return l
     }()
 
+    private let stormProximityLabel: UILabel = {
+        let l = UILabel()
+        l.font = .systemFont(ofSize: 13, weight: .medium)
+        l.textAlignment = .center
+        l.translatesAutoresizingMaskIntoConstraints = false
+        l.isHidden = true
+        return l
+    }()
+
     private let conditionIcon: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
@@ -87,7 +96,8 @@ class HeaderCardView: CardView {
             temperatureLabel,
             conditionLabel,
             feelsLikeLabel,
-            hiLoLabel
+            hiLoLabel,
+            stormProximityLabel
         ])
         stack.axis = .vertical
         stack.spacing = 4
@@ -121,6 +131,37 @@ class HeaderCardView: CardView {
             hiLoLabel.text = "H: \(TemperatureFormatter.format(hi))  L: \(TemperatureFormatter.format(lo))"
         } else {
             hiLoLabel.text = nil
+        }
+
+        // Storm proximity (Pirate Weather only)
+        if let distance = c.nearestStormDistance, distance < 100 {
+            let direction = Self.cardinalDirection(from: c.nearestStormBearing)
+            let distStr = TemperatureFormatter.isMetric
+                ? String(format: "%.0f km", distance)
+                : String(format: "%.0f mi", distance)
+            stormProximityLabel.text = "⛈ Storm \(distStr) \(direction)"
+            stormProximityLabel.textColor = Self.stormColor(distance: distance)
+            stormProximityLabel.isHidden = false
+        } else {
+            stormProximityLabel.isHidden = true
+        }
+    }
+
+    // MARK: - Storm helpers
+
+    private static func cardinalDirection(from bearing: Double?) -> String {
+        guard let b = bearing else { return "" }
+        let dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+        let index = Int((b + 22.5).truncatingRemainder(dividingBy: 360) / 45)
+        return dirs[min(index, dirs.count - 1)]
+    }
+
+    private static func stormColor(distance: Double) -> UIColor {
+        switch distance {
+        case ..<10:  return .systemRed
+        case ..<20:  return .systemOrange
+        case ..<50:  return .systemYellow
+        default:     return .secondaryLabel
         }
     }
 }
