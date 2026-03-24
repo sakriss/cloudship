@@ -44,13 +44,23 @@ final class OpenRouterService {
     }()
 
     /// Models to try in order — if the first provider errors, fall through to the next.
-    /// Google and Nvidia models are currently the most reliable on the free tier.
-    private let models = [
+    /// Premium users get higher-quality paid models; free users get free-tier models.
+    private let premiumModels = [
+        "anthropic/claude-3-haiku",
+        "openai/gpt-4o-mini"
+    ]
+    private let freeModels = [
         "google/gemma-3-27b-it:free",
         "google/gemma-3-12b-it:free",
         "nvidia/nemotron-3-super-120b-a12b:free",
         "meta-llama/llama-3.3-70b-instruct:free"
     ]
+    private var models: [String] {
+        if SubscriptionManager.shared.isPremiumCached {
+            return premiumModels + freeModels
+        }
+        return freeModels
+    }
     private let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
 
     // MARK: - System prompt

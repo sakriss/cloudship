@@ -19,6 +19,7 @@ class SettingsViewController: UITableViewController {
         case units
         case appearance
         case notifications
+        case subscription
         case about
     }
 
@@ -32,12 +33,14 @@ class SettingsViewController: UITableViewController {
     }()
 
     private lazy var sourceControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["Tomorrow.io", "NOAA", "Open-Meteo", "Pirate"])
+        let sc = UISegmentedControl(items: ["Tmrw", "NOAA", "O-Meteo", "Pirate", "Apple"])
+        sc.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         let active = WeatherDataSourceManager.shared.activeSource
-        if active is NOAADataSource              { sc.selectedSegmentIndex = 1 }
-        else if active is OpenMeteoDataSource    { sc.selectedSegmentIndex = 2 }
-        else if active is PirateWeatherDataSource { sc.selectedSegmentIndex = 3 }
-        else                                      { sc.selectedSegmentIndex = 0 }
+        if active is NOAADataSource                { sc.selectedSegmentIndex = 1 }
+        else if active is OpenMeteoDataSource      { sc.selectedSegmentIndex = 2 }
+        else if active is PirateWeatherDataSource  { sc.selectedSegmentIndex = 3 }
+        else if active is AppleWeatherDataSource   { sc.selectedSegmentIndex = 4 }
+        else                                        { sc.selectedSegmentIndex = 0 }
         sc.addTarget(self, action: #selector(sourceChanged(_:)), for: .valueChanged)
         return sc
     }()
@@ -63,7 +66,9 @@ class SettingsViewController: UITableViewController {
         super.viewDidLoad()
         title = "Settings"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.register(ControlCell.self, forCellReuseIdentifier: ControlCell.reuseID)
+        tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_source")
+        tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_units")
+        tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_appearance")
     }
 
     // MARK: - UITableView DataSource
@@ -78,6 +83,7 @@ class SettingsViewController: UITableViewController {
         case .units:          return 1
         case .appearance:     return 1
         case .notifications:  return 2
+        case .subscription:   return 1
         case .about:          return 3
         }
     }
@@ -88,13 +94,14 @@ class SettingsViewController: UITableViewController {
         case .units:          return "Units"
         case .appearance:     return "Appearance"
         case .notifications:  return "Notifications"
+        case .subscription:   return "Subscription"
         case .about:          return "About"
         }
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: US-only. Open-Meteo: global. Tomorrow.io: Global Pirate Weather: global, Dark Sky-style"
+            return "NOAA: US-only. Open-Meteo: global. Tomorrow.io, Pirate Weather, and Apple Weather require Premium."
         }
         return nil
     }
@@ -103,17 +110,17 @@ class SettingsViewController: UITableViewController {
         switch Section(rawValue: indexPath.section)! {
 
         case .dataSource:
-            let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_source", for: indexPath) as! ControlCell
             cell.configure(label: "Weather Source", control: sourceControl)
             return cell
 
         case .units:
-            let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_units", for: indexPath) as! ControlCell
             cell.configure(label: "Temperature", control: unitsControl)
             return cell
 
         case .appearance:
-            let cell = tableView.dequeueReusableCell(withIdentifier: ControlCell.reuseID, for: indexPath) as! ControlCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_appearance", for: indexPath) as! ControlCell
             cell.configure(label: "Theme", control: appearanceControl)
             return cell
 
@@ -141,6 +148,23 @@ class SettingsViewController: UITableViewController {
             }
             return cell
 
+        case .subscription:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            var config = cell.defaultContentConfiguration()
+            if SubscriptionManager.shared.isPremiumCached {
+                config.text = "Cloudship Premium"
+                config.image = UIImage(systemName: "checkmark.seal.fill")
+                config.imageProperties.tintColor = .systemBlue
+                cell.accessoryType = .disclosureIndicator
+            } else {
+                config.text = "Upgrade to Premium"
+                config.image = UIImage(systemName: "star.fill")
+                config.imageProperties.tintColor = .systemYellow
+                cell.accessoryType = .disclosureIndicator
+            }
+            cell.contentConfiguration = config
+            return cell
+
         case .about:
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
             var config = cell.defaultContentConfiguration()
@@ -149,7 +173,14 @@ class SettingsViewController: UITableViewController {
                 config.text = "Version"
                 let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
                 let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+                #if DEBUG
+                let demoActive = UserDefaults.standard.bool(forKey: "DemoModeEnabled")
+                config.secondaryText = demoActive
+                    ? "\(version) (\(build)) — DEMO"
+                    : "\(version) (\(build))"
+                #else
                 config.secondaryText = "\(version) (\(build))"
+                #endif
                 cell.accessoryType = .none
                 cell.selectionStyle = .none
             case 1:
@@ -175,24 +206,98 @@ class SettingsViewController: UITableViewController {
             return
         }
 
+        if Section(rawValue: indexPath.section) == .subscription {
+            if SubscriptionManager.shared.isPremiumCached {
+                if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                    UIApplication.shared.open(url)
+                }
+            } else {
+                presentPaywall()
+            }
+            return
+        }
+
         guard Section(rawValue: indexPath.section) == .about else { return }
         switch indexPath.row {
+        case 0:
+            #if DEBUG
+            handleVersionTap()
+            #endif
         case 1: sendFeedbackEmail()
         case 2: openAppStore()
         default: break
         }
     }
 
+    // MARK: - Demo Mode (DEBUG)
+
+    #if DEBUG
+    private var versionTapCount = 0
+    private var lastVersionTap: Date = .distantPast
+    #endif
+
     // MARK: - Actions
 
     @objc private func sourceChanged(_ sender: UISegmentedControl) {
+        let premiumIndices: Set<Int> = [0, 3, 4]  // Tomorrow.io, Pirate, Apple
+        if premiumIndices.contains(sender.selectedSegmentIndex)
+            && !SubscriptionManager.shared.isPremiumCached {
+            // Revert to current selection
+            let active = WeatherDataSourceManager.shared.activeSource
+            if active is NOAADataSource              { sender.selectedSegmentIndex = 1 }
+            else if active is OpenMeteoDataSource    { sender.selectedSegmentIndex = 2 }
+            else if active is PirateWeatherDataSource { sender.selectedSegmentIndex = 3 }
+            else if active is AppleWeatherDataSource  { sender.selectedSegmentIndex = 4 }
+            else                                      { sender.selectedSegmentIndex = 0 }
+            presentPaywall()
+            return
+        }
+
         switch sender.selectedSegmentIndex {
         case 1:  WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         case 2:  WeatherDataSourceManager.shared.activeSource = OpenMeteoDataSource()
         case 3:  WeatherDataSourceManager.shared.activeSource = PirateWeatherDataSource()
+        case 4:  WeatherDataSourceManager.shared.activeSource = AppleWeatherDataSource()
         default: WeatherDataSourceManager.shared.activeSource = TomorrowIODataSource()
         }
         triggerRefetch()
+    }
+
+    #if DEBUG
+    private func handleVersionTap() {
+        let now = Date()
+        // Reset counter if more than 2 seconds since last tap
+        if now.timeIntervalSince(lastVersionTap) > 2.0 {
+            versionTapCount = 0
+        }
+        lastVersionTap = now
+        versionTapCount += 1
+
+        if versionTapCount >= 5 {
+            versionTapCount = 0
+            let isEnabled = SubscriptionManager.shared.demoModeEnabled
+            SubscriptionManager.shared.demoModeEnabled = !isEnabled
+
+            let message = !isEnabled ? "Demo Mode Enabled" : "Demo Mode Disabled"
+            let toast = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+            present(toast, animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                toast.dismiss(animated: true)
+            }
+
+            // Reload to update version label and subscription section
+            tableView.reloadData()
+        }
+    }
+    #endif
+
+    private func presentPaywall() {
+        let paywall = PaywallViewController()
+        paywall.modalPresentationStyle = .pageSheet
+        if let sheet = paywall.sheetPresentationController {
+            sheet.detents = [.large()]
+        }
+        present(paywall, animated: true)
     }
 
     @objc private func unitsChanged(_ sender: UISegmentedControl) {

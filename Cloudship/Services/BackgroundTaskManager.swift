@@ -98,6 +98,7 @@ class BackgroundTaskManager: NSObject {
     // MARK: - Saved locations
 
     private func checkSavedLocations(source: OpenMeteoDataSource) async {
+        guard SubscriptionManager.shared.isPremiumCached else { return }
         let savedLocations = SavedLocationStore.shared.allWithRainAlerts()
         guard !savedLocations.isEmpty else { return }
 

@@ -3,8 +3,7 @@
 //  Cloudship
 //
 //  Animated weather radar powered by RainViewer (free, no API key).
-//  Layers: Precipitation (animated), Satellite Infrared (animated),
-//          Lightning Strikes (live via Blitzortung WebSocket).
+//  Layers: Precipitation (animated), Satellite Infrared (animated).
 //  Settings: color scheme, opacity, animation speed, loop range, map type.
 //
 
@@ -32,23 +31,16 @@ private struct RainViewerResponse: Codable {
     }
 }
 
-private struct LightningStrike {
-    let coordinate: CLLocationCoordinate2D
-    let timestamp: Date
-}
-
 // MARK: - Enums
 
 enum RadarLayer: String, CaseIterable {
     case precipitation = "Precipitation"
     case satellite     = "Satellite"
-    case lightning     = "Lightning"
 
     var icon: String {
         switch self {
         case .precipitation: return "cloud.rain.fill"
         case .satellite:     return "globe.americas.fill"
-        case .lightning:     return "bolt.fill"
         }
     }
 }
@@ -97,37 +89,6 @@ enum LoopRange: Int, CaseIterable {
         case .all:      return "All"
         case .oneHour:  return "1 hr"
         case .halfHour: return "30 min"
-        }
-    }
-}
-
-// MARK: - Lightning annotation
-
-private class LightningAnnotation: MKPointAnnotation {
-    var strikeDate: Date = Date()
-}
-
-private class LightningAnnotationView: MKAnnotationView {
-    override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
-        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        frame = CGRect(x: 0, y: 0, width: 18, height: 18)
-        backgroundColor = .clear
-        isOpaque = false
-    }
-    required init?(coder: NSCoder) { fatalError() }
-
-    override func draw(_ rect: CGRect) {
-        guard let ctx = UIGraphicsGetCurrentContext() else { return }
-        let strike = annotation as? LightningAnnotation
-        let age = Date().timeIntervalSince(strike?.strikeDate ?? Date())
-        let alpha = max(0.2, 1.0 - age / 300.0)   // fade over 5 min
-
-        let color = UIColor(red: 1.0, green: 0.85, blue: 0.1, alpha: alpha)
-        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
-        if let img = UIImage(systemName: "bolt.fill", withConfiguration: config)?
-            .withTintColor(color, renderingMode: .alwaysOriginal) {
-            ctx.translateBy(x: (rect.width - 14) / 2, y: (rect.height - 14) / 2)
-            img.draw(in: CGRect(x: 0, y: 0, width: 14, height: 14))
         }
     }
 }
@@ -348,13 +309,6 @@ class RadarViewController: UIViewController {
     private var tileHost = "https://tilecache.rainviewer.com"
     private var currentOverlay: MKTileOverlay?
 
-    // MARK: Lightning state
-    private var lightningStrikes: [LightningStrike] = []
-    private var lightningAnnotations: [LightningAnnotation] = []
-    private var webSocketTask: URLSessionWebSocketTask?
-    private let maxStrikes = 300
-    private var lightningFadeTimer: Timer?
-
     // MARK: UI
     private let mapView: MKMapView = {
         let m = MKMapView()
@@ -472,9 +426,6 @@ class RadarViewController: UIViewController {
             mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        mapView.register(LightningAnnotationView.self,
-                         forAnnotationViewWithReuseIdentifier: "lightning")
-
         view.addSubview(mapTypeButton)
         NSLayoutConstraint.activate([
             mapTypeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
@@ -508,8 +459,6 @@ class RadarViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopAnimation()
-        disconnectLightning()
-        lightningFadeTimer?.invalidate()
     }
 
     // MARK: - Control panel layout
@@ -586,11 +535,10 @@ class RadarViewController: UIViewController {
             btn.layer.borderColor = selected ? accent.cgColor : UIColor.separator.cgColor
         }
 
-        let hasFrames = activeLayer == .precipitation || activeLayer == .satellite
-        frameSlider.isHidden = !hasFrames
-        prevButton.isEnabled = hasFrames
-        nextButton.isEnabled = hasFrames
-        playPauseButton.isEnabled = hasFrames
+        frameSlider.isHidden = false
+        prevButton.isEnabled = true
+        nextButton.isEnabled = true
+        playPauseButton.isEnabled = true
     }
 
     // MARK: - Fetch radar data
@@ -629,7 +577,9 @@ class RadarViewController: UIViewController {
 
         let frames = activeFrames
         guard !frames.isEmpty else {
-            timeLabel.text = activeLayer == .satellite ? "Satellite unavailable" : "No data"
+            timeLabel.text = activeLayer == .satellite
+                ? "Satellite data unavailable from RainViewer"
+                : "No radar data available"
             return
         }
         frameSlider.maximumValue = Float(frames.count - 1)
@@ -643,7 +593,6 @@ class RadarViewController: UIViewController {
         switch activeLayer {
         case .precipitation: return precipFrames
         case .satellite:     return satelliteFrames
-        case .lightning:     return []
         }
     }
 
@@ -655,8 +604,6 @@ class RadarViewController: UIViewController {
             return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(colorScheme.rawValue)/1_1.png"
         case .satellite:
             return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png"
-        case .lightning:
-            return nil
         }
     }
 
@@ -744,106 +691,6 @@ class RadarViewController: UIViewController {
         }
     }
 
-    // MARK: - Lightning WebSocket
-
-    private func connectLightning() {
-        let servers = ["ws1.blitzortung.org", "ws7.blitzortung.org", "ws8.blitzortung.org"]
-        let host = servers.randomElement()!
-        guard let url = URL(string: "wss://\(host)/") else { return }
-
-        timeLabel.text = "Connecting…"
-        liveBadge.isHidden = true
-
-        var request = URLRequest(url: url)
-        request.setValue("https://www.blitzortung.org", forHTTPHeaderField: "Origin")
-        let session = URLSession(configuration: .default)
-        webSocketTask = session.webSocketTask(with: request)
-        webSocketTask?.resume()
-
-        // Send subscription for global coverage
-        let sub = #"{"west":-180,"east":180,"south":-90,"north":90}"#
-        webSocketTask?.send(.string(sub)) { _ in }
-
-        receiveNextStrike()
-        timeLabel.text = "Live Lightning"
-        liveBadge.isHidden = false
-
-        // Fade old strikes every 30s
-        lightningFadeTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            self?.removeOldStrikes()
-        }
-    }
-
-    private func disconnectLightning() {
-        webSocketTask?.cancel(with: .goingAway, reason: nil)
-        webSocketTask = nil
-        lightningFadeTimer?.invalidate()
-        lightningFadeTimer = nil
-        mapView.removeAnnotations(lightningAnnotations)
-        lightningAnnotations.removeAll()
-        lightningStrikes.removeAll()
-    }
-
-    private func receiveNextStrike() {
-        webSocketTask?.receive { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let message):
-                if case .string(let text) = message {
-                    self.parseStrike(text)
-                }
-                self.receiveNextStrike()
-            case .failure:
-                break
-            }
-        }
-    }
-
-    private func parseStrike(_ json: String) {
-        guard let data = json.data(using: .utf8),
-              let dict = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
-              let lat = dict["lat"] as? Double,
-              let lon = dict["lon"] as? Double else { return }
-
-        let strike = LightningStrike(
-            coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon),
-            timestamp: Date()
-        )
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.lightningStrikes.append(strike)
-
-            let ann = LightningAnnotation()
-            ann.coordinate = strike.coordinate
-            ann.strikeDate = strike.timestamp
-            self.lightningAnnotations.append(ann)
-            self.mapView.addAnnotation(ann)
-
-            // Keep capped
-            if self.lightningStrikes.count > self.maxStrikes {
-                let toRemove = Array(self.lightningAnnotations.prefix(
-                    self.lightningAnnotations.count - self.maxStrikes))
-                self.mapView.removeAnnotations(toRemove)
-                self.lightningAnnotations = Array(self.lightningAnnotations.suffix(self.maxStrikes))
-                self.lightningStrikes = Array(self.lightningStrikes.suffix(self.maxStrikes))
-            }
-
-            // Redraw all lightning views to update fade
-            for ann in self.lightningAnnotations {
-                self.mapView.view(for: ann)?.setNeedsDisplay()
-            }
-        }
-    }
-
-    private func removeOldStrikes() {
-        let cutoff = Date().addingTimeInterval(-300) // 5 min
-        let stale = lightningAnnotations.filter { $0.strikeDate < cutoff }
-        mapView.removeAnnotations(stale)
-        lightningAnnotations.removeAll { $0.strikeDate < cutoff }
-        lightningStrikes.removeAll { $0.timestamp < cutoff }
-    }
-
     // MARK: - Actions
 
     @objc private func layerTapped(_ sender: UIButton) {
@@ -852,20 +699,11 @@ class RadarViewController: UIViewController {
 
         // Tear down old layer
         stopAnimation()
-        if activeLayer == .lightning { disconnectLightning() }
         if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
 
         activeLayer = newLayer
         updateLayerUI()
-
-        switch activeLayer {
-        case .precipitation, .satellite:
-            reloadFrames()
-        case .lightning:
-            frameSlider.isHidden = true
-            timeLabel.text = "Connecting…"
-            connectLightning()
-        }
+        reloadFrames()
     }
 
     @objc private func togglePlayback() {
@@ -952,11 +790,6 @@ extension RadarViewController: MKMapViewDelegate {
         return renderer
     }
 
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        guard annotation is LightningAnnotation else { return nil }
-        let v = mapView.dequeueReusableAnnotationView(withIdentifier: "lightning", for: annotation)
-        return v
-    }
 }
 
 // MARK: - CLLocationManagerDelegate

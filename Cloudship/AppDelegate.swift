@@ -31,6 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         GADMobileAds.sharedInstance().start(completionHandler: nil)
 
+        // Start subscription manager
+        SubscriptionManager.shared.start()
+
         // Register background tasks for precipitation notifications
         BackgroundTaskManager.shared.registerTasks()
 

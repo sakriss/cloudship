@@ -274,9 +274,35 @@ class AIWeatherChatViewController: UIViewController {
 
     // MARK: - Messaging
 
+    private static let freeDailyLimit = 3
+
+    private func dailyMessageCount() -> Int {
+        let key = "aiChatCount_\(Calendar.current.startOfDay(for: Date()).timeIntervalSince1970)"
+        return UserDefaults.standard.integer(forKey: key)
+    }
+
+    private func incrementDailyMessageCount() {
+        let key = "aiChatCount_\(Calendar.current.startOfDay(for: Date()).timeIntervalSince1970)"
+        let count = UserDefaults.standard.integer(forKey: key)
+        UserDefaults.standard.set(count + 1, forKey: key)
+    }
+
     private func send(question: String) {
         guard !isLoading else { return }
 
+        // Rate limit free users
+        if !SubscriptionManager.shared.isPremiumCached
+            && dailyMessageCount() >= Self.freeDailyLimit {
+            let paywall = PaywallViewController()
+            paywall.modalPresentationStyle = .pageSheet
+            if let sheet = paywall.sheetPresentationController {
+                sheet.detents = [.large()]
+            }
+            present(paywall, animated: true)
+            return
+        }
+
+        incrementDailyMessageCount()
         addUserBubble(question)
         messages.append(ChatMessage(role: .user, content: question))
         textField.resignFirstResponder()

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import CoreLocation
 
 class WeatherDataSourceManager: NSObject {
@@ -42,6 +43,7 @@ class WeatherDataSourceManager: NSObject {
             if activeSource is NOAADataSource              { id = .noaa }
             else if activeSource is OpenMeteoDataSource    { id = .openMeteo }
             else if activeSource is PirateWeatherDataSource { id = .pirateWeather }
+            else if activeSource is AppleWeatherDataSource  { id = .appleWeather }
             else                                            { id = .tomorrowIO }
             UserDefaults.standard.set(id.rawValue, forKey: "WeatherSource")
             WeatherCacheManager.shared.clear()
@@ -57,12 +59,45 @@ class WeatherDataSourceManager: NSObject {
 
     private func restoreSelectedSource() {
         let raw = UserDefaults.standard.string(forKey: "WeatherSource") ?? WeatherSourceID.noaa.rawValue
-        switch WeatherSourceID(rawValue: raw) {
+        let sourceID = WeatherSourceID(rawValue: raw)
+
+        // Premium sources require an active subscription
+        let premiumSources: Set<WeatherSourceID> = [.tomorrowIO, .pirateWeather, .appleWeather]
+        if let id = sourceID, premiumSources.contains(id),
+           !SubscriptionManager.shared.isPremiumCached {
+            // Fall back to a free source and flag for migration alert
+            activeSource = NOAADataSource()
+            if !UserDefaults.standard.bool(forKey: "migrationAlertShown_v1") {
+                UserDefaults.standard.set(true, forKey: "migrationAlertShown_v1")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    Self.showMigrationAlert()
+                }
+            }
+            return
+        }
+
+        switch sourceID {
         case .noaa:           activeSource = NOAADataSource()
         case .openMeteo:      activeSource = OpenMeteoDataSource()
         case .pirateWeather:  activeSource = PirateWeatherDataSource()
+        case .appleWeather:   activeSource = AppleWeatherDataSource()
         default:              activeSource = TomorrowIODataSource()
         }
+    }
+
+    private static func showMigrationAlert() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = scene.windows.first?.rootViewController else { return }
+        var topVC = rootVC
+        while let presented = topVC.presentedViewController { topVC = presented }
+
+        let alert = UIAlertController(
+            title: "Weather Source Changed",
+            message: "Your previous weather source now requires Cloudship Premium. You've been switched to NOAA. Upgrade in Settings to restore your preferred source.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        topVC.present(alert, animated: true)
     }
 
     // MARK: - Fetch

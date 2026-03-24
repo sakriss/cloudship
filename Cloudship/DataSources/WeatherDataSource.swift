@@ -28,4 +28,5 @@ enum WeatherSourceID: String {
     case noaa          = "noaa"
     case openMeteo     = "openMeteo"
     case pirateWeather = "pirateWeather"
+    case appleWeather  = "appleWeather"
 }

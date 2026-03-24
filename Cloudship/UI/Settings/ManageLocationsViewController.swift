@@ -183,6 +183,16 @@ private class LocationCell: UITableViewCell {
         self.onChange = onChange
         nameLabel.text = location.name
         rainAlertSwitch.isOn = location.rainAlertsEnabled
+
+        // Gate rain alerts behind premium
+        let isPremium = SubscriptionManager.shared.isPremiumCached
+        rainAlertSwitch.isEnabled = isPremium
+        if !isPremium {
+            rainAlertSwitch.isOn = false
+            rainAlertLabel.text = "Rain Alerts (Premium)"
+        } else {
+            rainAlertLabel.text = "Rain Alerts"
+        }
     }
 
     @objc private func switchChanged() {
