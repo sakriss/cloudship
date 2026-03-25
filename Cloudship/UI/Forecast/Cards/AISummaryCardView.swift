@@ -37,7 +37,8 @@ class AISummaryCardView: CardView {
 
     private let summaryLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.numberOfLines = 0
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -47,7 +48,8 @@ class AISummaryCardView: CardView {
     private let retryLabel: UILabel = {
         let l = UILabel()
         l.text = "Couldn't load brief. Tap to retry."
-        l.font = .systemFont(ofSize: 14, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.isHidden = true

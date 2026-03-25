@@ -36,11 +36,101 @@ private struct RainViewerResponse: Codable {
 enum RadarLayer: String, CaseIterable {
     case precipitation = "Precipitation"
     case satellite     = "Satellite"
+    case temperature   = "Temperature"
+    case wind          = "Wind"
+    case clouds        = "Clouds"
+    case pressure      = "Pressure"
 
     var icon: String {
         switch self {
         case .precipitation: return "cloud.rain.fill"
         case .satellite:     return "globe.americas.fill"
+        case .temperature:   return "thermometer.medium"
+        case .wind:          return "wind"
+        case .clouds:        return "cloud.fill"
+        case .pressure:      return "gauge.medium"
+        }
+    }
+
+    /// Whether this layer supports animated playback (RainViewer layers only).
+    var isAnimatable: Bool {
+        switch self {
+        case .precipitation, .satellite: return true
+        case .temperature, .wind, .clouds, .pressure: return false
+        }
+    }
+
+    struct LegendInfo {
+        let title: String
+        let colors: [UIColor]
+        let minLabel: String
+        let maxLabel: String
+    }
+
+    /// Returns legend color scale info, or nil if the layer has no discrete legend
+    /// (precipitation / satellite have colors baked into the RainViewer tiles).
+    /// Labels automatically reflect the user's metric/imperial preference.
+    var legendInfo: LegendInfo? {
+        let metric = TemperatureFormatter.isMetric
+        switch self {
+        case .precipitation, .satellite:
+            return nil
+        case .temperature:
+            return LegendInfo(
+                title: "Temperature",
+                colors: [
+                    UIColor(red: 0.10, green: 0.00, blue: 0.50, alpha: 1), // deep violet
+                    UIColor(red: 0.00, green: 0.40, blue: 0.90, alpha: 1), // blue
+                    UIColor(red: 0.00, green: 0.85, blue: 0.85, alpha: 1), // cyan
+                    UIColor(red: 0.10, green: 0.75, blue: 0.10, alpha: 1), // green
+                    UIColor(red: 1.00, green: 1.00, blue: 0.00, alpha: 1), // yellow
+                    UIColor(red: 1.00, green: 0.50, blue: 0.00, alpha: 1), // orange
+                    UIColor(red: 0.90, green: 0.00, blue: 0.00, alpha: 1), // red
+                ],
+                minLabel: metric ? "−30°C" : "−22°F",
+                maxLabel: metric ? "50°C"  : "122°F"
+            )
+        case .wind:
+            return LegendInfo(
+                title: "Wind Speed",
+                colors: [
+                    UIColor(red: 0.10, green: 0.55, blue: 0.10, alpha: 1), // dark green
+                    UIColor(red: 0.55, green: 0.85, blue: 0.15, alpha: 1), // yellow-green
+                    UIColor(red: 1.00, green: 0.90, blue: 0.00, alpha: 1), // yellow
+                    UIColor(red: 1.00, green: 0.55, blue: 0.00, alpha: 1), // orange
+                    UIColor(red: 0.90, green: 0.05, blue: 0.05, alpha: 1), // red
+                    UIColor(red: 0.55, green: 0.00, blue: 0.55, alpha: 1), // purple
+                ],
+                minLabel: "0 \(metric ? "km/h" : "mph")",
+                maxLabel: "100+ \(metric ? "km/h" : "mph")"
+            )
+        case .clouds:
+            return LegendInfo(
+                title: "Cloud Cover",
+                colors: [
+                    UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 0.2), // nearly clear
+                    UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 0.6), // light gray
+                    UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.9), // mid gray
+                    UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 1.0), // dark gray
+                ],
+                minLabel: "0%",
+                maxLabel: "100%"
+            )
+        case .pressure:
+            // OWM pressure tiles use hPa regardless; show inHg conversion for imperial users
+            return LegendInfo(
+                title: "Pressure",
+                colors: [
+                    UIColor(red: 0.00, green: 0.00, blue: 0.80, alpha: 1), // blue (low)
+                    UIColor(red: 0.00, green: 0.75, blue: 0.50, alpha: 1), // teal
+                    UIColor(red: 0.15, green: 0.80, blue: 0.15, alpha: 1), // green
+                    UIColor(red: 1.00, green: 0.90, blue: 0.00, alpha: 1), // yellow
+                    UIColor(red: 1.00, green: 0.40, blue: 0.00, alpha: 1), // orange
+                    UIColor(red: 0.85, green: 0.00, blue: 0.00, alpha: 1), // red (high)
+                ],
+                minLabel: metric ? "950 hPa"  : "28.05\"",
+                maxLabel: metric ? "1050 hPa" : "31.01\""
+            )
         }
     }
 }
@@ -90,6 +180,168 @@ enum LoopRange: Int, CaseIterable {
         case .oneHour:  return "1 hr"
         case .halfHour: return "30 min"
         }
+    }
+}
+
+// MARK: - Legend pill
+
+private class RadarLegendPillView: UIView {
+
+    // MARK: Subviews
+    private let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
+    private let titleLabel: UILabel = {
+        let l = UILabel()
+        l.font = .systemFont(ofSize: 11, weight: .semibold)
+        l.textColor = .label
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let minLabel: UILabel = {
+        let l = UILabel()
+        l.font = .monospacedSystemFont(ofSize: 10, size: 10)
+        l.textColor = .secondaryLabel
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let maxLabel: UILabel = {
+        let l = UILabel()
+        l.font = .monospacedSystemFont(ofSize: 10, size: 10)
+        l.textColor = .secondaryLabel
+        l.textAlignment = .right
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+    private let gradientContainer: UIView = {
+        let v = UIView()
+        v.layer.cornerRadius = 4
+        v.layer.masksToBounds = true
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    private let gradientLayer = CAGradientLayer()
+    private let chevronButton: UIButton = {
+        let b = UIButton(type: .system)
+        let cfg = UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold)
+        b.setImage(UIImage(systemName: "chevron.down", withConfiguration: cfg), for: .normal)
+        b.tintColor = .tertiaryLabel
+        b.translatesAutoresizingMaskIntoConstraints = false
+        return b
+    }()
+
+    // MARK: State
+    private var isCollapsed = false
+    private var expandedConstraints: [NSLayoutConstraint] = []
+    private var collapsedConstraints: [NSLayoutConstraint] = []
+
+    // MARK: Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
+    }
+    required init?(coder: NSCoder) { fatalError() }
+
+    private func setup() {
+        translatesAutoresizingMaskIntoConstraints = false
+        layer.cornerRadius = 14
+        layer.masksToBounds = true
+
+        blur.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(blur)
+        NSLayoutConstraint.activate([
+            blur.topAnchor.constraint(equalTo: topAnchor),
+            blur.leadingAnchor.constraint(equalTo: leadingAnchor),
+            blur.trailingAnchor.constraint(equalTo: trailingAnchor),
+            blur.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+
+        let content = blur.contentView
+
+        // Gradient bar
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint   = CGPoint(x: 1, y: 0.5)
+        gradientContainer.layer.addSublayer(gradientLayer)
+
+        // Header row: title + chevron
+        let header = UIStackView(arrangedSubviews: [titleLabel, chevronButton])
+        header.axis = .horizontal; header.spacing = 4; header.alignment = .center
+        header.translatesAutoresizingMaskIntoConstraints = false
+
+        // Min/max row
+        let labelsRow = UIStackView(arrangedSubviews: [minLabel, maxLabel])
+        labelsRow.axis = .horizontal; labelsRow.distribution = .equalSpacing
+        labelsRow.translatesAutoresizingMaskIntoConstraints = false
+
+        content.addSubview(header)
+        content.addSubview(gradientContainer)
+        content.addSubview(labelsRow)
+
+        NSLayoutConstraint.activate([
+            header.topAnchor.constraint(equalTo: content.topAnchor, constant: 8),
+            header.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 12),
+            header.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -10),
+
+            gradientContainer.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 6),
+            gradientContainer.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 12),
+            gradientContainer.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -12),
+            gradientContainer.heightAnchor.constraint(equalToConstant: 10),
+
+            labelsRow.topAnchor.constraint(equalTo: gradientContainer.bottomAnchor, constant: 4),
+            labelsRow.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 12),
+            labelsRow.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -12),
+            labelsRow.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -8),
+        ])
+
+        // Tap to toggle
+        let tap = UITapGestureRecognizer(target: self, action: #selector(toggleCollapsed))
+        addGestureRecognizer(tap)
+    }
+
+    // MARK: Public API
+    func configure(with info: RadarLayer.LegendInfo) {
+        titleLabel.text = info.title
+        minLabel.text   = info.minLabel
+        maxLabel.text   = info.maxLabel
+        gradientLayer.colors = info.colors.map { $0.cgColor }
+        if isCollapsed { expandCollapsed() }
+    }
+
+    // MARK: Layout
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer.frame = gradientContainer.bounds
+    }
+
+    // MARK: Collapse
+    @objc private func toggleCollapsed() {
+        isCollapsed ? expandCollapsed() : collapseToTitle()
+    }
+
+    private func collapseToTitle() {
+        isCollapsed = true
+        let cfg = UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold)
+        chevronButton.setImage(UIImage(systemName: "chevron.up", withConfiguration: cfg), for: .normal)
+        UIView.animate(withDuration: 0.25) {
+            self.gradientContainer.alpha = 0
+            self.minLabel.alpha = 0
+            self.maxLabel.alpha = 0
+        }
+    }
+
+    private func expandCollapsed() {
+        isCollapsed = false
+        let cfg = UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold)
+        chevronButton.setImage(UIImage(systemName: "chevron.down", withConfiguration: cfg), for: .normal)
+        UIView.animate(withDuration: 0.25) {
+            self.gradientContainer.alpha = 1
+            self.minLabel.alpha = 1
+            self.maxLabel.alpha = 1
+        }
+    }
+}
+
+private extension UIFont {
+    static func monospacedSystemFont(ofSize size: CGFloat, size _: CGFloat) -> UIFont {
+        .monospacedSystemFont(ofSize: size, weight: .regular)
     }
 }
 
@@ -299,6 +551,10 @@ class RadarViewController: UIViewController {
     private var loopRange: LoopRange = .all
     private var radarOpacity: Float = 0.75
 
+    // MARK: OpenWeatherMap
+    private let owmAPIKey = "028172b81ffd68d6beb18b4ccf434ad4"
+    private let owmFrames = [RainViewerResponse.Frame(time: 0, path: "")]
+
     // MARK: Radar data
     private var precipFrames: [RainViewerResponse.Frame] = []
     private var satelliteFrames: [RainViewerResponse.Frame] = []
@@ -387,6 +643,8 @@ class RadarViewController: UIViewController {
         return b
     }()
 
+    private let legendView = RadarLegendPillView()
+
     private lazy var mapTypeButton: UIButton = {
         let b = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
@@ -435,7 +693,11 @@ class RadarViewController: UIViewController {
         ])
 
         setupControlPanel()
+        setupLegend()
         updateLayerUI()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(settingsChanged),
+                                               name: Notification.Name("settingsChanged"), object: nil)
 
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
@@ -513,6 +775,31 @@ class RadarViewController: UIViewController {
         ])
     }
 
+    private func setupLegend() {
+        legendView.isHidden = true
+        view.addSubview(legendView)
+        NSLayoutConstraint.activate([
+            legendView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
+            legendView.bottomAnchor.constraint(equalTo: controlPanel.topAnchor, constant: -8),
+            legendView.widthAnchor.constraint(equalToConstant: 190),
+        ])
+    }
+
+    private func updateLegend() {
+        if let info = activeLayer.legendInfo {
+            legendView.configure(with: info)
+            if legendView.isHidden {
+                legendView.alpha = 0
+                legendView.isHidden = false
+                UIView.animate(withDuration: 0.2) { self.legendView.alpha = 1 }
+            }
+        } else {
+            UIView.animate(withDuration: 0.2, animations: { self.legendView.alpha = 0 }) { _ in
+                self.legendView.isHidden = true
+            }
+        }
+    }
+
     private func makeControlButton(_ systemName: String, action: Selector) -> UIButton {
         let b = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
@@ -534,11 +821,8 @@ class RadarViewController: UIViewController {
             btn.setTitleColor(selected ? .white : .label, for: .normal)
             btn.layer.borderColor = selected ? accent.cgColor : UIColor.separator.cgColor
         }
-
-        frameSlider.isHidden = false
-        prevButton.isEnabled = true
-        nextButton.isEnabled = true
-        playPauseButton.isEnabled = true
+        // Legend is set up after setupLegend() is called; guard prevents crash during init ordering
+        if legendView.superview != nil { updateLegend() }
     }
 
     // MARK: - Fetch radar data
@@ -575,6 +859,15 @@ class RadarViewController: UIViewController {
     private func reloadFrames() {
         if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
 
+        let animatable = activeLayer.isAnimatable
+
+        // Hide animation controls for static (OWM) layers
+        frameSlider.isHidden = !animatable
+        playPauseButton.isHidden = !animatable
+        prevButton.isHidden = !animatable
+        nextButton.isHidden = !animatable
+        liveBadge.isHidden = true
+
         let frames = activeFrames
         guard !frames.isEmpty else {
             timeLabel.text = activeLayer == .satellite
@@ -586,13 +879,20 @@ class RadarViewController: UIViewController {
         currentIndex = frames.count - 1
         frameSlider.value = Float(currentIndex)
         showCurrentFrame()
-        startAnimation()
+
+        if animatable {
+            startAnimation()
+        } else {
+            timeLabel.text = activeLayer.rawValue
+        }
     }
 
     private var activeFrames: [RainViewerResponse.Frame] {
         switch activeLayer {
         case .precipitation: return precipFrames
         case .satellite:     return satelliteFrames
+        case .temperature, .wind, .clouds, .pressure:
+            return owmFrames
         }
     }
 
@@ -604,6 +904,14 @@ class RadarViewController: UIViewController {
             return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(colorScheme.rawValue)/1_1.png"
         case .satellite:
             return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png"
+        case .temperature:
+            return "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
+        case .wind:
+            return "https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
+        case .clouds:
+            return "https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
+        case .pressure:
+            return "https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         }
     }
 
@@ -640,6 +948,12 @@ class RadarViewController: UIViewController {
     }
 
     private func updateTimeLabel(for frame: RainViewerResponse.Frame) {
+        // Static OWM layers have no meaningful timestamp
+        guard activeLayer.isAnimatable else {
+            timeLabel.text = activeLayer.rawValue
+            liveBadge.isHidden = true
+            return
+        }
         let date = Date(timeIntervalSince1970: TimeInterval(frame.time))
         let now = Date()
         let diff = Int(now.timeIntervalSince(date))
@@ -703,6 +1017,7 @@ class RadarViewController: UIViewController {
 
         activeLayer = newLayer
         updateLayerUI()
+        updateLegend()
         reloadFrames()
     }
 
@@ -730,6 +1045,11 @@ class RadarViewController: UIViewController {
         showCurrentFrame()
     }
 
+    @objc private func settingsChanged() {
+        // Re-read legend info so unit labels (°C/°F, km/h/mph, hPa/inHg) stay current
+        updateLegend()
+    }
+
     @objc private func cycleMapType() {
         mapTypeIndex = (mapTypeIndex + 1) % mapTypes.count
         mapView.mapType = mapTypes[mapTypeIndex]
@@ -749,6 +1069,8 @@ class RadarViewController: UIViewController {
             guard let self else { return }
             self.colorScheme = scheme
             // Color scheme changes the URL template, so rebuild all overlays
+            self.stopAnimation()
+            if let old = self.currentOverlay { self.mapView.removeOverlay(old); self.currentOverlay = nil }
             self.reloadFrames()
         }
         vc.onSpeedChanged = { [weak self] speed in

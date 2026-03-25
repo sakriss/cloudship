@@ -161,6 +161,13 @@ class PirateWeatherDataSource: WeatherDataSource {
                 moonPhase:         point.moonPhase,
                 dayDescription:    point.summary,
                 nightDescription:  nil,
+                windSpeed:         point.windSpeed,
+                windGust:          point.windGust,
+                uvIndex:           point.uvIndex,
+                humidity:          point.humidity.map { $0 * 100 }, // 0–1 → 0–100%
+                cloudCover:        point.cloudCover.map { $0 * 100 },
+                visibility:        point.visibility,
+                pressure:          point.pressure,
                 dawnTime:          point.dawnTime.map { Date(timeIntervalSince1970: $0) },
                 duskTime:          point.duskTime.map { Date(timeIntervalSince1970: $0) },
                 snowAccumulation:  point.snowAccumulation,

@@ -86,7 +86,8 @@ private class ActivityRowView: UIView {
 
     private let emojiLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 22)
+        l.font = .preferredFont(forTextStyle: .title3)
+        l.adjustsFontForContentSizeCategory = true
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.required, for: .horizontal)
         l.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -95,7 +96,8 @@ private class ActivityRowView: UIView {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -106,7 +108,8 @@ private class ActivityRowView: UIView {
 
     private let scoreLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .bold)
+        l.font = .preferredFont(forTextStyle: .headline)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.textAlignment = .right
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -117,7 +120,8 @@ private class ActivityRowView: UIView {
 
     private let ratingLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .semibold)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textAlignment = .right
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.required, for: .horizontal)
@@ -127,7 +131,8 @@ private class ActivityRowView: UIView {
 
     private let factorLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -203,6 +208,14 @@ private class ActivityRowView: UIView {
         ratingLabel.textColor = color
         scoreBar.progress = CGFloat(score.score) / 100.0
         scoreBar.barColor = color
+
+        // VoiceOver
+        isAccessibilityElement = true
+        var parts = ["\(score.activity.displayName): \(score.score) out of 100, \(score.rating.displayName)"]
+        if let factor = score.limitingFactor, !factor.isEmpty {
+            parts.append(factor)
+        }
+        accessibilityLabel = parts.joined(separator: ". ")
     }
 
     private func scoreColor(for score: Int) -> UIColor {

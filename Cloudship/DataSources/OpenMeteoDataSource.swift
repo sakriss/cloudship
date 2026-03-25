@@ -51,7 +51,8 @@ class OpenMeteoDataSource: WeatherDataSource {
             "weather_code", "temperature_2m_max", "temperature_2m_min",
             "apparent_temperature_max", "apparent_temperature_min",
             "precipitation_sum", "precipitation_probability_max",
-            "sunrise", "sunset", "uv_index_max"
+            "sunrise", "sunset", "uv_index_max",
+            "wind_speed_10m_max", "wind_gusts_10m_max"
             // moon_phase is not a valid Open-Meteo forecast variable
         ].joined(separator: ",")
 
@@ -229,7 +230,10 @@ class OpenMeteoDataSource: WeatherDataSource {
                 sunset:           sunsetStr.flatMap  { parseDate($0) },
                 moonPhase:        d.moonPhase?[safe: i] ?? nil,
                 dayDescription:   nil,
-                nightDescription: nil
+                nightDescription: nil,
+                windSpeed:        d.windSpeed10mMax?[safe: i] ?? nil,
+                windGust:         d.windGusts10mMax?[safe: i] ?? nil,
+                uvIndex:          d.uvIndexMax?[safe: i] ?? nil
             )
         }
     }

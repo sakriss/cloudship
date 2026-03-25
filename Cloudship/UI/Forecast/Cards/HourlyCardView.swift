@@ -195,7 +195,8 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let hourLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -211,7 +212,8 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let valueLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 14, weight: .semibold)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.textAlignment = .center
         l.adjustsFontSizeToFitWidth = true
@@ -222,7 +224,8 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let precipLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 10, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -272,6 +275,16 @@ private class HourlyItemCell: UICollectionViewCell {
             precipLabel.text = nil
             precipLabel.isHidden = true
         }
+
+        // VoiceOver
+        isAccessibilityElement = true
+        var parts: [String] = []
+        if let hour = hourLabel.text { parts.append(hour) }
+        let condition = WeatherCodeMapper.description(for: entry.condition)
+        if !condition.isEmpty { parts.append(condition) }
+        if let val = valueLabel.text, val != "—" { parts.append("\(metric.rawValue): \(val)") }
+        if let precip = precipLabel.text, !precipLabel.isHidden { parts.append("Precipitation: \(precip)") }
+        accessibilityLabel = parts.joined(separator: ", ")
     }
 }
 
@@ -285,7 +298,8 @@ private class MetricPillButton: UIButton {
         self.metric = metric
         super.init(frame: .zero)
         setTitle(metric.rawValue, for: .normal)
-        titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+        titleLabel?.font = .preferredFont(forTextStyle: .caption1)
+        titleLabel?.adjustsFontForContentSizeCategory = true
         layer.cornerRadius = 14
         layer.borderWidth = 1
         contentEdgeInsets = UIEdgeInsets(top: 5, left: 12, bottom: 5, right: 12)
@@ -316,6 +330,9 @@ private class MetricPillButton: UIButton {
 // MARK: - Card
 
 class HourlyCardView: CardView {
+
+    /// Called whenever the user taps a metric pill. Use this to sync the daily card.
+    var onMetricChanged: ((HourlyMetric) -> Void)?
 
     private var entries: [HourlyEntry] = []
     private var activeMetric: HourlyMetric = .temp
@@ -464,6 +481,7 @@ class HourlyCardView: CardView {
         UIView.transition(with: curveView, duration: 0.25, options: .transitionCrossDissolve) {
             self.updateCurve()
         }
+        onMetricChanged?(activeMetric)
     }
 }
 

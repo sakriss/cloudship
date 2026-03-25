@@ -113,6 +113,8 @@ struct OpenMeteoDaily: Codable {
     let sunset: [String?]?
     let uvIndexMax: [Double?]?
     let moonPhase: [Double?]?
+    let windSpeed10mMax: [Double?]?
+    let windGusts10mMax: [Double?]?
 
     enum CodingKeys: String, CodingKey {
         case time
@@ -127,6 +129,8 @@ struct OpenMeteoDaily: Codable {
         case sunset
         case uvIndexMax                  = "uv_index_max"
         case moonPhase                   = "moon_phase"
+        case windSpeed10mMax             = "wind_speed_10m_max"
+        case windGusts10mMax             = "wind_gusts_10m_max"
     }
 }
 

@@ -89,6 +89,10 @@ class MainForecastViewController: UIViewController {
     private let activityScoresCard = ActivityScoresCardView()
     private let aiSummaryCard      = AISummaryCardView()
     private let animationView      = WeatherAnimationView()
+    private let weatherGradient    = WeatherGradientView()
+    private var currentStatusBarStyle: UIStatusBarStyle = .default
+
+    override var preferredStatusBarStyle: UIStatusBarStyle { currentStatusBarStyle }
 
     /// Cards the user can reorder, in current display order.
     private var reorderableCards: [CardView] = []
@@ -391,9 +395,23 @@ class MainForecastViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = .systemBackground
 
-        // Animation view sits behind everything
+        // Weather-reactive gradient sits behind everything
+        weatherGradient.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(weatherGradient, at: 0)
+        NSLayoutConstraint.activate([
+            weatherGradient.topAnchor.constraint(equalTo: view.topAnchor),
+            weatherGradient.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            weatherGradient.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            weatherGradient.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        // Check if weather-reactive theme is enabled
+        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
+        weatherGradient.isHidden = (appearanceIdx != 3)  // 3 = Auto (Weather-Reactive)
+
+        // Animation view sits behind content but above gradient
         animationView.translatesAutoresizingMaskIntoConstraints = false
-        view.insertSubview(animationView, at: 0)
+        view.insertSubview(animationView, aboveSubview: weatherGradient)
         NSLayoutConstraint.activate([
             animationView.topAnchor.constraint(equalTo: view.topAnchor),
             animationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -662,6 +680,10 @@ class MainForecastViewController: UIViewController {
             )
             self.navigationController?.pushViewController(vc, animated: true)
         }
+
+        hourlyCard.onMetricChanged = { [weak self] metric in
+            self?.dailyCard.updateMetric(metric)
+        }
     }
 
     private func setupAISummaryCard() {
@@ -697,6 +719,89 @@ class MainForecastViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 
+    private func applyWeatherTheme(for condition: WeatherCondition) {
+        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
+        guard appearanceIdx == 3 else {
+            weatherGradient.isHidden = true
+            resetBarAppearance()
+            return
+        }
+
+        let hour = Calendar.current.component(.hour, from: Date())
+        let isNight = hour < 6 || hour >= 20
+        let theme = WeatherTheme.theme(for: condition, isNight: isNight)
+
+        weatherGradient.isHidden = false
+        weatherGradient.applyTheme(theme)
+        applyBarAppearance(theme: theme)
+    }
+
+    private func applyBarAppearance(theme: WeatherTheme) {
+        let barColor   = theme.gradientTop.withAlphaComponent(0.92)
+        let textColor  = theme.isDark ? UIColor.white : UIColor.black
+        let faintText  = textColor.withAlphaComponent(0.55)
+        let accentColor = theme.isDark
+            ? theme.accentColor                          // keep accent on dark
+            : theme.accentColor.blended(with: .black, ratio: 0.7) // deepen on light bars
+
+        // Navigation bar
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithOpaqueBackground()
+        navAppearance.backgroundColor = barColor
+        navAppearance.titleTextAttributes = [.foregroundColor: textColor]
+        navAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
+        // Back button chevron & bar button items
+        let buttonAppearance = UIBarButtonItemAppearance()
+        buttonAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
+        navAppearance.buttonAppearance = buttonAppearance
+        navAppearance.backButtonAppearance = buttonAppearance
+
+        navigationController?.navigationBar.standardAppearance = navAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = navAppearance
+        navigationController?.navigationBar.compactAppearance = navAppearance
+        navigationController?.navigationBar.tintColor = textColor  // icons & back arrow
+
+        // Tab bar
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
+        tabAppearance.backgroundColor = barColor
+
+        let itemAppearance = UITabBarItemAppearance()
+        itemAppearance.normal.iconColor = faintText
+        itemAppearance.normal.titleTextAttributes = [.foregroundColor: faintText]
+        itemAppearance.selected.iconColor = accentColor
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor: accentColor]
+        tabAppearance.stackedLayoutAppearance = itemAppearance
+        tabAppearance.inlineLayoutAppearance = itemAppearance
+        tabAppearance.compactInlineLayoutAppearance = itemAppearance
+
+        tabBarController?.tabBar.standardAppearance = tabAppearance
+        tabBarController?.tabBar.scrollEdgeAppearance = tabAppearance
+
+        // Status bar
+        currentStatusBarStyle = theme.statusBarStyle
+        UIView.animate(withDuration: 0.6) {
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+
+    private func resetBarAppearance() {
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithDefaultBackground()
+        navigationController?.navigationBar.standardAppearance = navAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = navAppearance
+        navigationController?.navigationBar.compactAppearance = navAppearance
+        navigationController?.navigationBar.tintColor = nil
+
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithDefaultBackground()
+        tabBarController?.tabBar.standardAppearance = tabAppearance
+        tabBarController?.tabBar.scrollEdgeAppearance = tabAppearance
+
+        currentStatusBarStyle = .default
+        setNeedsStatusBarAppearanceUpdate()
+    }
+
     private func updateSourceLabel() {
         guard let label = sourceLabel.viewWithTag(99) as? UILabel else { return }
         label.text = WeatherDataSourceManager.shared.activeSource.name
@@ -706,6 +811,7 @@ class MainForecastViewController: UIViewController {
         updateSourceLabel()
         let todayDaily = data.daily.first { DateFormatHelper.isToday($0.time) } ?? data.daily.first
         headerCard.configure(with: data, todayDaily: todayDaily)
+        applyWeatherTheme(for: data.current.condition)
         alertBannerCard.configure(alerts: data.alerts)
 
         minutelyCard.configure(minutely: data.minutely,
@@ -719,7 +825,8 @@ class MainForecastViewController: UIViewController {
         // Get today's sunrise/sunset and dawn/dusk from daily data
         detailsCard.configure(with: data.current,
                               sunrise: todayDaily?.sunrise, sunset: todayDaily?.sunset,
-                              dawn: todayDaily?.dawnTime, dusk: todayDaily?.duskTime)
+                              dawn: todayDaily?.dawnTime, dusk: todayDaily?.duskTime,
+                              todayDaily: todayDaily)
         windGustCard.configure(hourly: data.hourly)
 
         // Air quality — show card only when data is available

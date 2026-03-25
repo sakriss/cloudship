@@ -83,7 +83,8 @@ class CardView: UIView {
     func makeTitleLabel(text: String) -> UILabel {
         let label = UILabel()
         label.text = text.uppercased()
-        label.font = .systemFont(ofSize: 11, weight: .semibold)
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.adjustsFontForContentSizeCategory = true
         label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

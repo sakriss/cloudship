@@ -36,6 +36,15 @@ class BackgroundTaskManager: NSObject {
         ) { [weak self] task in
             self?.handlePrecipCheck(task: task as! BGAppRefreshTask)
         }
+
+        // Schedule daily briefing notifications if enabled
+        scheduleBriefings()
+    }
+
+    /// Schedule morning and evening briefing notifications (premium feature).
+    func scheduleBriefings() {
+        PrecipitationNotificationService.shared.scheduleMorningBrief()
+        PrecipitationNotificationService.shared.scheduleEveningBrief()
     }
 
     // MARK: - Scheduling
@@ -81,6 +90,9 @@ class BackgroundTaskManager: NSObject {
 
                 // Evaluate saved locations with rain alerts
                 await self.checkSavedLocations(source: source)
+
+                // Refresh daily briefing notifications with latest data
+                self.scheduleBriefings()
 
                 task.setTaskCompleted(success: true)
             } catch {

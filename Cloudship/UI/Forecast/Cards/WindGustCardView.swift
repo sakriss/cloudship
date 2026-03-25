@@ -154,14 +154,16 @@ class WindGustCardView: CardView {
     private let chartView = WindGustChartView()
     private let maxLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
     private let minLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -176,7 +178,8 @@ class WindGustCardView: CardView {
     private static func makeTickLabel(_ text: String) -> UILabel {
         let l = UILabel()
         l.text = text
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -278,6 +281,15 @@ class WindGustCardView: CardView {
         }
         if times.count > 18 {
             endTickLabel.text = DateFormatHelper.hourString(from: times[min(23, times.count - 1)])
+        }
+
+        // VoiceOver
+        isAccessibilityElement = true
+        let a11yUnit = isMetric ? "kilometers per hour" : "miles per hour"
+        if let maxG = gustData.max(), let minG = gustData.min() {
+            accessibilityLabel = "Wind Gusts: ranging from \(Int(minG.rounded())) to \(Int(maxG.rounded())) \(a11yUnit) over the next 24 hours"
+        } else {
+            accessibilityLabel = "Wind Gusts chart"
         }
     }
 }

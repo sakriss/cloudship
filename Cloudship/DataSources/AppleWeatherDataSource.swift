@@ -87,16 +87,33 @@ class AppleWeatherDataSource: WeatherDataSource {
 
     private func buildDaily(_ forecast: Forecast<DayWeather>, imperial: Bool) -> [DailyEntry] {
         forecast.prefix(10).map { d in
-            DailyEntry(
+            let windSpeedVal = imperial
+                ? d.wind.speed.converted(to: .milesPerHour).value
+                : d.wind.speed.converted(to: .kilometersPerHour).value
+            let windGustVal = d.wind.gust.map { imperial
+                ? $0.converted(to: .milesPerHour).value
+                : $0.converted(to: .kilometersPerHour).value
+            }
+            return DailyEntry(
                 time:           d.date,
                 tempMin:        imperial ? d.lowTemperature.converted(to: .fahrenheit).value : d.lowTemperature.converted(to: .celsius).value,
                 tempMax:        imperial ? d.highTemperature.converted(to: .fahrenheit).value : d.highTemperature.converted(to: .celsius).value,
+                feelsLikeMin:   nil,
+                feelsLikeMax:   nil,
                 condition:      mapCondition(d.condition),
                 conditionNight: mapCondition(d.condition),
                 precipChance:   d.precipitationChance * 100,
+                precipAmount:   imperial
+                    ? d.precipitationAmount.converted(to: .inches).value
+                    : d.precipitationAmount.converted(to: .millimeters).value,
                 sunrise:        d.sun.sunrise,
                 sunset:         d.sun.sunset,
-                moonPhase:      nil
+                moonPhase:      nil,
+                dayDescription: nil,
+                nightDescription: nil,
+                windSpeed:      windSpeedVal,
+                windGust:       windGustVal,
+                uvIndex:        Double(d.uvIndex.value)
             )
         }
     }

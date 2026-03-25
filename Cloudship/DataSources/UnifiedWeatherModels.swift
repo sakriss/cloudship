@@ -191,6 +191,15 @@ struct DailyEntry: Codable {
     var dayDescription: String?     // e.g. "Partly sunny"
     var nightDescription: String?   // e.g. "Partly cloudy and cold"
 
+    // Daily aggregate fields (available from Pirate Weather, Open-Meteo max; nil for others)
+    var windSpeed: Double?          // mph or kph (daily max or representative)
+    var windGust: Double?           // mph or kph (daily max)
+    var uvIndex: Double?            // daily max UV index
+    var humidity: Double?           // 0–100% (daily mean, Pirate Weather only)
+    var cloudCover: Double?         // 0–100% (daily mean, Pirate Weather only)
+    var visibility: Double?         // miles or km (Pirate Weather only)
+    var pressure: Double?           // inHg or hPa (Pirate Weather only)
+
     // Pirate Weather unique fields
     var dawnTime: Date?             // civil dawn
     var duskTime: Date?             // civil dusk

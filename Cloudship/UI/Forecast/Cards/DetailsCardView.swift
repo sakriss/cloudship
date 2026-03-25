@@ -22,7 +22,8 @@ private class DetailTileView: UIView {
 
     private let valueLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 22, weight: .semibold)
+        l.font = .preferredFont(forTextStyle: .headline)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.adjustsFontSizeToFitWidth = true
         l.minimumScaleFactor = 0.7
@@ -32,7 +33,8 @@ private class DetailTileView: UIView {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -43,6 +45,10 @@ private class DetailTileView: UIView {
         iconView.image = UIImage(systemName: systemIcon)
         valueLabel.text = value
         nameLabel.text = name
+
+        // VoiceOver
+        isAccessibilityElement = true
+        accessibilityLabel = "\(name): \(value)"
 
         let stack = UIStackView(arrangedSubviews: [iconView, valueLabel, nameLabel])
         stack.axis = .vertical
@@ -64,6 +70,7 @@ private class DetailTileView: UIView {
 
     func update(value: String) {
         valueLabel.text = value
+        accessibilityLabel = "\(nameLabel.text ?? ""): \(value)"
     }
 }
 
@@ -176,7 +183,7 @@ private class SunArcView: UIView {
         let sunsetStr = timeString(from: sunset)
 
         let attrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 11, weight: .regular),
+            .font: UIFont.preferredFont(forTextStyle: .caption2),
             .foregroundColor: UIColor.secondaryLabel
         ]
         let riseSize = sunriseStr.size(withAttributes: attrs)
@@ -188,7 +195,7 @@ private class SunArcView: UIView {
 
         // Dawn/dusk labels (Pirate Weather)
         let dawnDuskAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 9, weight: .regular),
+            .font: UIFont.preferredFont(forTextStyle: .caption2),
             .foregroundColor: UIColor.tertiaryLabel
         ]
         if let dawn = dawn {
@@ -243,14 +250,15 @@ class DetailsCardView: CardView {
             ("eye.fill",      "—", "Visibility"),
             ("gauge.medium",  "—", "Pressure"),
             ("thermometer",   "—", "Dew Point"),
-            ("cloud.fill",    "—", "Cloud Cover")
+            ("cloud.fill",    "—", "Cloud Cover"),
+            ("moonphase.waxing.crescent", "—", "Moon Phase")
         ]
 
         tiles = tileData.map { DetailTileView(systemIcon: $0.icon, value: $0.value, name: $0.name) }
 
         // Build rows: each row is a plain UIView that holds left + right tiles plus a centre separator line
         var rowViews: [UIView] = []
-        for i in stride(from: 0, to: tiles.count, by: 2) {
+        for i in stride(from: 0, to: tiles.count - (tiles.count % 2 == 1 ? 1 : 0), by: 2) {
             let left  = tiles[i]
             let right = tiles[i + 1]
             left.translatesAutoresizingMaskIntoConstraints  = false
@@ -287,6 +295,22 @@ class DetailsCardView: CardView {
                 right.trailingAnchor.constraint(equalTo: row.trailingAnchor)
             ])
 
+            rowViews.append(row)
+        }
+
+        // Handle last tile if odd count (moon phase)
+        if tiles.count % 2 == 1 {
+            let lastTile = tiles.last!
+            lastTile.translatesAutoresizingMaskIntoConstraints = false
+            let row = UIView()
+            row.translatesAutoresizingMaskIntoConstraints = false
+            row.addSubview(lastTile)
+            NSLayoutConstraint.activate([
+                lastTile.topAnchor.constraint(equalTo: row.topAnchor),
+                lastTile.bottomAnchor.constraint(equalTo: row.bottomAnchor),
+                lastTile.leadingAnchor.constraint(equalTo: row.leadingAnchor),
+                lastTile.trailingAnchor.constraint(equalTo: row.centerXAnchor)
+            ])
             rowViews.append(row)
         }
 
@@ -333,7 +357,20 @@ class DetailsCardView: CardView {
     // MARK: - Configure
 
     func configure(with current: CurrentConditions, sunrise: Date? = nil, sunset: Date? = nil,
-                   dawn: Date? = nil, dusk: Date? = nil) {
+                   dawn: Date? = nil, dusk: Date? = nil, todayDaily: DailyEntry? = nil) {
+        // Moon phase (from daily data)
+        if tiles.count > 8 {
+            let moonStr: String
+            if let phase = todayDaily?.moonPhase {
+                let emoji = todayDaily?.moonPhaseEmoji ?? "🌑"
+                let name = todayDaily?.moonPhaseName ?? ""
+                moonStr = "\(emoji) \(name)"
+                _ = phase  // suppress unused warning
+            } else {
+                moonStr = "—"
+            }
+            tiles[8].update(value: moonStr)
+        }
         // Update sun arc
         if let rise = sunrise, let set = sunset {
             sunArcView.sunrise = rise

@@ -13,7 +13,8 @@ class AirQualityCardView: CardView {
 
     private let indexLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 42, weight: .thin)
+        l.font = .preferredFont(forTextStyle: .largeTitle)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -21,14 +22,16 @@ class AirQualityCardView: CardView {
 
     private let categoryLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 16, weight: .semibold)
+        l.font = .preferredFont(forTextStyle: .headline)
+        l.adjustsFontForContentSizeCategory = true
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
 
     private let descriptionLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.numberOfLines = 2
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -92,6 +95,10 @@ class AirQualityCardView: CardView {
         descriptionLabel.text = data.category.description
         categoryLabel.textColor = color(for: data.index)
         gradientBarView.aqiIndex = data.index
+
+        // VoiceOver
+        isAccessibilityElement = true
+        accessibilityLabel = "Air Quality Index \(data.index), \(data.category.rawValue). \(data.category.description)"
     }
 
     private func color(for index: Int) -> UIColor {

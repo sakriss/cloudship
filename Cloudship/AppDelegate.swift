@@ -51,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Restore appearance override if saved
         let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
-        let styles: [UIUserInterfaceStyle] = [.unspecified, .light, .dark]
+        let styles: [UIUserInterfaceStyle] = [.unspecified, .light, .dark, .unspecified]
         window?.overrideUserInterfaceStyle = appearanceIdx < styles.count ? styles[appearanceIdx] : .unspecified
 
         window?.makeKeyAndVisible()

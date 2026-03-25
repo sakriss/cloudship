@@ -13,7 +13,8 @@ class HeaderCardView: CardView {
 
     private let locationLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +23,8 @@ class HeaderCardView: CardView {
 
     private let temperatureLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 80, weight: .thin)
+        l.font = .preferredFont(forTextStyle: .largeTitle)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.textAlignment = .center
         l.adjustsFontSizeToFitWidth = true
@@ -33,7 +35,8 @@ class HeaderCardView: CardView {
 
     private let conditionLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 20, weight: .light)
+        l.font = .preferredFont(forTextStyle: .headline)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +45,8 @@ class HeaderCardView: CardView {
 
     private let feelsLikeLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -51,7 +55,8 @@ class HeaderCardView: CardView {
 
     private let hiLoLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +65,8 @@ class HeaderCardView: CardView {
 
     private let stormProximityLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         l.isHidden = true
@@ -121,8 +127,25 @@ class HeaderCardView: CardView {
         temperatureLabel.text = TemperatureFormatter.format(c.temperature)
         conditionLabel.text = WeatherCodeMapper.description(for: c.condition)
 
-        if let fl = c.feelsLike {
+        if let fl = c.feelsLike, let temp = c.temperature {
+            let diff = fl - temp
+            let absDiff = abs(diff)
             feelsLikeLabel.text = "Feels like \(TemperatureFormatter.format(fl))"
+
+            if absDiff >= 5 {
+                // Prominent display when feels-like differs significantly
+                feelsLikeLabel.font = .preferredFont(forTextStyle: .headline)
+                feelsLikeLabel.textColor = diff > 0
+                    ? UIColor.systemOrange   // feels hotter
+                    : UIColor.systemCyan     // feels colder
+            } else {
+                feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
+                feelsLikeLabel.textColor = .secondaryLabel
+            }
+        } else if let fl = c.feelsLike {
+            feelsLikeLabel.text = "Feels like \(TemperatureFormatter.format(fl))"
+            feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
+            feelsLikeLabel.textColor = .secondaryLabel
         } else {
             feelsLikeLabel.text = nil
         }
@@ -145,6 +168,26 @@ class HeaderCardView: CardView {
         } else {
             stormProximityLabel.isHidden = true
         }
+
+        // VoiceOver: combine key info into a single accessibility element
+        isAccessibilityElement = true
+        var accessibilityParts: [String] = []
+        if let temp = temperatureLabel.text {
+            accessibilityParts.append("Current temperature \(temp)")
+        }
+        if let feels = feelsLikeLabel.text, !feels.isEmpty {
+            accessibilityParts.append(feels)
+        }
+        if let condition = conditionLabel.text, !condition.isEmpty {
+            accessibilityParts.append(condition)
+        }
+        if let hiLo = hiLoLabel.text, !hiLo.isEmpty {
+            accessibilityParts.append(hiLo)
+        }
+        if let storm = stormProximityLabel.text, !stormProximityLabel.isHidden {
+            accessibilityParts.append(storm)
+        }
+        accessibilityLabel = accessibilityParts.joined(separator: ", ")
     }
 
     // MARK: - Storm helpers

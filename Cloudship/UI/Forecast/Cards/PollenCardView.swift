@@ -88,7 +88,8 @@ class PollenCardView: CardView {
 
         let iconLabel = UILabel()
         iconLabel.text = icon
-        iconLabel.font = .systemFont(ofSize: 22)
+        iconLabel.font = .preferredFont(forTextStyle: .title3)
+        iconLabel.adjustsFontForContentSizeCategory = true
         iconLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let badge = UIView()
@@ -99,13 +100,15 @@ class PollenCardView: CardView {
 
         let nameLabel = UILabel()
         nameLabel.text = name
-        nameLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        nameLabel.font = .preferredFont(forTextStyle: .body)
+        nameLabel.adjustsFontForContentSizeCategory = true
         nameLabel.textColor = .label
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let levelLabel = UILabel()
         levelLabel.text = level.label
-        levelLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        levelLabel.font = .preferredFont(forTextStyle: .body)
+        levelLabel.adjustsFontForContentSizeCategory = true
         levelLabel.textColor = levelColor(level)
         levelLabel.textAlignment = .right
         levelLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -133,6 +136,10 @@ class PollenCardView: CardView {
             levelLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             levelLabel.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8)
         ])
+
+        // VoiceOver
+        container.isAccessibilityElement = true
+        container.accessibilityLabel = "\(name) pollen: \(level.label)"
 
         return container
     }

@@ -101,7 +101,8 @@ class MinutelyCardView: CardView {
     private var titleLabel: UILabel!
     private let summaryLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 15, weight: .medium)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.numberOfLines = 1
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -110,7 +111,8 @@ class MinutelyCardView: CardView {
     private let emptyLabel: UILabel = {
         let l = UILabel()
         l.text = "No precipitation expected"
-        l.font = .systemFont(ofSize: 14, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .body)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +122,8 @@ class MinutelyCardView: CardView {
     private let nowLabel: UILabel = {
         let l = UILabel()
         l.text = "Now"
-        l.font = .systemFont(ofSize: 11, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -129,7 +132,8 @@ class MinutelyCardView: CardView {
     private let endLabel: UILabel = {
         let l = UILabel()
         l.text = "+60 min"
-        l.font = .systemFont(ofSize: 11, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .right
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -139,7 +143,8 @@ class MinutelyCardView: CardView {
     private let label15: UILabel = {
         let l = UILabel()
         l.text = "+15"
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -149,7 +154,8 @@ class MinutelyCardView: CardView {
     private let label30: UILabel = {
         let l = UILabel()
         l.text = "+30"
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -159,7 +165,8 @@ class MinutelyCardView: CardView {
     private let label45: UILabel = {
         let l = UILabel()
         l.text = "+45"
-        l.font = .systemFont(ofSize: 10, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -169,7 +176,8 @@ class MinutelyCardView: CardView {
     private let noSourceLabel: UILabel = {
         let l = UILabel()
         l.text = "Minutely data not available for this source"
-        l.font = .systemFont(ofSize: 13, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -316,6 +324,18 @@ class MinutelyCardView: CardView {
                     label45.text = "+45"
                 }
             }
+        }
+
+        // VoiceOver
+        isAccessibilityElement = true
+        if !hasData {
+            accessibilityLabel = "Precipitation: Minutely data not available for this source"
+        } else if allZero {
+            accessibilityLabel = "Precipitation: No precipitation expected"
+        } else if let summary = summaryLabel.text {
+            accessibilityLabel = "Precipitation: \(summary)"
+        } else {
+            accessibilityLabel = "Precipitation timeline"
         }
     }
 }

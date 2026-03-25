@@ -26,7 +26,8 @@ class AlertBannerCardView: CardView {
 
     private let titleLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .semibold)
+        l.font = .preferredFont(forTextStyle: .headline)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .white
         l.numberOfLines = 1
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -35,7 +36,8 @@ class AlertBannerCardView: CardView {
 
     private let subtitleLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .regular)
+        l.font = .preferredFont(forTextStyle: .caption1)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.85)
         l.numberOfLines = 1
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +54,8 @@ class AlertBannerCardView: CardView {
 
     private let alertCountBadge: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .bold)
+        l.font = .preferredFont(forTextStyle: .caption2)
+        l.adjustsFontForContentSizeCategory = true
         l.textColor = .white
         l.textAlignment = .center
         l.backgroundColor = UIColor.white.withAlphaComponent(0.25)
@@ -162,6 +165,15 @@ class AlertBannerCardView: CardView {
         } else {
             alertCountBadge.isHidden = true
         }
+
+        // VoiceOver
+        isAccessibilityElement = true
+        accessibilityTraits = [.button]
+        var accParts = ["Weather alert: \(top.event)"]
+        if let sub = subtitleLabel.text { accParts.append(sub) }
+        if alerts.count > 1 { accParts.append("\(alerts.count) total alerts") }
+        accessibilityLabel = accParts.joined(separator: ". ")
+        accessibilityHint = "Double tap to view alert details"
     }
 
     // MARK: - Tap

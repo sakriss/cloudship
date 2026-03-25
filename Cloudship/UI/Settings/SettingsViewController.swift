@@ -32,6 +32,20 @@ class SettingsViewController: UITableViewController {
         return sw
     }()
 
+    private lazy var morningBriefSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.isOn = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
+        sw.addTarget(self, action: #selector(morningBriefChanged(_:)), for: .valueChanged)
+        return sw
+    }()
+
+    private lazy var eveningBriefSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.isOn = UserDefaults.standard.bool(forKey: "EveningBriefEnabled")
+        sw.addTarget(self, action: #selector(eveningBriefChanged(_:)), for: .valueChanged)
+        return sw
+    }()
+
     private lazy var sourceControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["Tmrw", "NOAA", "O-Meteo", "Pirate", "Apple"])
         sc.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 11)], for: .normal)
@@ -54,11 +68,54 @@ class SettingsViewController: UITableViewController {
     }()
 
     private lazy var appearanceControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["System", "Light", "Dark"])
+        let sc = UISegmentedControl(items: ["System", "Light", "Dark", "Auto"])
         sc.selectedSegmentIndex = savedAppearanceIndex()
         sc.addTarget(self, action: #selector(appearanceChanged(_:)), for: .valueChanged)
         return sc
     }()
+
+    // MARK: - Notification row helpers
+
+    /// Dynamic row count for the notifications section.
+    /// Rows: 0 = Rain Alerts, 1 = Manage Locations,
+    ///        2 = Morning Brief toggle, 3 = Morning Brief Time (if enabled),
+    ///        4(or 3) = Evening Brief toggle, next = Evening Brief Time (if enabled)
+    private var notificationRowCount: Int {
+        var count = 4 // Rain Alerts, Manage Locations, Morning Brief, Evening Brief
+        if UserDefaults.standard.bool(forKey: "MorningBriefEnabled") { count += 1 }
+        if UserDefaults.standard.bool(forKey: "EveningBriefEnabled") { count += 1 }
+        return count
+    }
+
+    /// Returns the logical role of a row in the notifications section accounting for conditional time picker rows.
+    private enum NotificationRow {
+        case rainAlerts
+        case manageLocations
+        case morningBriefToggle
+        case morningBriefTime
+        case eveningBriefToggle
+        case eveningBriefTime
+    }
+
+    private func notificationRow(for index: Int) -> NotificationRow {
+        let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
+        // Row 0: Rain Alerts
+        // Row 1: Manage Locations
+        // Row 2: Morning Brief toggle
+        // Row 3: Morning Brief Time (only if morningEnabled) OR Evening Brief toggle
+        // ...
+        switch index {
+        case 0: return .rainAlerts
+        case 1: return .manageLocations
+        case 2: return .morningBriefToggle
+        case 3 where morningEnabled: return .morningBriefTime
+        case 3: return .eveningBriefToggle
+        case 4 where morningEnabled: return .eveningBriefToggle
+        case 4: return .eveningBriefTime
+        case 5: return .eveningBriefTime
+        default: return .rainAlerts
+        }
+    }
 
     // MARK: - Lifecycle
 
@@ -82,7 +139,7 @@ class SettingsViewController: UITableViewController {
         case .dataSource:     return 1
         case .units:          return 1
         case .appearance:     return 1
-        case .notifications:  return 2
+        case .notifications:  return notificationRowCount
         case .subscription:   return 1
         case .about:          return 3
         }
@@ -127,22 +184,61 @@ class SettingsViewController: UITableViewController {
         case .notifications:
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
             var config = cell.defaultContentConfiguration()
-            if indexPath.row == 0 {
+            cell.accessoryView = nil
+            cell.accessoryType = .none
+            cell.selectionStyle = .none
+
+            switch notificationRow(for: indexPath.row) {
+            case .rainAlerts:
                 config.text = "Rain Alerts"
                 config.secondaryText = "Get notified when rain is starting or stopping"
                 config.secondaryTextProperties.color = .secondaryLabel
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = rainAlertsSwitch
-                cell.accessoryType = .none
-                cell.selectionStyle = .none
-            } else {
+
+            case .manageLocations:
                 config.text = "Manage Locations"
                 config.secondaryText = "Set up rain alerts for specific locations"
                 config.secondaryTextProperties.color = .secondaryLabel
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
-                cell.accessoryView = nil
+                cell.accessoryType = .disclosureIndicator
+                cell.selectionStyle = .default
+
+            case .morningBriefToggle:
+                config.text = "Morning Brief"
+                config.secondaryText = "Daily weather summary"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = morningBriefSwitch
+
+            case .morningBriefTime:
+                config.text = "Morning Brief Time"
+                let hour = UserDefaults.standard.object(forKey: "MorningBriefHour") as? Int ?? 7
+                config.secondaryText = formattedHour(hour)
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryType = .disclosureIndicator
+                cell.selectionStyle = .default
+
+            case .eveningBriefToggle:
+                config.text = "Evening Brief"
+                config.secondaryText = "Tonight and tomorrow outlook"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = eveningBriefSwitch
+
+            case .eveningBriefTime:
+                config.text = "Evening Brief Time"
+                let hour = UserDefaults.standard.object(forKey: "EveningBriefHour") as? Int ?? 20
+                config.secondaryText = formattedHour(hour)
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
             }
@@ -200,9 +296,19 @@ class SettingsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        if Section(rawValue: indexPath.section) == .notifications && indexPath.row == 1 {
-            let vc = ManageLocationsViewController(style: .grouped)
-            navigationController?.pushViewController(vc, animated: true)
+        if Section(rawValue: indexPath.section) == .notifications {
+            let role = notificationRow(for: indexPath.row)
+            switch role {
+            case .manageLocations:
+                let vc = ManageLocationsViewController(style: .grouped)
+                navigationController?.pushViewController(vc, animated: true)
+            case .morningBriefTime:
+                presentTimePicker(forKey: "MorningBriefHour", defaultHour: 7, title: "Morning Brief Time")
+            case .eveningBriefTime:
+                presentTimePicker(forKey: "EveningBriefHour", defaultHour: 20, title: "Evening Brief Time")
+            default:
+                break
+            }
             return
         }
 
@@ -313,10 +419,91 @@ class SettingsViewController: UITableViewController {
         }
     }
 
+    @objc private func morningBriefChanged(_ sender: UISwitch) {
+        guard SubscriptionManager.shared.isPremiumCached else {
+            sender.setOn(false, animated: true)
+            presentPaywall()
+            return
+        }
+        UserDefaults.standard.set(sender.isOn, forKey: "MorningBriefEnabled")
+        if sender.isOn {
+            PrecipitationNotificationService.shared.scheduleMorningBrief()
+        } else {
+            PrecipitationNotificationService.shared.cancelBrief(identifier: "morningBrief")
+        }
+        // Reload notifications section to show/hide time row
+        tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .automatic)
+    }
+
+    @objc private func eveningBriefChanged(_ sender: UISwitch) {
+        guard SubscriptionManager.shared.isPremiumCached else {
+            sender.setOn(false, animated: true)
+            presentPaywall()
+            return
+        }
+        UserDefaults.standard.set(sender.isOn, forKey: "EveningBriefEnabled")
+        if sender.isOn {
+            PrecipitationNotificationService.shared.scheduleEveningBrief()
+        } else {
+            PrecipitationNotificationService.shared.cancelBrief(identifier: "eveningBrief")
+        }
+        tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .automatic)
+    }
+
+    private func presentTimePicker(forKey key: String, defaultHour: Int, title: String) {
+        let currentHour = UserDefaults.standard.object(forKey: key) as? Int ?? defaultHour
+
+        let alert = UIAlertController(title: title, message: "\n\n\n\n\n\n\n\n\n", preferredStyle: .actionSheet)
+
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .time
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.frame = CGRect(x: 0, y: 40, width: alert.view.bounds.width, height: 200)
+        datePicker.autoresizingMask = [.flexibleWidth]
+
+        // Set initial time
+        var components = DateComponents()
+        components.hour = currentHour
+        components.minute = 0
+        if let date = Calendar.current.date(from: components) {
+            datePicker.date = date
+        }
+
+        alert.view.addSubview(datePicker)
+
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak self] _ in
+            let selectedHour = Calendar.current.component(.hour, from: datePicker.date)
+            UserDefaults.standard.set(selectedHour, forKey: key)
+            // Re-schedule with new time
+            if key == "MorningBriefHour" {
+                PrecipitationNotificationService.shared.scheduleMorningBrief()
+            } else {
+                PrecipitationNotificationService.shared.scheduleEveningBrief()
+            }
+            self?.tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .none)
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        present(alert, animated: true)
+    }
+
+    private func formattedHour(_ hour: Int) -> String {
+        var components = DateComponents()
+        components.hour = hour
+        components.minute = 0
+        guard let date = Calendar.current.date(from: components) else { return "\(hour):00" }
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
     @objc private func appearanceChanged(_ sender: UISegmentedControl) {
         UserDefaults.standard.set(sender.selectedSegmentIndex, forKey: "AppearanceIndex")
-        let style: UIUserInterfaceStyle = [.unspecified, .light, .dark][sender.selectedSegmentIndex]
-        view.window?.overrideUserInterfaceStyle = style
+        let styles: [UIUserInterfaceStyle] = [.unspecified, .light, .dark, .unspecified]
+        let idx = min(sender.selectedSegmentIndex, styles.count - 1)
+        view.window?.overrideUserInterfaceStyle = styles[idx]
+        // Notify forecast to update weather-reactive theme
+        NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
     }
 
     private func triggerRefetch() {

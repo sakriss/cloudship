@@ -138,6 +138,89 @@ class PrecipitationNotificationService {
         }
     }
 
+    // MARK: - Morning / Evening Briefings
+
+    /// Schedule (or update) the morning weather briefing notification.
+    /// Reads the configured hour from UserDefaults and uses the latest cached weather data.
+    func scheduleMorningBrief() {
+        guard SubscriptionManager.shared.isPremiumCached else { return }
+        guard UserDefaults.standard.bool(forKey: "MorningBriefEnabled") else {
+            cancelBrief(identifier: "morningBrief")
+            return
+        }
+
+        guard let data = WeatherDataSourceManager.shared.lastData,
+              let today = data.daily.first else { return }
+
+        let hour = UserDefaults.standard.object(forKey: "MorningBriefHour") as? Int ?? 7
+
+        let high = TemperatureFormatter.format(today.tempMax)
+        let low = TemperatureFormatter.format(today.tempMin)
+        let condition = today.condition.description
+        let precipChance = Int(today.precipChance ?? 0)
+        let body = "Today: \(high)/\(low), \(condition), \(precipChance)% chance of rain"
+
+        let locationName = data.locationName ?? WeatherDataSourceManager.shared.locationName ?? "Weather"
+
+        scheduleBrief(identifier: "morningBrief",
+                      title: locationName,
+                      body: body,
+                      hour: hour)
+    }
+
+    /// Schedule (or update) the evening weather briefing notification.
+    func scheduleEveningBrief() {
+        guard SubscriptionManager.shared.isPremiumCached else { return }
+        guard UserDefaults.standard.bool(forKey: "EveningBriefEnabled") else {
+            cancelBrief(identifier: "eveningBrief")
+            return
+        }
+
+        guard let data = WeatherDataSourceManager.shared.lastData,
+              let today = data.daily.first else { return }
+
+        let hour = UserDefaults.standard.object(forKey: "EveningBriefHour") as? Int ?? 20
+
+        let tonightLow = TemperatureFormatter.format(today.tempMin)
+        let tomorrowEntry = data.daily.count > 1 ? data.daily[1] : today
+        let tomorrowCondition = tomorrowEntry.condition.description
+        let tomorrowHigh = TemperatureFormatter.format(tomorrowEntry.tempMax)
+        let tomorrowLow = TemperatureFormatter.format(tomorrowEntry.tempMin)
+        let body = "Tonight: Low \(tonightLow), \(tomorrowCondition). Tomorrow: \(tomorrowHigh)/\(tomorrowLow)"
+
+        let locationName = data.locationName ?? WeatherDataSourceManager.shared.locationName ?? "Weather"
+
+        scheduleBrief(identifier: "eveningBrief",
+                      title: locationName,
+                      body: body,
+                      hour: hour)
+    }
+
+    /// Cancel a scheduled briefing by identifier.
+    func cancelBrief(identifier: String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+    }
+
+    private func scheduleBrief(identifier: String, title: String, body: String, hour: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Briefing notification error (\(identifier)): \(error)")
+            }
+        }
+    }
+
     private func sendNotification(title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = title
