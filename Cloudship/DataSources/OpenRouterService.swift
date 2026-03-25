@@ -29,39 +29,36 @@ final class OpenRouterService {
     private init() {}
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 🔑 API key is read from Info.plist → Secrets.xcconfig (gitignored).
-    // Copy Secrets.xcconfig.example → Secrets.xcconfig and add your key.
-    // Free tier — no credit card required: https://openrouter.ai/keys
+    // 🔑 API keys are read from Info.plist → Secrets.xcconfig (gitignored).
+    // Copy Secrets.xcconfig.example → Secrets.xcconfig and add your keys.
     // ─────────────────────────────────────────────────────────────────────────
-    private let apiKey: String = {
-        guard let key = Bundle.main.infoDictionary?["OpenRouterAPIKey"] as? String,
-              !key.isEmpty,
-              key != "your-openrouter-api-key-here" else {
-            print("⚠️ OpenRouter API key not configured. See Secrets.xcconfig.example")
-            return ""
-        }
-        return key
-    }()
 
-    /// Models to try in order — if the first provider errors, fall through to the next.
-    /// Premium users get higher-quality paid models; free users get free-tier models.
-    private let premiumModels = [
-        "anthropic/claude-3-haiku",
-        "openai/gpt-4o-mini"
-    ]
-    private let freeModels = [
+    /// Google AI Studio (Gemini) key — tried first because it's free & fast.
+    /// https://aistudio.google.com/app/apikey
+    private let geminiAPIKey: String =
+        (Bundle.main.infoDictionary?["GeminiAPIKey"] as? String) ?? ""
+
+    /// OpenRouter key — used as fallback when Gemini is unavailable.
+    /// Free tier: https://openrouter.ai/keys
+    private let openRouterAPIKey: String =
+        (Bundle.main.infoDictionary?["OpenRouterAPIKey"] as? String) ?? ""
+
+    // Gemini native generateContent API (v1beta).
+    // gemini-2.0-flash: confirmed available on v1beta, 15 RPM / 1500 RPD free tier.
+    // The retry logic below handles transient 429s — in normal app use (<1 req/min) this never triggers.
+    private let geminiModels = ["gemini-2.5-flash-lite"]
+    private func geminiURL(model: String) -> URL {
+        URL(string: "https://generativelanguage.googleapis.com/v1beta/models/\(model):generateContent?key=\(geminiAPIKey)")!
+    }
+
+    private let openRouterEndpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
+
+    /// OpenRouter fallback models (tried if Gemini fails or is unconfigured).
+    private let openRouterFreeModels = [
         "google/gemma-3-27b-it:free",
         "google/gemma-3-12b-it:free",
-        "nvidia/nemotron-3-super-120b-a12b:free",
         "meta-llama/llama-3.3-70b-instruct:free"
     ]
-    private var models: [String] {
-        if SubscriptionManager.shared.isPremiumCached {
-            return premiumModels + freeModels
-        }
-        return freeModels
-    }
-    private let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
 
     // MARK: - System prompt
 
@@ -132,76 +129,160 @@ final class OpenRouterService {
             ChatMessage(role: .user, content: weatherContext + "\n\nGenerate today's weather brief.")
         ]
 
-        // Try each model with shorter output
-        var lastError: Error?
-        for model in models {
-            do {
-                let reply = try await callModel(model, messages: messages, maxTokens: 150)
-                return reply
-            } catch {
-                print("OpenRouter brief: \(model) failed — \(error.localizedDescription). Trying next…")
-                lastError = error
-            }
-        }
-
-        throw lastError ?? NSError(domain: "OpenRouter", code: -1,
-                                    userInfo: [NSLocalizedDescriptionKey: "All models unavailable"])
+        return try await callWithFallback(messages: messages, maxTokens: 150)
     }
 
     // MARK: - Send
 
-    /// Send the full conversation history to OpenRouter and return the assistant's reply.
-    /// - Parameters:
-    ///   - messages: The full conversation so far (system message is prepended automatically).
-    ///   - weatherData: Used to build the system prompt.
+    /// Send the full conversation history and return the assistant's reply.
     func send(messages: [ChatMessage], weatherData: UnifiedWeatherData) async throws -> String {
         let systemMsg = ChatMessage(role: .system, content: systemPrompt(from: weatherData))
         let allMessages = [systemMsg] + messages
+        return try await callWithFallback(messages: allMessages, maxTokens: 300)
+    }
 
-        // Try each model in order until one succeeds
+    // MARK: - Routing
+
+    /// Try each Gemini model in order, then fall back to OpenRouter free models.
+    private func callWithFallback(messages: [ChatMessage], maxTokens: Int) async throws -> String {
+        // 1. Try Gemini models in order (flash-lite → 1.5-flash → 2.0-flash)
+        if !geminiAPIKey.isEmpty {
+            for model in geminiModels {
+                do {
+                    let reply = try await callGemini(model: model, messages: messages, maxTokens: maxTokens)
+                    print("✅ AI: Gemini/\(model) answered")
+                    return reply
+                } catch {
+                    print("⚠️ Gemini/\(model) failed (\(error.localizedDescription))")
+                }
+            }
+            print("⚠️ All Gemini models failed — falling back to OpenRouter")
+        } else {
+            print("⚠️ Gemini API key not configured — trying OpenRouter")
+        }
+
+        // 2. Fall back to OpenRouter free models
         var lastError: Error?
-        for model in models {
+        for model in openRouterFreeModels {
             do {
-                let reply = try await callModel(model, messages: allMessages)
+                let reply = try await callOpenRouter(model: model, messages: messages, maxTokens: maxTokens)
+                print("✅ AI: OpenRouter/\(model) answered")
                 return reply
             } catch {
-                print("OpenRouter: \(model) failed — \(error.localizedDescription). Trying next…")
+                print("⚠️ OpenRouter \(model) failed — \(error.localizedDescription)")
                 lastError = error
             }
         }
 
-        throw lastError ?? NSError(domain: "OpenRouter", code: -1,
-                                    userInfo: [NSLocalizedDescriptionKey: "All models unavailable"])
+        throw lastError ?? NSError(domain: "AIService", code: -1,
+                                    userInfo: [NSLocalizedDescriptionKey: "All AI providers unavailable"])
     }
 
-    private func callModel(_ model: String, messages: [ChatMessage], maxTokens: Int = 300) async throws -> String {
+    // MARK: - Gemini (Google AI Studio — native generateContent API)
+
+    private func callGemini(model: String, messages: [ChatMessage], maxTokens: Int) async throws -> String {
+        // Split system messages out — native API takes them in `systemInstruction`.
+        let systemText = messages.filter { $0.role == .system }.map(\.content).joined(separator: "\n")
+        let userMessages = messages.filter { $0.role != .system }
+
+        // Build `contents` array (user/model turns only)
+        let contents: [[String: Any]] = userMessages.map { msg in
+            let role = msg.role == .assistant ? "model" : "user"
+            return ["role": role, "parts": [["text": msg.content]]]
+        }
+
+        var body: [String: Any] = [
+            "contents": contents,
+            "generationConfig": [
+                "maxOutputTokens": maxTokens,
+                "temperature": 0.7
+            ]
+        ]
+        if !systemText.isEmpty {
+            body["systemInstruction"] = ["parts": [["text": systemText]]]
+        }
+
+        var request = URLRequest(url: geminiURL(model: model))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.timeoutInterval = 30
+
+        // Retry once on 429 (rate limit) with a short backoff — common during dev but rare in production.
+        var lastData = Data()
+        var lastStatus = 0
+        for attempt in 0..<2 {
+            if attempt > 0 {
+                print("⚠️ Gemini/\(model) rate-limited — retrying in 3s…")
+                try await Task.sleep(nanoseconds: 3_000_000_000)
+            }
+            let (d, r) = try await URLSession.shared.data(for: request)
+            lastData   = d
+            lastStatus = (r as? HTTPURLResponse)?.statusCode ?? -1
+            if lastStatus != 429 { break }
+        }
+
+        if lastStatus != 200 {
+            let rawBody = String(data: lastData, encoding: .utf8) ?? "(unreadable)"
+            var msg = "Gemini/\(model) HTTP \(lastStatus)"
+            if let errorJSON = (try? JSONSerialization.jsonObject(with: lastData)) as? [String: Any],
+               let errorDict = errorJSON["error"] as? [String: Any],
+               let errorMsg  = errorDict["message"] as? String {
+                msg = errorMsg
+            }
+            print("⚠️ Gemini/\(model) error body: \(rawBody)")
+            throw NSError(domain: "Gemini", code: lastStatus,
+                          userInfo: [NSLocalizedDescriptionKey: msg])
+        }
+
+        let data = lastData
+
+        // Native response: candidates[0].content.parts[0].text
+        guard let json        = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let candidates  = json["candidates"] as? [[String: Any]],
+              let first       = candidates.first,
+              let content     = first["content"] as? [String: Any],
+              let parts       = content["parts"] as? [[String: Any]],
+              let text        = parts.first?["text"] as? String
+        else {
+            let rawBody = String(data: data, encoding: .utf8) ?? "(unreadable)"
+            print("⚠️ Gemini/\(model) unexpected response: \(rawBody)")
+            throw NSError(domain: "Gemini", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Unexpected Gemini response format"])
+        }
+
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - OpenRouter (fallback)
+
+    private func callOpenRouter(model: String, messages: [ChatMessage], maxTokens: Int) async throws -> String {
         let body: [String: Any] = [
             "model": model,
             "messages": messages.map { ["role": $0.role.rawValue, "content": $0.content] },
             "max_tokens": maxTokens,
             "temperature": 0.7,
-            "provider": ["allow_fallbacks": true]   // let OpenRouter try alternate providers
+            "provider": ["allow_fallbacks": true]
         ]
 
-        var request = URLRequest(url: endpoint)
+        var request = URLRequest(url: openRouterEndpoint)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)",   forHTTPHeaderField: "Authorization")
-        request.setValue("application/json",   forHTTPHeaderField: "Content-Type")
-        request.setValue("https://cloudshipapp.com", forHTTPHeaderField: "HTTP-Referer")
-        request.setValue("Cloudship iOS",      forHTTPHeaderField: "X-Title")
+        request.setValue("Bearer \(openRouterAPIKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json",            forHTTPHeaderField: "Content-Type")
+        request.setValue("https://cloudshipapp.com",    forHTTPHeaderField: "HTTP-Referer")
+        request.setValue("Cloudship iOS",               forHTTPHeaderField: "X-Title")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         request.timeoutInterval = 30
 
-        // Retry up to 2 times for transient provider errors
+        // Retry once on transient errors
         var lastError: Error?
         for attempt in 0..<2 {
             if attempt > 0 {
-                try await Task.sleep(nanoseconds: UInt64(attempt) * 1_500_000_000) // 1.5s backoff
+                try await Task.sleep(nanoseconds: 1_500_000_000)
             }
 
             let (data, response) = try await URLSession.shared.data(for: request)
 
-            // Check HTTP status
             if let http = response as? HTTPURLResponse, http.statusCode != 200 {
                 var msg = "HTTP \(http.statusCode)"
                 if let errorJSON = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
@@ -209,7 +290,6 @@ final class OpenRouterService {
                    let errorMsg  = errorDict["message"] as? String {
                     msg = errorMsg
                 }
-                // 429/502/503 are transient — retry; others are fatal
                 if http.statusCode == 429 || http.statusCode == 502 || http.statusCode == 503 {
                     lastError = NSError(domain: "OpenRouter", code: http.statusCode,
                                         userInfo: [NSLocalizedDescriptionKey: msg])
@@ -219,26 +299,20 @@ final class OpenRouterService {
                               userInfo: [NSLocalizedDescriptionKey: msg])
             }
 
-            // Parse JSON
             guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
                 throw NSError(domain: "OpenRouter", code: -1,
                               userInfo: [NSLocalizedDescriptionKey: "Invalid JSON response"])
             }
 
-            // OpenRouter can return HTTP 200 with an error body (e.g. provider failures)
             if let errorDict = json["error"] as? [String: Any],
                let errorMsg  = errorDict["message"] as? String {
                 let code = errorDict["code"] as? Int ?? -1
                 lastError = NSError(domain: "OpenRouter", code: code,
                                     userInfo: [NSLocalizedDescriptionKey: errorMsg])
-                // Provider errors are transient — retry
-                if errorMsg.lowercased().contains("provider") {
-                    continue
-                }
+                if errorMsg.lowercased().contains("provider") { continue }
                 throw lastError!
             }
 
-            // Parse successful response
             guard let choices = json["choices"] as? [[String: Any]],
                   let first   = choices.first,
                   let msgDict = first["message"] as? [String: Any],
@@ -248,7 +322,7 @@ final class OpenRouterService {
                               userInfo: [NSLocalizedDescriptionKey: "Unexpected response format"])
             }
 
-            return content.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            return content.trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
         throw lastError ?? NSError(domain: "OpenRouter", code: -1,

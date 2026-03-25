@@ -26,7 +26,7 @@ final class AISummaryService {
 
     // MARK: - State
 
-    private static let cacheMaxAge: TimeInterval = 7200   // 2 hours
+    private static let cacheMaxAge: TimeInterval = 21160   // 6 hours
     private static let fileName = "ai_summary_cache.json"
 
     private var entry: AISummaryCacheEntry?
@@ -70,10 +70,12 @@ final class AISummaryService {
 
     private func dataHash(for data: UnifiedWeatherData) -> Int {
         var hasher = Hasher()
-        if let temp = data.current.temperature { hasher.combine(Int(temp / 5) * 5) }
-        hasher.combine(data.current.condition.rawValue)
+        // Hash only on location name + calendar date.
+        // Condition is intentionally excluded — weather refreshes can report slightly different
+        // conditions throughout the day and we don't want every refresh to bust the cache.
+        // The brief is regenerated once per day per location automatically via maxAge.
+        hasher.combine((data.locationName ?? "unknown").lowercased())
         hasher.combine(Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 0)
-        if let chance = data.hourly.first?.precipChance { hasher.combine(Int(chance * 4)) }
         return hasher.finalize()
     }
 
@@ -101,3 +103,4 @@ final class AISummaryService {
         }
     }
 }
+

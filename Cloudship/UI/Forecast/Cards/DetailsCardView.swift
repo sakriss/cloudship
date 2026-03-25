@@ -103,7 +103,9 @@ private class SunArcView: UIView {
         let arcRight = rect.width - insetX
         let arcWidth = arcRight - arcLeft
         let arcCenterX = rect.midX
-        let arcBottom: CGFloat = rect.height - 24  // space for labels
+        let hasDawnDusk = dawn != nil || dusk != nil
+        let bottomPadding: CGFloat = hasDawnDusk ? 42 : 24  // extra room for dawn/dusk labels
+        let arcBottom: CGFloat = rect.height - bottomPadding
         let arcHeight: CGFloat = arcBottom * 0.7
 
         // Draw semicircular arc (sunrise left → sunset right)
@@ -187,11 +189,11 @@ private class SunArcView: UIView {
             .foregroundColor: UIColor.secondaryLabel
         ]
         let riseSize = sunriseStr.size(withAttributes: attrs)
-        sunriseStr.draw(at: CGPoint(x: arcLeft - riseSize.width / 2,
-                                     y: arcBottom + 4), withAttributes: attrs)
+        let riseX = max(4, arcLeft - riseSize.width / 2)
+        sunriseStr.draw(at: CGPoint(x: riseX, y: arcBottom + 4), withAttributes: attrs)
         let setSize = sunsetStr.size(withAttributes: attrs)
-        sunsetStr.draw(at: CGPoint(x: arcRight - setSize.width / 2,
-                                    y: arcBottom + 4), withAttributes: attrs)
+        let setX = min(rect.width - setSize.width - 4, arcRight - setSize.width / 2)
+        sunsetStr.draw(at: CGPoint(x: setX, y: arcBottom + 4), withAttributes: attrs)
 
         // Dawn/dusk labels (Pirate Weather)
         let dawnDuskAttrs: [NSAttributedString.Key: Any] = [
@@ -201,13 +203,15 @@ private class SunArcView: UIView {
         if let dawn = dawn {
             let dawnStr = "Dawn " + timeString(from: dawn)
             let dawnSize = dawnStr.size(withAttributes: dawnDuskAttrs)
-            dawnStr.draw(at: CGPoint(x: arcLeft - dawnSize.width / 2,
+            let dawnX = max(4, arcLeft - dawnSize.width / 2)
+            dawnStr.draw(at: CGPoint(x: dawnX,
                                       y: arcBottom + 4 + riseSize.height + 1), withAttributes: dawnDuskAttrs)
         }
         if let dusk = dusk {
             let duskStr = "Dusk " + timeString(from: dusk)
             let duskSize = duskStr.size(withAttributes: dawnDuskAttrs)
-            duskStr.draw(at: CGPoint(x: arcRight - duskSize.width / 2,
+            let duskX = min(rect.width - duskSize.width - 4, arcRight - duskSize.width / 2)
+            duskStr.draw(at: CGPoint(x: duskX,
                                       y: arcBottom + 4 + setSize.height + 1), withAttributes: dawnDuskAttrs)
         }
     }
@@ -243,7 +247,7 @@ class DetailsCardView: CardView {
         addSubview(titleLabel)
 
         let tileData: [(icon: String, value: String, name: String)] = [
-            ("wind.fill",     "—", "Wind"),
+            ("wind",     "—", "Wind"),
             ("wind",          "—", "Gusts"),
             ("humidity.fill", "—", "Humidity"),
             ("sun.max.fill",  "—", "UV Index"),
@@ -378,7 +382,7 @@ class DetailsCardView: CardView {
             sunArcView.dawn = dawn
             sunArcView.dusk = dusk
             sunArcView.isHidden = false
-            sunArcHeightConstraint.constant = (dawn != nil || dusk != nil) ? 114 : 100
+            sunArcHeightConstraint.constant = (dawn != nil || dusk != nil) ? 130 : 100
             sunArcView.setNeedsDisplay()
         } else {
             sunArcView.isHidden = true

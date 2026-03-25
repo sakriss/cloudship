@@ -635,8 +635,15 @@ class MainForecastViewController: UIViewController {
 
     @objc private func handleSettingsChanged() {
         guard let loc = currentLocation else { return }
-        activityIndicator.startAnimating()
-        fetchWeather(for: loc)
+        // Re-fetch with new units but keep current cards visible (no spinner)
+        Task {
+            await WeatherDataSourceManager.shared.fetchWeather(
+                lat: loc.coordinate.latitude,
+                lon: loc.coordinate.longitude,
+                forceRefresh: true,
+                updateWidget: isShowingGPSLocation
+            )
+        }
     }
 
     @objc private func handleDataReady(_ notification: Notification) {
@@ -694,13 +701,23 @@ class MainForecastViewController: UIViewController {
     }
 
     private func fetchAISummary(for data: UnifiedWeatherData) {
-        // Show cached summary immediately — no loading spinner needed
+        // If already showing a loaded summary, don't flicker back to loading on every refresh.
+        // The cache check below will confirm whether it's still valid.
+        if case .loaded = aiSummaryCard.state {
+            if let cached = AISummaryService.shared.cachedSummary(for: data) {
+                aiSummaryCard.state = .loaded(cached)   // refresh text in case of new cache
+                return
+            }
+            // Cache expired (new day or new location) — fall through to re-fetch
+        }
+
+        // Show cached summary immediately if available — no spinner needed
         if let cached = AISummaryService.shared.cachedSummary(for: data) {
             aiSummaryCard.state = .loaded(cached)
             return
         }
 
-        // No valid cache — show spinner and fetch
+        // No valid cache — show shimmer and fetch
         aiSummaryCard.state = .loading
         Task { [weak self] in
             do {
@@ -708,7 +725,11 @@ class MainForecastViewController: UIViewController {
                 await MainActor.run { self?.aiSummaryCard.state = .loaded(summary) }
             } catch {
                 print("AI Summary failed: \(error.localizedDescription)")
-                await MainActor.run { self?.aiSummaryCard.state = .error }
+                await MainActor.run {
+                    // Don't overwrite an already-loaded summary with an error on background refresh
+                    if case .loaded = self?.aiSummaryCard.state { return }
+                    self?.aiSummaryCard.state = .error
+                }
             }
         }
     }
