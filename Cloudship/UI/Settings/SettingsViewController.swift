@@ -32,6 +32,18 @@ class SettingsViewController: UITableViewController {
         return sw
     }()
 
+    private lazy var liveActivitySwitch: UISwitch = {
+        let sw = UISwitch()
+        if #available(iOS 16.1, *) {
+            sw.isOn = UserDefaults.standard.bool(forKey: PrecipitationLiveActivityManager.enabledKey)
+        } else {
+            sw.isOn = false
+            sw.isEnabled = false
+        }
+        sw.addTarget(self, action: #selector(liveActivityChanged(_:)), for: .valueChanged)
+        return sw
+    }()
+
     private lazy var morningBriefSwitch: UISwitch = {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
@@ -78,10 +90,11 @@ class SettingsViewController: UITableViewController {
 
     /// Dynamic row count for the notifications section.
     /// Rows: 0 = Rain Alerts, 1 = Manage Locations,
-    ///        2 = Morning Brief toggle, 3 = Morning Brief Time (if enabled),
-    ///        4(or 3) = Evening Brief toggle, next = Evening Brief Time (if enabled)
+    ///        2 = Live Activity (premium, iOS 16.1+),
+    ///        3 = Morning Brief toggle, 4 = Morning Brief Time (if enabled),
+    ///        next = Evening Brief toggle, next = Evening Brief Time (if enabled)
     private var notificationRowCount: Int {
-        var count = 4 // Rain Alerts, Manage Locations, Morning Brief, Evening Brief
+        var count = 5 // Rain Alerts, Manage Locations, Live Activity, Morning Brief, Evening Brief
         if UserDefaults.standard.bool(forKey: "MorningBriefEnabled") { count += 1 }
         if UserDefaults.standard.bool(forKey: "EveningBriefEnabled") { count += 1 }
         return count
@@ -91,6 +104,7 @@ class SettingsViewController: UITableViewController {
     private enum NotificationRow {
         case rainAlerts
         case manageLocations
+        case liveActivity
         case morningBriefToggle
         case morningBriefTime
         case eveningBriefToggle
@@ -99,20 +113,16 @@ class SettingsViewController: UITableViewController {
 
     private func notificationRow(for index: Int) -> NotificationRow {
         let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
-        // Row 0: Rain Alerts
-        // Row 1: Manage Locations
-        // Row 2: Morning Brief toggle
-        // Row 3: Morning Brief Time (only if morningEnabled) OR Evening Brief toggle
-        // ...
         switch index {
         case 0: return .rainAlerts
         case 1: return .manageLocations
-        case 2: return .morningBriefToggle
-        case 3 where morningEnabled: return .morningBriefTime
-        case 3: return .eveningBriefToggle
-        case 4 where morningEnabled: return .eveningBriefToggle
-        case 4: return .eveningBriefTime
+        case 2: return .liveActivity
+        case 3: return .morningBriefToggle
+        case 4 where morningEnabled: return .morningBriefTime
+        case 4: return .eveningBriefToggle
+        case 5 where morningEnabled: return .eveningBriefToggle
         case 5: return .eveningBriefTime
+        case 6: return .eveningBriefTime
         default: return .rainAlerts
         }
     }
@@ -215,6 +225,23 @@ class SettingsViewController: UITableViewController {
                 cell.contentConfiguration = config
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
+
+            case .liveActivity:
+                config.text = "Precipitation Live Activity"
+                config.secondaryText = "Real-time rain tracking in Dynamic Island"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                if #available(iOS 16.1, *) {
+                    cell.accessoryView = liveActivitySwitch
+                } else {
+                    var unavailConfig = cell.defaultContentConfiguration()
+                    unavailConfig.text = "Precipitation Live Activity"
+                    unavailConfig.secondaryText = "Requires iOS 16.1+"
+                    unavailConfig.secondaryTextProperties.color = .tertiaryLabel
+                    unavailConfig.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                    cell.contentConfiguration = unavailConfig
+                }
 
             case .morningBriefToggle:
                 config.text = "Morning Brief"
@@ -426,6 +453,20 @@ class SettingsViewController: UITableViewController {
         UserDefaults.standard.set(sender.isOn, forKey: "RainAlertsEnabled")
         if sender.isOn {
             BackgroundTaskManager.shared.scheduleNextRefresh()
+        }
+    }
+
+    @objc private func liveActivityChanged(_ sender: UISwitch) {
+        guard SubscriptionManager.shared.isPremiumCached else {
+            sender.setOn(false, animated: true)
+            presentPaywall()
+            return
+        }
+        if #available(iOS 16.1, *) {
+            UserDefaults.standard.set(sender.isOn, forKey: PrecipitationLiveActivityManager.enabledKey)
+            if !sender.isOn {
+                PrecipitationLiveActivityManager.shared.end()
+            }
         }
     }
 

@@ -13,5 +13,8 @@ import SwiftUI
 struct CloudshipWidgetBundle: WidgetBundle {
     var body: some Widget {
         CloudshipWidget()
+        if #available(iOSApplicationExtension 16.1, *) {
+            PrecipitationLiveActivityWidget()
+        }
     }
 }

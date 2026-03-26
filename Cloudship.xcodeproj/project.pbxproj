@@ -54,6 +54,11 @@
 		92A3789E2F6D95D50090F977 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92A3789D2F6D95D50090F977 /* SwiftUI.framework */; };
 		92A378AD2F6D95D60090F977 /* CloudshipWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 92A3789A2F6D95D50090F977 /* CloudshipWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		92A378BF2F6D98240090F977 /* Shared/SharedWeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */; };
+		FA0202020202020202FA02 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
+		FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		FC0303030303030303FC03 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		FA0303030303030303FA03 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
+		FB0202020202020202FB02 /* Services/PrecipitationLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */; };
 		92A37C072F745A950090F977 /* DailyBriefCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A37C062F745A950090F977 /* DailyBriefCardView.swift */; };
 		975C3C61B2584CF8B0AC3C70 /* Shared/DateFormatHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */; };
 		994BD254C61245F08BD02173 /* DataSources/TomorrowIODataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D7A2FD05E9477FAB8BD805 /* DataSources/TomorrowIODataSource.swift */; };
@@ -157,6 +162,7 @@
 		168C8CF820C255A800D0413C /* AlertsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsViewController.swift; sourceTree = "<group>"; };
 		168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsTableViewCell.swift; sourceTree = "<group>"; };
 		16C5223C214C4C9D007F9935 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
+		FC0101010101010101FC01 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		16C5223F214C4C9D007F9935 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		16C52242214C4C9D007F9935 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		16C52244214C4C9D007F9935 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -215,6 +221,8 @@
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ManageLocationsViewController.swift; sourceTree = "<group>"; };
 		EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/SharedWeatherData.swift; sourceTree = "<group>"; };
+		FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/PrecipitationActivityAttributes.swift; sourceTree = "<group>"; };
+		FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PrecipitationLiveActivityManager.swift; sourceTree = "<group>"; };
 		EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/WidgetDataWriter.swift; sourceTree = "<group>"; };
 		EE0505050505050505EE05 /* UI/Forecast/WeatherAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/WeatherAnimationView.swift; sourceTree = "<group>"; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
@@ -245,6 +253,7 @@
 			files = (
 				37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */,
 				1D99DB50389843F3A9FCAE90 /* Lottie in Frameworks */,
+				FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +263,7 @@
 			files = (
 				92A3789E2F6D95D50090F977 /* SwiftUI.framework in Frameworks */,
 				92A3789C2F6D95D50090F977 /* WidgetKit.framework in Frameworks */,
+				FC0303030303030303FC03 /* ActivityKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,6 +364,7 @@
 				AA1638EA54414FD5A2A6AF0A /* UI/Alert/AlertDetailViewController.swift */,
 				0D9992EDB3DB49328AD8A066 /* UI/Settings/SettingsViewController.swift */,
 				EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */,
+				FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */,
 				EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */,
 				A1B2C3D4E5F6A7B8C9D0E1F2 /* UI/Shared/WeatherColors.swift */,
 				D7E8F9A0B1C2D3E4F5A6B7C8 /* UI/Shared/WeatherTheme.swift */,
@@ -365,6 +376,7 @@
 				D5E6F7A8B9C0D1E2F3A4B5C6 /* DataSources/SavedLocationStore.swift */,
 				E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */,
 				CC1122334455667788990011 /* Services/SubscriptionManager.swift */,
+				FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */,
 				CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */,
 				92A37C062F745A950090F977 /* DailyBriefCardView.swift */,
 			);
@@ -718,6 +730,7 @@
 				57D141E4370348318F1DF8BB /* UI/Alert/AlertDetailViewController.swift in Sources */,
 				143DB078A2E046D1935085CE /* UI/Settings/SettingsViewController.swift in Sources */,
 				EE0202020202020202EE02 /* Shared/SharedWeatherData.swift in Sources */,
+				FA0202020202020202FA02 /* Shared/PrecipitationActivityAttributes.swift in Sources */,
 				EE0404040404040404EE04 /* Shared/WidgetDataWriter.swift in Sources */,
 				F2E1D0C9B8A7F6E5D4C3B2A1 /* UI/Shared/WeatherColors.swift in Sources */,
 				E8F9A0B1C2D3E4F5A6B7C8D9 /* UI/Shared/WeatherTheme.swift in Sources */,
@@ -727,6 +740,7 @@
 				F7A8B9C0D1E2F3A4B5C6D7E8 /* DataSources/SavedLocationStore.swift in Sources */,
 				A8B9C0D1E2F3A4B5C6D7E8F9 /* UI/Settings/ManageLocationsViewController.swift in Sources */,
 				BB1122334455667788990011 /* Services/SubscriptionManager.swift in Sources */,
+				FB0202020202020202FB02 /* Services/PrecipitationLiveActivityManager.swift in Sources */,
 				BB2233445566778899001122 /* UI/Subscription/PaywallViewController.swift in Sources */,
 				BB3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift in Sources */,
 			);
@@ -737,6 +751,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92A378BF2F6D98240090F977 /* Shared/SharedWeatherData.swift in Sources */,
+				FA0303030303030303FA03 /* Shared/PrecipitationActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

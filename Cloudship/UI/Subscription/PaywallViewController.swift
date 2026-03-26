@@ -133,6 +133,7 @@ class PaywallViewController: UIViewController {
             ("sparkles", "Premium AI weather summaries & chat"),
             ("cloud.sun.rain.fill", "Apple, Tomorrow.io & Pirate Weather sources"),
             ("bell.badge.fill", "Rain alerts for multiple locations"),
+            ("drop.fill", "Precipitation Live Activity in Dynamic Island"),
         ]
 
         for (icon, text) in features {

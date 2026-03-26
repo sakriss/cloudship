@@ -142,7 +142,14 @@ class WeatherDataSourceManager: NSObject {
             ))
 
             // Update widget shared data only for GPS/home location fetches
-            if updateWidget { WidgetDataWriter.shared.write(data) }
+            if updateWidget {
+                WidgetDataWriter.shared.write(data)
+                if #available(iOS 16.1, *) {
+                    await MainActor.run {
+                        PrecipitationLiveActivityManager.shared.startOrUpdate(weather: data)
+                    }
+                }
+            }
 
             await MainActor.run {
                 NotificationCenter.default.post(name: WeatherDataSourceManager.weatherDataParseComplete, object: nil)
