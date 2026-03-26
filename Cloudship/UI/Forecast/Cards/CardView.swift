@@ -77,6 +77,24 @@ class CardView: UIView {
         ])
     }
 
+    // MARK: - Tint & vintage styling
+
+    /// Apply the user's chosen card tint. Call after configuring card content.
+    func applyTint(_ style: CardTintStyle) {
+        backgroundColor = style.cardBackgroundColor
+    }
+
+    /// Apply warm parchment/sepia styling for Time Machine historical mode.
+    /// Overrides any user tint for the duration of the historical session.
+    func applyVintageStyle() {
+        backgroundColor = UIColor(red: 0.94, green: 0.87, blue: 0.70, alpha: 1)
+    }
+
+    /// Restore the card to the user's currently saved tint preference.
+    func restoreTint() {
+        applyTint(CardTintStyle.saved)
+    }
+
     // MARK: - Helpers
 
     /// Convenience: add a section title label pinned to top-left.

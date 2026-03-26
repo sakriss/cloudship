@@ -311,6 +311,9 @@ class MainForecastViewController: UIViewController {
         ])
 
         timeMachineBanner = banner
+
+        // Apply vintage sepia theme to the whole UI
+        applyTimeMachineTheme()
     }
 
     private func removeTimeMachineBanner() {
@@ -318,9 +321,29 @@ class MainForecastViewController: UIViewController {
         timeMachineBanner = nil
     }
 
+    // MARK: - Time Machine theme
+
+    private var allForecastCards: [CardView] {
+        [headerCard, alertBannerCard, minutelyCard, hourlyCard, dailyCard,
+         detailsCard, windGustCard, airQualityCard, pollenCard, activityScoresCard, aiSummaryCard]
+    }
+
+    private func applyTimeMachineTheme() {
+        let theme = WeatherTheme.timeMachineTheme
+        weatherGradient.isHidden = false
+        weatherGradient.applyTheme(theme)
+        applyBarAppearance(theme: theme)
+        allForecastCards.forEach { $0.applyVintageStyle() }
+        animationView.transitionToTimeMachine()
+    }
+
     private func backToToday() {
         WeatherDataSourceManager.shared.exitHistoricalMode()
         removeTimeMachineBanner()
+
+        // Restore user's card tint and weather background now that vintage mode is exiting
+        allForecastCards.forEach { $0.restoreTint() }
+        animationView.restoreWeatherBackground()
 
         // Hide cards that were hidden during historical mode — restore all
         minutelyCard.isHidden = false
@@ -631,6 +654,19 @@ class MainForecastViewController: UIViewController {
             name: Notification.Name("settingsChanged"),
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleCardTintChanged),
+            name: Notification.Name("cardTintChanged"),
+            object: nil
+        )
+    }
+
+    @objc private func handleCardTintChanged() {
+        // Skip tint update if time machine vintage styling is active
+        guard !WeatherDataSourceManager.shared.isShowingHistorical else { return }
+        let tint = CardTintStyle.saved
+        allForecastCards.forEach { $0.applyTint(tint) }
     }
 
     @objc private func handleSettingsChanged() {
@@ -833,6 +869,9 @@ class MainForecastViewController: UIViewController {
         let todayDaily = data.daily.first { DateFormatHelper.isToday($0.time) } ?? data.daily.first
         headerCard.configure(with: data, todayDaily: todayDaily)
         applyWeatherTheme(for: data.current.condition)
+        // Apply user's card tint (overridden by vintage style if time machine is active below)
+        let tint = CardTintStyle.saved
+        allForecastCards.forEach { $0.applyTint(tint) }
         alertBannerCard.configure(alerts: data.alerts)
 
         minutelyCard.configure(minutely: data.minutely,

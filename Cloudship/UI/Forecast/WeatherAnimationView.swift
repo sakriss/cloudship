@@ -28,6 +28,34 @@ final class WeatherAnimationView: UIView {
         }
     }
 
+    /// Swap to the vintage Time Machine background image.
+    func transitionToTimeMachine(animated: Bool = true) {
+        let newImage = UIImage(named: "TimeMachineBackground")
+        if animated {
+            UIView.transition(with: backgroundImageView,
+                              duration: 0.8,
+                              options: .transitionCrossDissolve) {
+                self.backgroundImageView.image = newImage
+            }
+        } else {
+            backgroundImageView.image = newImage
+        }
+    }
+
+    /// Restore the background for the last known weather condition.
+    func restoreWeatherBackground(animated: Bool = true) {
+        let image = UIImage(named: backgroundImageName(for: currentCondition))
+        if animated {
+            UIView.transition(with: backgroundImageView,
+                              duration: 0.6,
+                              options: .transitionCrossDissolve) {
+                self.backgroundImageView.image = image
+            }
+        } else {
+            backgroundImageView.image = image
+        }
+    }
+
     // MARK: - Subviews
 
     private let backgroundImageView: UIImageView = {

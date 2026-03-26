@@ -228,6 +228,19 @@ struct WeatherTheme {
         }
     }
 
+    // MARK: - Time Machine (historical mode)
+
+    /// Warm sepia/amber theme applied whenever the user is viewing historical weather.
+    /// Always shown regardless of the user's appearance setting.
+    static let timeMachineTheme = WeatherTheme(
+        gradientTop:    UIColor(red: 0.72, green: 0.55, blue: 0.28, alpha: 1),
+        gradientBottom: UIColor(red: 0.48, green: 0.33, blue: 0.13, alpha: 1),
+        cardBackground: UIColor(red: 0.94, green: 0.87, blue: 0.70, alpha: 1),
+        accentColor:    UIColor(red: 0.55, green: 0.35, blue: 0.00, alpha: 1),
+        textPrimary:    UIColor(red: 0.22, green: 0.14, blue: 0.04, alpha: 1),
+        textSecondary:  UIColor(red: 0.40, green: 0.28, blue: 0.12, alpha: 1)
+    )
+
     // MARK: - Default
 
     static let defaultTheme = WeatherTheme(

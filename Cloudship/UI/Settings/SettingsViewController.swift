@@ -126,6 +126,7 @@ class SettingsViewController: UITableViewController {
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_source")
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_units")
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_appearance")
+        tableView.register(CardTintPickerCell.self, forCellReuseIdentifier: "CardTintPickerCell")
     }
 
     // MARK: - UITableView DataSource
@@ -138,7 +139,7 @@ class SettingsViewController: UITableViewController {
         switch Section(rawValue: section)! {
         case .dataSource:     return 1
         case .units:          return 1
-        case .appearance:     return 1
+        case .appearance:     return 2
         case .notifications:  return notificationRowCount
         case .subscription:   return 1
         case .about:          return 3
@@ -177,9 +178,18 @@ class SettingsViewController: UITableViewController {
             return cell
 
         case .appearance:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_appearance", for: indexPath) as! ControlCell
-            cell.configure(label: "Theme", control: appearanceControl)
-            return cell
+            if indexPath.row == 0 {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_appearance", for: indexPath) as! ControlCell
+                cell.configure(label: "Theme", control: appearanceControl)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "CardTintPickerCell", for: indexPath) as! CardTintPickerCell
+                cell.onSelect = { [weak self] _ in
+                    // Notify forecast to re-apply tints without a full refetch
+                    NotificationCenter.default.post(name: Notification.Name("cardTintChanged"), object: nil)
+                }
+                return cell
+            }
 
         case .notifications:
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
@@ -541,6 +551,91 @@ extension SettingsViewController: MFMailComposeViewControllerDelegate {
                                didFinishWith result: MFMailComposeResult,
                                error: Error?) {
         controller.dismiss(animated: true)
+    }
+}
+
+// MARK: - Card tint picker cell
+
+private class CardTintPickerCell: UITableViewCell {
+
+    var onSelect: ((CardTintStyle) -> Void)?
+
+    private let nameLabel: UILabel = {
+        let l = UILabel()
+        l.text = "Card Color"
+        l.font = .systemFont(ofSize: 16)
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+
+    private lazy var swatchStack: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 10
+        sv.alignment = .center
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+
+    private var swatchButtons: [UIButton] = []
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
+
+        contentView.addSubview(nameLabel)
+        contentView.addSubview(swatchStack)
+
+        for tint in CardTintStyle.allCases {
+            let btn = UIButton(type: .custom)
+            btn.backgroundColor = tint.swatchColor
+            btn.layer.cornerRadius = 15
+            btn.layer.borderWidth = 2.5
+            btn.layer.borderColor = UIColor.clear.cgColor
+            btn.translatesAutoresizingMaskIntoConstraints = false
+
+            let action = UIAction { [weak self] _ in
+                UserDefaults.standard.set(tint.rawValue, forKey: "CardTintStyle")
+                self?.refresh()
+                self?.onSelect?(tint)
+            }
+            btn.addAction(action, for: .touchUpInside)
+
+            swatchStack.addArrangedSubview(btn)
+            swatchButtons.append(btn)
+
+            NSLayoutConstraint.activate([
+                btn.widthAnchor.constraint(equalToConstant: 30),
+                btn.heightAnchor.constraint(equalToConstant: 30)
+            ])
+        }
+
+        NSLayoutConstraint.activate([
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+
+            swatchStack.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10),
+            swatchStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            swatchStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
+        ])
+
+        refresh()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func refresh() {
+        let selected = CardTintStyle.saved
+        for (i, btn) in swatchButtons.enumerated() {
+            let isSelected = i == selected.rawValue
+            UIView.animate(withDuration: 0.15) {
+                btn.layer.borderColor = isSelected ? UIColor.label.cgColor : UIColor.clear.cgColor
+                btn.transform = isSelected ? CGAffineTransform(scaleX: 1.20, y: 1.20) : .identity
+            }
+        }
     }
 }
 
