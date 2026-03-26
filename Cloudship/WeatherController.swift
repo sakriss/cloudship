@@ -10,8 +10,10 @@ import UIKit
 import Foundation
 import CoreLocation
 
+private let tomorrowAPIKey = "KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM"
+
 class WeatherController {
-    
+
     static let shared = WeatherController()
     
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
@@ -42,7 +44,7 @@ class WeatherController {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "location", value: "\(lat),\(lon)"),
-            URLQueryItem(name: "apikey", value: "KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM"),
+            URLQueryItem(name: "apikey", value: tomorrowAPIKey),
         ]
         components.queryItems = queryItems
 
@@ -91,7 +93,7 @@ class WeatherController {
         // Add query items directly
         let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "location", value: "\(lat),\(lon)"),
-            URLQueryItem(name: "apikey", value: "KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM"),
+            URLQueryItem(name: "apikey", value: tomorrowAPIKey),
             URLQueryItem(name: "units", value: "imperial") // Pass units as well
         ]
         components.queryItems = queryItems

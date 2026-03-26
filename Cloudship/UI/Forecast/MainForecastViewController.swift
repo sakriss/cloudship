@@ -598,6 +598,12 @@ class MainForecastViewController: UIViewController {
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
 
+        // When nearest station mode is active, invalidate the cached result so the
+        // background lookup runs for the new location and updates the Settings subtitle.
+        if UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey) {
+            WeatherDataSourceManager.shared.clearNearestStationCache()
+        }
+
         Task {
             // Resolve location name BEFORE fetching weather so it's available
             // when the data is stamped and written to the widget.
@@ -654,6 +660,34 @@ class MainForecastViewController: UIViewController {
             name: Notification.Name("cardTintChanged"),
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleConsensusPaywall),
+            name: Notification.Name("showConsensusPaywall"),
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleNearestStationResolved),
+            name: Notification.Name("nearestStationResolved"),
+            object: nil
+        )
+    }
+
+    @objc private func handleConsensusPaywall() {
+        guard let settingsNav = tabBarController?.viewControllers?.first(where: {
+            ($0 as? UINavigationController)?.viewControllers.first is SettingsViewController ||
+            $0 is SettingsViewController
+        }) as? UINavigationController,
+        let settingsVC = settingsNav.viewControllers.first as? SettingsViewController else {
+            return
+        }
+        let paywall = PaywallViewController()
+        paywall.modalPresentationStyle = .pageSheet
+        if let sheet = paywall.sheetPresentationController {
+            sheet.detents = [.large()]
+        }
+        present(paywall, animated: true)
     }
 
     @objc private func handleCardTintChanged() {
@@ -665,7 +699,12 @@ class MainForecastViewController: UIViewController {
 
     @objc private func handleSettingsChanged() {
         guard let loc = currentLocation else { return }
-        // Re-fetch with new units but keep current cards visible (no spinner)
+        // Show spinner when nearest station needs resolution (involves network calls)
+        let needsStationLookup = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+            && UserDefaults.standard.string(forKey: "NearestStationLastSourceID") == nil
+        if needsStationLookup {
+            activityIndicator.startAnimating()
+        }
         Task {
             await WeatherDataSourceManager.shared.fetchWeather(
                 lat: loc.coordinate.latitude,
@@ -674,6 +713,12 @@ class MainForecastViewController: UIViewController {
                 updateWidget: isShowingGPSLocation
             )
         }
+    }
+
+    /// Called when station resolution finishes. Just refresh the source label —
+    /// the weather fetch is already in progress inline (awaited in fetchWeather).
+    @objc private func handleNearestStationResolved() {
+        updateSourceLabel()
     }
 
     @objc private func handleDataReady(_ notification: Notification) {
@@ -855,7 +900,45 @@ class MainForecastViewController: UIViewController {
 
     private func updateSourceLabel() {
         guard let label = sourceLabel.viewWithTag(99) as? UILabel else { return }
-        label.text = WeatherDataSourceManager.shared.activeSource.name
+        let defaults = UserDefaults.standard
+        let isConsensus     = defaults.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        let isNearestStation = defaults.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+
+        if isConsensus,
+           let breakdown = WeatherDataSourceManager.shared.lastData?.consensusBreakdown {
+            label.text = "Consensus (\(breakdown.sourcesUsed) sources)"
+        } else if isNearestStation {
+            let sourceID = defaults.string(forKey: "NearestStationLastSourceID")
+            let km = defaults.double(forKey: "NearestStationLastDistanceKm")
+            if sourceID == WeatherSourceID.noaa.rawValue, km > 0 {
+                if TemperatureFormatter.isMetric {
+                    label.text = String(format: "NOAA · %.1f km", km)
+                } else {
+                    label.text = String(format: "NOAA · %.1f mi", km * 0.621371)
+                }
+            } else {
+                label.text = WeatherDataSourceManager.shared.activeSource.name
+            }
+        } else {
+            label.text = WeatherDataSourceManager.shared.activeSource.name
+        }
+
+        // Allow tapping the pill when consensus is active to show the breakdown sheet
+        sourceLabel.isUserInteractionEnabled = isConsensus
+        if isConsensus {
+            if sourceLabel.gestureRecognizers?.isEmpty ?? true {
+                let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSourceLabel))
+                sourceLabel.addGestureRecognizer(tap)
+            }
+        } else {
+            sourceLabel.gestureRecognizers?.forEach { sourceLabel.removeGestureRecognizer($0) }
+        }
+    }
+
+    @objc private func didTapSourceLabel() {
+        guard let breakdown = WeatherDataSourceManager.shared.lastData?.consensusBreakdown else { return }
+        let vc = ConsensusBreakdownViewController(breakdown: breakdown)
+        present(vc, animated: true)
     }
 
     private func configureCards(with data: UnifiedWeatherData) {

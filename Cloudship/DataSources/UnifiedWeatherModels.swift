@@ -19,6 +19,9 @@ struct UnifiedWeatherData: Codable {
     var alerts: [WeatherAlert]      // active weather alerts (may be empty)
     var airQuality: AirQualityData? // nil when unavailable (e.g. NOAA source)
     var pollen: PollenData?         // nil when unavailable
+
+    /// Populated only when Consensus Mode is active; nil for single-source fetches.
+    var consensusBreakdown: ConsensusBreakdown?
 }
 
 // MARK: - Air Quality

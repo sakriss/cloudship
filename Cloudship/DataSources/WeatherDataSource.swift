@@ -23,7 +23,7 @@ protocol WeatherDataSource {
 
 // MARK: - Known source identifiers for UserDefaults persistence
 
-enum WeatherSourceID: String {
+enum WeatherSourceID: String, Codable {
     case tomorrowIO    = "tomorrowIO"
     case noaa          = "noaa"
     case openMeteo     = "openMeteo"

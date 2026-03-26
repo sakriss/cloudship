@@ -30,10 +30,17 @@ struct NOAAStationsResponse: Codable {
 
 struct NOAAStationFeature: Codable {
     let properties: NOAAStationProperties?
+    let geometry: NOAAStationGeometry?
 }
 
 struct NOAAStationProperties: Codable {
     let stationIdentifier: String?
+    let name: String?
+}
+
+/// GeoJSON Point geometry — coordinates are [longitude, latitude].
+struct NOAAStationGeometry: Codable {
+    let coordinates: [Double]?
 }
 
 // MARK: - Latest observation (current conditions)

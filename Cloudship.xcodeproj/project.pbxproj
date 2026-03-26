@@ -54,11 +54,6 @@
 		92A3789E2F6D95D50090F977 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92A3789D2F6D95D50090F977 /* SwiftUI.framework */; };
 		92A378AD2F6D95D60090F977 /* CloudshipWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 92A3789A2F6D95D50090F977 /* CloudshipWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		92A378BF2F6D98240090F977 /* Shared/SharedWeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */; };
-		FA0202020202020202FA02 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
-		FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		FC0303030303030303FC03 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		FA0303030303030303FA03 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
-		FB0202020202020202FB02 /* Services/PrecipitationLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */; };
 		92A37C072F745A950090F977 /* DailyBriefCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A37C062F745A950090F977 /* DailyBriefCardView.swift */; };
 		975C3C61B2584CF8B0AC3C70 /* Shared/DateFormatHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */; };
 		994BD254C61245F08BD02173 /* DataSources/TomorrowIODataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D7A2FD05E9477FAB8BD805 /* DataSources/TomorrowIODataSource.swift */; };
@@ -72,6 +67,9 @@
 		BB1122334455667788990011 /* Services/SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1122334455667788990011 /* Services/SubscriptionManager.swift */; };
 		BB2233445566778899001122 /* UI/Subscription/PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */; };
 		BB3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift */; };
+		AB001001001001001001AB01 /* DataSources/StationProximityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA001001001001001001AA01 /* DataSources/StationProximityService.swift */; };
+		AB002002002002002002AB02 /* DataSources/ConsensusWeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA002002002002002002AA02 /* DataSources/ConsensusWeatherService.swift */; };
+		AB003003003003003003AB03 /* UI/Consensus/ConsensusBreakdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA003003003003003003AA03 /* UI/Consensus/ConsensusBreakdownViewController.swift */; };
 		BBCDB05168284F6F8C12D08B /* UI/Forecast/Cards/CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7DEABC4FD344E8682753FF2 /* UI/Forecast/Cards/CardView.swift */; };
 		BD67AA6205D44A19B00037AA /* HeaderCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80DC2BC32A6B44DC95C8D4BB /* HeaderCardView.swift */; };
 		C1866956AF38495DACB044BE /* DataSources/NOAADataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D5680F4DA24E25AD61EE9E /* DataSources/NOAADataSource.swift */; };
@@ -100,7 +98,12 @@
 		F2E1D0C9A8B7C6D5E4F3A2B1 /* DataSources/PirateWeatherDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D5E6F7A8B9C0D1E2F /* DataSources/PirateWeatherDataSource.swift */; };
 		F2E1D0C9B8A7F6E5D4C3B2A1 /* UI/Shared/WeatherColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* UI/Shared/WeatherColors.swift */; };
 		F7A8B9C0D1E2F3A4B5C6D7E8 /* DataSources/SavedLocationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E6F7A8B9C0D1E2F3A4B5C6 /* DataSources/SavedLocationStore.swift */; };
+		FA0202020202020202FA02 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
+		FA0303030303030303FA03 /* Shared/PrecipitationActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */; };
+		FB0202020202020202FB02 /* Services/PrecipitationLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */; };
 		FB598DCB43574CB7B794C358 /* UI/Forecast/Cards/HourlyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2936012EBFF64B6798B8AF71 /* UI/Forecast/Cards/HourlyCardView.swift */; };
+		FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		FC0303030303030303FC03 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FF2E1D0C9B8A7F6E5D4C3B2A /* DataSources/PirateWeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1B2C3D4E5F6A7B8C9D0E1F /* DataSources/PirateWeatherModels.swift */; };
 /* End PBXBuildFile section */
 
@@ -162,7 +165,6 @@
 		168C8CF820C255A800D0413C /* AlertsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsViewController.swift; sourceTree = "<group>"; };
 		168C8CFA20C25A7400D0413C /* AlertsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsTableViewCell.swift; sourceTree = "<group>"; };
 		16C5223C214C4C9D007F9935 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
-		FC0101010101010101FC01 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		16C5223F214C4C9D007F9935 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		16C52242214C4C9D007F9935 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		16C52244214C4C9D007F9935 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -211,6 +213,9 @@
 		CC1122334455667788990011 /* Services/SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SubscriptionManager.swift; sourceTree = "<group>"; };
 		CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Subscription/PaywallViewController.swift; sourceTree = "<group>"; };
 		CC3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/AppleWeatherDataSource.swift; sourceTree = "<group>"; };
+		AA001001001001001001AA01 /* DataSources/StationProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/StationProximityService.swift; sourceTree = "<group>"; };
+		AA002002002002002002AA02 /* DataSources/ConsensusWeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/ConsensusWeatherService.swift; sourceTree = "<group>"; };
+		AA003003003003003003AA03 /* UI/Consensus/ConsensusBreakdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Consensus/ConsensusBreakdownViewController.swift; sourceTree = "<group>"; };
 		D21908F926278F5B00FFB366 /* ClimacellV4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimacellV4.swift; sourceTree = "<group>"; };
 		D5E6F7A8B9C0D1E2F3A4B5C6 /* DataSources/SavedLocationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/SavedLocationStore.swift; sourceTree = "<group>"; };
 		D7E8F9A0B1C2D3E4F5A6B7C8 /* UI/Shared/WeatherTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/WeatherTheme.swift; sourceTree = "<group>"; };
@@ -221,13 +226,14 @@
 		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ManageLocationsViewController.swift; sourceTree = "<group>"; };
 		EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/SharedWeatherData.swift; sourceTree = "<group>"; };
-		FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/PrecipitationActivityAttributes.swift; sourceTree = "<group>"; };
-		FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PrecipitationLiveActivityManager.swift; sourceTree = "<group>"; };
 		EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/WidgetDataWriter.swift; sourceTree = "<group>"; };
 		EE0505050505050505EE05 /* UI/Forecast/WeatherAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/WeatherAnimationView.swift; sourceTree = "<group>"; };
 		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F7A8B9C0D1E2 /* Services/BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		F1A5DFCBB162407A9EE45CD2 /* UI/Forecast/Cards/MinutelyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/MinutelyCardView.swift; sourceTree = "<group>"; };
+		FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/PrecipitationActivityAttributes.swift; sourceTree = "<group>"; };
+		FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PrecipitationLiveActivityManager.swift; sourceTree = "<group>"; };
+		FC0101010101010101FC01 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherCodeMapper.swift; path = Shared/WeatherCodeMapper.swift; sourceTree = "<group>"; };
 		FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/WeatherDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -292,6 +298,7 @@
 				16C5223B214C4C9D007F9935 /* Frameworks */,
 				162DC6022020FAAB00C19DCE /* Products */,
 				248F29917683ABA8929D7DD8 /* Pods */,
+				92A37D2D2F74EC660090F977 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -379,6 +386,9 @@
 				FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */,
 				CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */,
 				92A37C062F745A950090F977 /* DailyBriefCardView.swift */,
+				AA001001001001001001AA01 /* DataSources/StationProximityService.swift */,
+				AA002002002002002002AA02 /* DataSources/ConsensusWeatherService.swift */,
+				AA003003003003003003AA03 /* UI/Consensus/ConsensusBreakdownViewController.swift */,
 			);
 			path = Cloudship;
 			sourceTree = "<group>";
@@ -463,6 +473,14 @@
 				EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		92A37D2D2F74EC660090F977 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				FC0101010101010101FC01 /* ActivityKit.framework */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		D21908F826278F0100FFB366 /* Tomorrow.io */ = {
@@ -743,6 +761,9 @@
 				FB0202020202020202FB02 /* Services/PrecipitationLiveActivityManager.swift in Sources */,
 				BB2233445566778899001122 /* UI/Subscription/PaywallViewController.swift in Sources */,
 				BB3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift in Sources */,
+				AB001001001001001001AB01 /* DataSources/StationProximityService.swift in Sources */,
+				AB002002002002002002AB02 /* DataSources/ConsensusWeatherService.swift in Sources */,
+				AB003003003003003003AB03 /* UI/Consensus/ConsensusBreakdownViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

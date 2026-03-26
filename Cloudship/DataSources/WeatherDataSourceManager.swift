@@ -19,6 +19,11 @@ class WeatherDataSourceManager: NSObject {
     static let weatherDataParseComplete = Notification.Name("weatherDataParseComplete")
     static let weatherDataParseFailed   = Notification.Name("weatherDataParseFailed")
 
+    // MARK: - Feature flag keys
+
+    static let nearestStationEnabledKey = "NearestStationEnabled"
+    static let consensusModeEnabledKey  = "ConsensusModeEnabled"
+
     // MARK: - State
 
     /// The most recently fetched unified weather data.
@@ -32,6 +37,9 @@ class WeatherDataSourceManager: NSObject {
 
     /// The historical date being displayed, if any.
     var historicalDate: Date?
+
+    /// Nearest NOAA station result for the last resolved location (displayed in Settings).
+    private(set) var nearestStationResult: StationProximityService.Result?
 
     /// Historical data source (always Open-Meteo Archive API).
     private let historicalSource = OpenMeteoHistoricalDataSource()
@@ -104,6 +112,34 @@ class WeatherDataSourceManager: NSObject {
 
     func fetchWeather(lat: Double, lon: Double, forceRefresh: Bool = false, updateWidget: Bool = false) async {
         let units = TemperatureFormatter.apiUnits
+        let defaults = UserDefaults.standard
+
+        // -- Nearest Station auto-select (free feature) --
+        // If the station hasn't been resolved yet for this location, resolve it
+        // inline (awaited). This suspends the task but does NOT block the main
+        // thread — the caller's Task yields at the await point. Once resolved,
+        // activeSource is set to the correct provider and the fetch continues
+        // with that source. No second fetch needed.
+        if defaults.bool(forKey: Self.nearestStationEnabledKey) {
+            let alreadyResolved = defaults.string(forKey: "NearestStationLastSourceID") != nil
+            if !alreadyResolved {
+                await autoSelectNearestStation(lat: lat, lon: lon)
+            }
+        }
+
+        // -- Consensus Mode (premium feature) --
+        if defaults.bool(forKey: Self.consensusModeEnabledKey) {
+            guard SubscriptionManager.shared.isPremiumCached else {
+                // Not premium — turn off the toggle silently and fall through to normal fetch
+                defaults.set(false, forKey: Self.consensusModeEnabledKey)
+                await postConsensusPaywallNotice()
+                return
+            }
+            await fetchConsensus(lat: lat, lon: lon, units: units, updateWidget: updateWidget)
+            return
+        }
+
+        // -- Standard single-source fetch --
 
         // Return cached data if it is fresh, same location, and same source
         if !forceRefresh,
@@ -181,6 +217,100 @@ class WeatherDataSourceManager: NSObject {
         } catch {
             await postFailure(error: error)
         }
+    }
+
+    // MARK: - Nearest Station auto-select
+
+    /// Clears all cached station results so the next fetch triggers a fresh resolution.
+    func clearNearestStationCache() {
+        nearestStationResult = nil
+        UserDefaults.standard.removeObject(forKey: "NearestStationLastDistanceKm")
+        UserDefaults.standard.removeObject(forKey: "NearestStationLastSourceID")
+    }
+
+    /// Queries NOAA station metadata and sets `activeSource` to the best free
+    /// source for the given location. Caches the result in `nearestStationResult`.
+    func autoSelectNearestStation(lat: Double, lon: Double) async {
+        let stationResult = await StationProximityService.shared.nearestNOAAStation(lat: lat, lon: lon)
+
+        // If this task was cancelled (a newer location was selected), discard the result.
+        guard !Task.isCancelled else { return }
+
+        nearestStationResult = stationResult
+
+        // Cache distance for Settings display without an extra network call
+        if let km = stationResult?.distanceKm {
+            UserDefaults.standard.set(km, forKey: "NearestStationLastDistanceKm")
+            UserDefaults.standard.set(WeatherSourceID.noaa.rawValue, forKey: "NearestStationLastSourceID")
+        }
+
+        if stationResult != nil {
+            // US location — NOAA has an active nearby station
+            if !(activeSource is NOAADataSource) {
+                activeSource = NOAADataSource()
+            }
+        } else {
+            // Non-US or station lookup failed — use Open-Meteo (global gridded model)
+            UserDefaults.standard.set(WeatherSourceID.openMeteo.rawValue, forKey: "NearestStationLastSourceID")
+            UserDefaults.standard.removeObject(forKey: "NearestStationLastDistanceKm")
+            if !(activeSource is OpenMeteoDataSource) {
+                activeSource = OpenMeteoDataSource()
+            }
+        }
+
+        // Notify Settings to refresh its subtitle
+        await MainActor.run {
+            NotificationCenter.default.post(name: Notification.Name("nearestStationResolved"), object: nil)
+        }
+    }
+
+    // MARK: - Consensus fetch
+
+    private func fetchConsensus(lat: Double, lon: Double, units: String, updateWidget: Bool) async {
+        do {
+            let (data, breakdown) = try await ConsensusWeatherService.shared.fetch(
+                lat: lat,
+                lon: lon,
+                units: units,
+                isPremium: SubscriptionManager.shared.isPremiumCached
+            )
+
+            var merged = data
+            merged.locationName = locationName
+            // Alerts are fetched separately and overlaid
+            let alerts = await fetchNOAAAlerts(lat: lat, lon: lon)
+            merged.alerts = alerts
+            lastData = merged
+
+            WeatherCacheManager.shared.save(WeatherCacheEntry(
+                data: merged,
+                fetchDate: Date(),
+                latitude: lat,
+                longitude: lon,
+                sourceName: "consensus(\(breakdown.sourcesUsed))"
+            ))
+
+            if updateWidget {
+                WidgetDataWriter.shared.write(merged)
+            }
+
+            await MainActor.run {
+                NotificationCenter.default.post(
+                    name: WeatherDataSourceManager.weatherDataParseComplete,
+                    object: "consensus"
+                )
+            }
+        } catch {
+            await postFailure(error: error)
+        }
+    }
+
+    @MainActor
+    private func postConsensusPaywallNotice() {
+        NotificationCenter.default.post(
+            name: Notification.Name("showConsensusPaywall"),
+            object: nil
+        )
     }
 
     // MARK: - Historical fetch

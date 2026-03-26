@@ -71,6 +71,20 @@ class SettingsViewController: UITableViewController {
         return sc
     }()
 
+    private lazy var nearestStationSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.isOn = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+        sw.addTarget(self, action: #selector(nearestStationChanged(_:)), for: .valueChanged)
+        return sw
+    }()
+
+    private lazy var consensusModeSwitch: UISwitch = {
+        let sw = UISwitch()
+        sw.isOn = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        sw.addTarget(self, action: #selector(consensusModeChanged(_:)), for: .valueChanged)
+        return sw
+    }()
+
     private lazy var unitsControl: UISegmentedControl = {
         let isMetric = TemperatureFormatter.isMetric
         let sc = UISegmentedControl(items: ["°F (Imperial)", "°C (Metric)"])
@@ -137,6 +151,28 @@ class SettingsViewController: UITableViewController {
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_units")
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_appearance")
         tableView.register(CardTintPickerCell.self, forCellReuseIdentifier: "CardTintPickerCell")
+
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(nearestStationResolved),
+            name: Notification.Name("nearestStationResolved"),
+            object: nil)
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(reloadNearestStationRow),
+            name: Notification.Name("settingsChanged"),
+            object: nil)
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(premiumStatusChanged),
+            name: SubscriptionManager.premiumStatusChanged,
+            object: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateSourceControlState()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - UITableView DataSource
@@ -147,7 +183,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section)! {
-        case .dataSource:     return 1
+        case .dataSource:     return 3   // source picker + nearest station + consensus mode
         case .units:          return 1
         case .appearance:     return 2
         case .notifications:  return notificationRowCount
@@ -169,7 +205,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: US-only. Open-Meteo: global. Tomorrow.io, Pirate Weather, and Apple Weather require Premium."
+            return "NOAA: US-only. Open-Meteo: global. Tomorrow.io, Pirate Weather, and Apple Weather require Premium. Nearest Station and Consensus Mode override the source selector above."
         }
         return nil
     }
@@ -178,9 +214,44 @@ class SettingsViewController: UITableViewController {
         switch Section(rawValue: indexPath.section)! {
 
         case .dataSource:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_source", for: indexPath) as! ControlCell
-            cell.configure(label: "Weather Source", control: sourceControl)
-            return cell
+            switch indexPath.row {
+            case 0:
+                let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_source", for: indexPath) as! ControlCell
+                cell.configure(label: "Weather Source", control: sourceControl)
+                return cell
+
+            case 1:
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                var config = cell.defaultContentConfiguration()
+                config.text = "Nearest Active Station"
+                config.secondaryText = nearestStationSubtitle
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = nearestStationSwitch
+                cell.selectionStyle = .none
+                return cell
+
+            default:
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                var config = cell.defaultContentConfiguration()
+                // "Consensus Mode" with a star badge for Premium
+                let title = NSMutableAttributedString(string: "Consensus Mode  ")
+                let star  = NSAttributedString(
+                    string: "\u{2605}",
+                    attributes: [.foregroundColor: UIColor.systemYellow,
+                                 .font: UIFont.systemFont(ofSize: 14)]
+                )
+                title.append(star)
+                config.attributedText = title
+                config.secondaryText = "Weighted average of all sources"
+                config.secondaryTextProperties.color = .secondaryLabel
+                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                cell.contentConfiguration = config
+                cell.accessoryView = consensusModeSwitch
+                cell.selectionStyle = .none
+                return cell
+            }
 
         case .units:
             let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_units", for: indexPath) as! ControlCell
@@ -404,6 +475,106 @@ class SettingsViewController: UITableViewController {
         default: WeatherDataSourceManager.shared.activeSource = TomorrowIODataSource()
         }
         triggerRefetch()
+    }
+
+    // MARK: - Nearest Station
+
+    @objc private func nearestStationChanged(_ sender: UISwitch) {
+        let defaults = UserDefaults.standard
+        defaults.set(sender.isOn, forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+
+        if sender.isOn {
+            // Mutual exclusion: turn off consensus mode
+            if consensusModeSwitch.isOn {
+                consensusModeSwitch.setOn(false, animated: true)
+                defaults.set(false, forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+            }
+            // Clear any stale station cache so the next fetch triggers a fresh lookup
+            WeatherDataSourceManager.shared.clearNearestStationCache()
+        }
+        updateSourceControlState()
+        triggerRefetch()
+    }
+
+    @objc private func nearestStationResolved() {
+        let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        var config = cell.defaultContentConfiguration()
+        config.text = "Nearest Active Station"
+        config.secondaryText = nearestStationSubtitle
+        config.secondaryTextProperties.color = .secondaryLabel
+        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+        cell.contentConfiguration = config
+    }
+
+    /// Updates the nearest-station cell's subtitle in place (no row reload).
+    /// Called when settingsChanged fires so the km/mi label tracks the unit preference.
+    @objc private func reloadNearestStationRow() {
+        guard UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey) else { return }
+        let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        var config = cell.defaultContentConfiguration()
+        config.text = "Nearest Active Station"
+        config.secondaryText = nearestStationSubtitle
+        config.secondaryTextProperties.color = .secondaryLabel
+        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+        cell.contentConfiguration = config
+    }
+
+    private var nearestStationSubtitle: String {
+        guard UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey) else {
+            return "Use the source with the nearest active weather station"
+        }
+        let sourceID = UserDefaults.standard.string(forKey: "NearestStationLastSourceID")
+        let km = UserDefaults.standard.double(forKey: "NearestStationLastDistanceKm")
+        if sourceID == WeatherSourceID.noaa.rawValue, km > 0 {
+            if TemperatureFormatter.isMetric {
+                return String(format: "NOAA · %.1f km away", km)
+            } else {
+                return String(format: "NOAA · %.1f mi away", km * 0.621371)
+            }
+        } else if sourceID == WeatherSourceID.openMeteo.rawValue {
+            return "Open-Meteo (global model)"
+        }
+        return "Resolving nearest station…"
+    }
+
+    // MARK: - Consensus Mode
+
+    @objc private func consensusModeChanged(_ sender: UISwitch) {
+        let defaults = UserDefaults.standard
+
+        if sender.isOn {
+            guard SubscriptionManager.shared.isPremiumCached else {
+                sender.setOn(false, animated: true)
+                presentPaywall()
+                return
+            }
+            // Mutual exclusion: turn off nearest station
+            if nearestStationSwitch.isOn {
+                nearestStationSwitch.setOn(false, animated: true)
+                defaults.set(false, forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+            }
+        }
+
+        defaults.set(sender.isOn, forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        updateSourceControlState()
+        triggerRefetch()
+    }
+
+    @objc private func premiumStatusChanged() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadSections(IndexSet(integer: Section.dataSource.rawValue), with: .none)
+            self?.tableView.reloadSections(IndexSet(integer: Section.subscription.rawValue), with: .none)
+        }
+    }
+
+    /// Dims/enables the source segmented control based on whether an override mode is active.
+    private func updateSourceControlState() {
+        let overrideActive = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+                          || UserDefaults.standard.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        sourceControl.isEnabled = !overrideActive
+        sourceControl.alpha = overrideActive ? 0.40 : 1.0
     }
 
     #if DEBUG

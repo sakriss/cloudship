@@ -94,11 +94,7 @@ final class PrecipitationLiveActivityManager {
     private func makeContentState(
         from weather: UnifiedWeatherData
     ) -> PrecipitationActivityAttributes.ContentState {
-        let isMetric = TemperatureFormatter.isMetric
-        let rawTemp = weather.current.temperature ?? 0
-        let displayTemp = isMetric ? rawTemp : (rawTemp * 9 / 5 + 32)
-        let unit = isMetric ? "°C" : "°F"
-        let tempStr = "\(Int(displayTemp.rounded()))\(unit)"
+        let tempStr = TemperatureFormatter.format(weather.current.temperature, showUnit: true)
 
         let summary = PrecipitationAnalyzer.oneLiner(
             minutely: weather.minutely,
