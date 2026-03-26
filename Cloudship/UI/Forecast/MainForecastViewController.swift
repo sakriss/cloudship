@@ -598,19 +598,24 @@ class MainForecastViewController: UIViewController {
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
 
-        // Kick off geocode in parallel — don't block weather fetch
         Task {
-            if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
+            // Resolve location name BEFORE fetching weather so it's available
+            // when the data is stamped and written to the widget.
+            // Use a dedicated geocoder to avoid conflicts with any other in-flight request.
+            let geo = CLGeocoder()
+            if let placemarks = try? await geo.reverseGeocodeLocation(location),
                let pm = placemarks.first {
                 let name = pm.locality ?? pm.name ?? pm.administrativeArea ?? "My Location"
                 WeatherDataSourceManager.shared.locationName = name
                 await MainActor.run {
                     self.navigationItem.title = name
+                    if isGPSLocation {
+                        self.searchResultsVC.gpsLocationName = name
+                        self.searchResultsVC.tableView.reloadData()
+                    }
                 }
             }
-        }
 
-        Task {
             await WeatherDataSourceManager.shared.fetchWeather(lat: lat, lon: lon,
                                                                updateWidget: isGPSLocation)
         }
@@ -620,17 +625,6 @@ class MainForecastViewController: UIViewController {
     /// Called ONLY from CLLocationManagerDelegate — never from search selections.
     private func updateGPSLocationInSearch(_ location: CLLocation) {
         searchResultsVC.gpsLocation = location
-        // Reverse geocode just for the display name in the search row
-        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
-            guard let self = self else { return }
-            let name = placemarks?.first.flatMap {
-                $0.locality ?? $0.name ?? $0.administrativeArea
-            } ?? "Current Location"
-            DispatchQueue.main.async {
-                self.searchResultsVC.gpsLocationName = name
-                self.searchResultsVC.tableView.reloadData()
-            }
-        }
     }
 
     // MARK: - Notifications

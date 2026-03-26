@@ -480,16 +480,6 @@ extension ViewController: UITableViewDelegate {
             
         }
     }
-    
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if searchTableView == tableView {
-//            return "Last Location " + lastLocationString
-//        }
-//        else{
-//            return nil
-//        }
-//    }
-    
 
 }
 
