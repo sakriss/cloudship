@@ -241,7 +241,7 @@ final class SettingsLogicTests: XCTestCase {
 // MARK: - WeatherSourceID allCases conformance for test enumeration
 
 extension WeatherSourceID: CaseIterable {
-    static var allCases: [WeatherSourceID] {
+    public static var allCases: [WeatherSourceID] {
         [.tomorrowIO, .noaa, .openMeteo, .pirateWeather, .appleWeather]
     }
 }

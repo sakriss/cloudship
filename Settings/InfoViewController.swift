@@ -11,7 +11,7 @@ import MessageUI
 import UserNotifications
 
 class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, MFMailComposeViewControllerDelegate {
-
+    
     //--------------------------------------------------------------------------
     // MARK: - Outlets
     //--------------------------------------------------------------------------
@@ -19,7 +19,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     @IBOutlet weak var picker: UIPickerView!
     @IBOutlet weak var unitsLabel: UILabel!
     @IBOutlet var unitsTapRec: UITapGestureRecognizer!
-//    @IBOutlet weak var alertTimePicker: UIDatePicker!
+    //    @IBOutlet weak var alertTimePicker: UIDatePicker!
     @IBOutlet var alertTapRec: UITapGestureRecognizer!
     @IBOutlet weak var alertsLabel: UILabel!
     @IBOutlet weak var alertsSwitch: UISwitch!
@@ -58,12 +58,12 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         if let url = NSURL(string: "https://darksky.net/poweredby/"){
             UIApplication.shared.open(url as URL, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
         }
-    
+        
     }
     
     @IBAction func rateAppButton(_ sender: UIButton) {
         let appID = "1412122012"
-//        let urlStr = "itms-apps://itunes.apple.com/app/id\(appID)" // (Option 1) Open App Page
+        //        let urlStr = "itms-apps://itunes.apple.com/app/id\(appID)" // (Option 1) Open App Page
         let urlStr = "itms-apps://itunes.apple.com/app/viewContentsUserReviews?id=\(appID)" // (Option 2) Open App Review Tab
         
         if let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
@@ -87,7 +87,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
             alertsSwitch.isOn = true
             UserDefaults.standard.set(true, forKey: "switchState")
             setUpAlertPicker()
-//            scheduleLocal()
+            //            scheduleLocal()
         } else {
             alertsSwitch.isOn = false
             UserDefaults.standard.set(false, forKey: "switchState")
@@ -117,7 +117,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
             var buildString = "   Application version\n"
-//            self.appVersionLabel.text = "   App Version \n   " + version
+            //            self.appVersionLabel.text = "   App Version \n   " + version
             buildString.append("   " + version)
             buildString.append(" (")
             buildString.append(build)
@@ -131,8 +131,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         unitsLabel.addGestureRecognizer(tap)
         unitsLabel.isUserInteractionEnabled = true
         
-//        setUpAlertPicker()
-//        registerLocal()
+        //        setUpAlertPicker()
+        //        registerLocal()
     }
     
     //--------------------------------------------------------------------------
@@ -164,7 +164,7 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         // add datepicker to textField
         pickerDoneTextView.inputView = alertTimePicker
         alertTimePicker.datePickerMode = .time
-
+        
     }
     
     @objc func doneDatePicker() {
@@ -197,23 +197,23 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         //cancel button dismiss datepicker dialog
         self.view.endEditing(true)
     }
-
+    
     
     func scheduleLocal() {
         center.removeAllPendingNotificationRequests()
         let content = UNMutableNotificationContent()
-
+        
         content.title = "Daily Forecast"
         content.body = "Check Cloudship for today's forecast."
         content.categoryIdentifier = "DailyAlert"
         content.sound = UNNotificationSound.default
-
+        
         var dateComponents = DateComponents()
         dateComponents.hour = alertHour
         dateComponents.minute = alertMin
         print(dateComponents)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-
+        
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         center.add(request)
     }
@@ -242,7 +242,16 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     func showSendMailErrorAlert() {
         let sendEmailErrorAlert = UIAlertController(title: "Could not send the Email", message: "Email is not set up on your device", preferredStyle: UIAlertController.Style.alert)
         sendEmailErrorAlert.addAction(UIAlertAction(title: "DISMISS", style: UIAlertAction.Style.default, handler: nil))
-        UIApplication.shared.keyWindow?.rootViewController?.present(sendEmailErrorAlert, animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if self.presentedViewController == nil {
+                self.present(sendEmailErrorAlert, animated: true, completion: nil)
+            } else {
+                self.dismiss(animated: false) {
+                    self.present(sendEmailErrorAlert, animated: true, completion: nil)
+                }
+            }
+        }
     }
     
     
@@ -261,8 +270,8 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
             break
         }
         self.dismiss(animated: true, completion: nil)
-//        controller.dismiss(animated: true, completion: nil)
-
+        //        controller.dismiss(animated: true, completion: nil)
+        
     }
     
     func unitsToDisplay() {
@@ -285,31 +294,18 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     //--------------------------------------------------------------------------
     
     @objc func tapFunction() {
-//        picker.isHidden = false
-//        view.addSubview(picker)
-//        unitsLabel.isUserInteractionEnabled = true
         
-        print(defaults.string(forKey: "Units"))
-                print(picker.selectedRow(inComponent: 0))
-                
-                if defaults.string(forKey: "Units") == "units=i"
-                {
-                    picker.selectRow(0, inComponent: 0, animated: true)
-                } else {
-                    picker.selectRow(1, inComponent: 0, animated: true)
-                }
-                
-                picker.isHidden = false
-                view.addSubview(picker)
-                unitsLabel.isUserInteractionEnabled = true
+        if defaults.string(forKey: "Units") == "units=i"
+        {
+            picker.selectRow(0, inComponent: 0, animated: true)
+        } else {
+            picker.selectRow(1, inComponent: 0, animated: true)
+        }
+        
+        picker.isHidden = false
+        view.addSubview(picker)
+        unitsLabel.isUserInteractionEnabled = true
     }
-    
-//    @objc func alertTapFunction() {
-//        print("Alerts Lable Tapped")
-//        alertTimePicker.isHidden = false
-//        view.addSubview(alertTimePicker)
-//        alertsLabel.isUserInteractionEnabled = true
-//    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -337,12 +333,13 @@ class InfoViewController: UIViewController, UIPickerViewDataSource, UIPickerView
             defaults.set("units=si", forKey: "Units")
             unitsLabel.text = "   Units \n   SI (Celsius, km, m/s)"
         }
-
+        
     }
-
+    
 }
 
 // Helper function inserted by Swift 4.2 migrator.
 fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+    return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }
+

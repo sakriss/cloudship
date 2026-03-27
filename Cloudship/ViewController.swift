@@ -48,7 +48,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
     private let refreshControl = UIRefreshControl()
     private let sharedDefaults = UserDefaults(suiteName: "group.happygiraffe.Cloudship-test")
     
-    let activityIndicator = UIActivityIndicatorView(style: .gray)
+    let activityIndicator = UIActivityIndicatorView.Style.medium
     
     let locationManager = CLLocationManager()
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
@@ -120,7 +120,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
     }
     
-    @available (iOS 11, *)
+    @available(iOS 11, *)
     func positionBannerViewFullWidthAtBottomOfSafeArea(_ bannerView: UIView) {
         // Position the banner. Stick it to the bottom of the Safe Area.
         // Make it constrained to the edges of the safe area.
@@ -257,7 +257,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         let alert = UIAlertController(title: nil, message: "Gathering weather...", preferredStyle: .alert)
         let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
         loadingIndicator.hidesWhenStopped = true
-        loadingIndicator.style = UIActivityIndicatorView.Style.gray
+        loadingIndicator.style = UIActivityIndicatorView.Style.medium
         loadingIndicator.startAnimating()
         view.addSubview(blurEffectView)
         alert.view.addSubview(loadingIndicator)
