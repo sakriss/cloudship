@@ -647,14 +647,22 @@ class SettingsViewController: UITableViewController {
             presentPaywall()
             return
         }
+        let wasEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "MorningBriefEnabled")
         if sender.isOn {
             PrecipitationNotificationService.shared.scheduleMorningBrief()
         } else {
             PrecipitationNotificationService.shared.cancelBrief(identifier: "morningBrief")
         }
-        // Reload notifications section to show/hide time row
-        tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .automatic)
+        // Insert or delete only the time-picker row; leave the toggle cell untouched
+        // so the UISwitch isn't destroyed mid-touch.
+        if sender.isOn && !wasEnabled {
+            let timeRow = IndexPath(row: 4, section: Section.notifications.rawValue)
+            tableView.insertRows(at: [timeRow], with: .automatic)
+        } else if !sender.isOn && wasEnabled {
+            let timeRow = IndexPath(row: 4, section: Section.notifications.rawValue)
+            tableView.deleteRows(at: [timeRow], with: .automatic)
+        }
     }
 
     @objc private func eveningBriefChanged(_ sender: UISwitch) {
@@ -663,13 +671,23 @@ class SettingsViewController: UITableViewController {
             presentPaywall()
             return
         }
+        let wasEnabled = UserDefaults.standard.bool(forKey: "EveningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "EveningBriefEnabled")
         if sender.isOn {
             PrecipitationNotificationService.shared.scheduleEveningBrief()
         } else {
             PrecipitationNotificationService.shared.cancelBrief(identifier: "eveningBrief")
         }
-        tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .automatic)
+        // Insert or delete only the time-picker row; leave the toggle cell untouched.
+        let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
+        let timeRowIndex = morningEnabled ? 6 : 5
+        if sender.isOn && !wasEnabled {
+            let timeRow = IndexPath(row: timeRowIndex, section: Section.notifications.rawValue)
+            tableView.insertRows(at: [timeRow], with: .automatic)
+        } else if !sender.isOn && wasEnabled {
+            let timeRow = IndexPath(row: timeRowIndex, section: Section.notifications.rawValue)
+            tableView.deleteRows(at: [timeRow], with: .automatic)
+        }
     }
 
     private func presentTimePicker(forKey key: String, defaultHour: Int, title: String) {

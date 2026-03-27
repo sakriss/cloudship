@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "2630"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB00000000000000000002"
+               BuildableName = "CloudshipUITests.xctest"
+               BlueprintName = "CloudshipUITests"
+               ReferencedContainer = "container:Cloudship.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SettingsUITests">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testAppearanceSegmentedControl_switchable()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testConsensusModeToggle_respondsToTap()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testEveningBriefToggle_respondsToTap()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testManageLocations_navigates()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testMorningBriefToggle_respondsToTap()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testNearestStationAndConsensusMode_mutualExclusion()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testNearestStationToggle_respondsToTap()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testRainAlertsToggle_respondsToTap()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testSettingsScreen_displaysAllSections()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testSourceSelector_disabledWhenNearestStationOn()">
+               </Test>
+               <Test
+                  Identifier = "SettingsUITests/testUnitsSegmentedControl_switchable()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>
