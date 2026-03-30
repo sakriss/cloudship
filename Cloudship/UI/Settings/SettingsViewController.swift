@@ -205,7 +205,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: US-only. Open-Meteo: global. Tomorrow.io, Pirate Weather, and Apple Weather require Premium. Nearest Station and Consensus Mode override the source selector above."
+            return "NOAA: US-only. Open-Meteo: global. \nTomorrow.io, Pirate Weather, and Apple Weather require Premium \n Nearest Station and Consensus Mode override the source selector above."
         }
         return nil
     }

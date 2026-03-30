@@ -129,14 +129,13 @@ class WeatherDataSourceManager: NSObject {
 
         // -- Consensus Mode (premium feature) --
         if defaults.bool(forKey: Self.consensusModeEnabledKey) {
-            guard SubscriptionManager.shared.isPremiumCached else {
-                // Not premium — turn off the toggle silently and fall through to normal fetch
-                defaults.set(false, forKey: Self.consensusModeEnabledKey)
-                await postConsensusPaywallNotice()
+            if SubscriptionManager.shared.isPremiumCached {
+                await fetchConsensus(lat: lat, lon: lon, units: units, updateWidget: updateWidget)
                 return
             }
-            await fetchConsensus(lat: lat, lon: lon, units: units, updateWidget: updateWidget)
-            return
+            // Not premium — turn off the toggle silently and fall through to normal fetch
+            defaults.set(false, forKey: Self.consensusModeEnabledKey)
+            await postConsensusPaywallNotice()
         }
 
         // -- Standard single-source fetch --

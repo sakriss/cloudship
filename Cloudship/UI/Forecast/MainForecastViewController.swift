@@ -583,13 +583,32 @@ class MainForecastViewController: UIViewController {
 
     // MARK: - Location
 
+    private var locationTimeoutTask: Task<Void, Never>?
+
     private func setupLocation() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
         locationManager.distanceFilter = 1000   // update every 1km
-        locationManager.requestWhenInUseAuthorization()
-        // Also start updating (simulator-friendly; we'll stop after first fix)
-        locationManager.startUpdatingLocation()
+
+        let status = locationManager.authorizationStatus
+        if status == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+            locationManager.startUpdatingLocation()
+            startLocationTimeout()
+        }
+    }
+
+    /// If no location arrives within 10 seconds, stop waiting and show an error.
+    private func startLocationTimeout() {
+        locationTimeoutTask?.cancel()
+        locationTimeoutTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+            guard !Task.isCancelled, let self = self, self.currentLocation == nil else { return }
+            self.locationManager.stopUpdatingLocation()
+            self.activityIndicator.stopAnimating()
+            self.showErrorAlert(message: "Unable to determine your location. Please try searching for a city instead.")
+        }
     }
 
     private func fetchWeather(for location: CLLocation, isGPSLocation: Bool = false) {
@@ -1076,7 +1095,8 @@ extension MainForecastViewController: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            manager.requestLocation()
+            manager.startUpdatingLocation()
+            startLocationTimeout()
         case .denied, .restricted:
             activityIndicator.stopAnimating()
             showErrorAlert(message: "Location access is required to show local weather. Enable it in Settings.")
@@ -1089,6 +1109,7 @@ extension MainForecastViewController: CLLocationManagerDelegate {
         guard let loc = locations.first else { return }
         // Stop continuous updates — just need a single fix
         manager.stopUpdatingLocation()
+        locationTimeoutTask?.cancel()
         // Update the "Current Location" search row with the real GPS fix (only from here)
         updateGPSLocationInSearch(loc)
         fetchWeather(for: loc, isGPSLocation: true)
@@ -1096,7 +1117,13 @@ extension MainForecastViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error)")
+        // kCLErrorLocationUnknown is transient — the system may retry automatically.
+        // Only stop the spinner and show an error for persistent failures.
+        if let clError = error as? CLError, clError.code == .locationUnknown {
+            return
+        }
         activityIndicator.stopAnimating()
+        showErrorAlert(message: "Unable to determine your location. Please try searching for a city instead.")
     }
 }
 

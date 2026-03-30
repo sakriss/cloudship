@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:UI TestPlan.xctestplan">
+   </FileRef>
+   <FileRef
+      location = "group:TestPlan.xctestplan">
+   </FileRef>
+   <FileRef
       location = "group:Cloudship.xcodeproj">
    </FileRef>
    <FileRef
