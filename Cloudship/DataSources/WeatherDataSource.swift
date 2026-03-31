@@ -29,4 +29,5 @@ enum WeatherSourceID: String, Codable {
     case openMeteo     = "openMeteo"
     case pirateWeather = "pirateWeather"
     case appleWeather  = "appleWeather"
+    case accuWeather   = "accuWeather"
 }

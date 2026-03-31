@@ -36,22 +36,24 @@ actor ConsensusWeatherService {
 
     // MARK: - Weight tables
 
-    /// Temperature weights by source (must sum to 1.0 across all five sources).
+    /// Temperature weights by source (must sum to 1.0 across all six sources).
     private static let tempWeights: [WeatherSourceID: Double] = [
-        .tomorrowIO:    0.25,
-        .noaa:          0.30,
-        .openMeteo:     0.25,
+        .tomorrowIO:    0.20,
+        .noaa:          0.25,
+        .openMeteo:     0.20,
         .pirateWeather: 0.10,
-        .appleWeather:  0.10
+        .appleWeather:  0.10,
+        .accuWeather:   0.15
     ]
 
     /// Precipitation-chance weights by source (must sum to 1.0).
     private static let precipWeights: [WeatherSourceID: Double] = [
-        .tomorrowIO:    0.35,
-        .noaa:          0.30,
+        .tomorrowIO:    0.25,
+        .noaa:          0.25,
         .openMeteo:     0.15,
         .pirateWeather: 0.10,
-        .appleWeather:  0.10
+        .appleWeather:  0.10,
+        .accuWeather:   0.15
     ]
 
     // MARK: - Public
@@ -77,11 +79,14 @@ actor ConsensusWeatherService {
                 (.noaa,          NOAADataSource()),
                 (.openMeteo,     OpenMeteoDataSource()),
                 (.pirateWeather, PirateWeatherDataSource()),
-                (.appleWeather,  AppleWeatherDataSource())
+                (.appleWeather,  AppleWeatherDataSource()),
+                (.accuWeather,   AccuWeatherDataSource())
               ]
             : [
-                (.noaa,      NOAADataSource()),
-                (.openMeteo, OpenMeteoDataSource())
+                (.noaa,          NOAADataSource()),
+                (.openMeteo,     OpenMeteoDataSource()),
+                (.pirateWeather, PirateWeatherDataSource()),
+                (.appleWeather,  AppleWeatherDataSource())
               ]
 
         // Fetch all sources in parallel; failed sources are silently dropped.

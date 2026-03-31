@@ -26,6 +26,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8795986379052808~6028111057</string>
+	<key>AccuWeatherAPIKey</key>
+	<string>$(ACCUWEATHER_API_KEY)</string>
 	<key>GeminiAPIKey</key>
 	<string>$(GEMINI_API_KEY)</string>
 	<key>LSRequiresIPhoneOS</key>

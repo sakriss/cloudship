@@ -59,13 +59,15 @@ class SettingsViewController: UITableViewController {
     }()
 
     private lazy var sourceControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["Tmrw", "NOAA", "O-Meteo", "Pirate", "Apple"])
+        let sc = UISegmentedControl(items: ["NOAA", "O-Meteo", "Pirate", "Apple", "Tmrw", "Accu"])
         sc.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 11)], for: .normal)
         let active = WeatherDataSourceManager.shared.activeSource
-        if active is NOAADataSource                { sc.selectedSegmentIndex = 1 }
-        else if active is OpenMeteoDataSource      { sc.selectedSegmentIndex = 2 }
-        else if active is PirateWeatherDataSource  { sc.selectedSegmentIndex = 3 }
-        else if active is AppleWeatherDataSource   { sc.selectedSegmentIndex = 4 }
+        if active is NOAADataSource                { sc.selectedSegmentIndex = 0 }
+        else if active is OpenMeteoDataSource      { sc.selectedSegmentIndex = 1 }
+        else if active is PirateWeatherDataSource  { sc.selectedSegmentIndex = 2 }
+        else if active is AppleWeatherDataSource   { sc.selectedSegmentIndex = 3 }
+        else if active is TomorrowIODataSource     { sc.selectedSegmentIndex = 4 }
+        else if active is AccuWeatherDataSource    { sc.selectedSegmentIndex = 5 }
         else                                        { sc.selectedSegmentIndex = 0 }
         sc.addTarget(self, action: #selector(sourceChanged(_:)), for: .valueChanged)
         return sc
@@ -188,7 +190,7 @@ class SettingsViewController: UITableViewController {
         case .appearance:     return 2
         case .notifications:  return notificationRowCount
         case .subscription:   return 1
-        case .about:          return 3
+        case .about:          return 5
         }
     }
 
@@ -205,7 +207,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: US-only. Open-Meteo: global. \nTomorrow.io, Pirate Weather, and Apple Weather require Premium \n Nearest Station and Consensus Mode override the source selector above."
+            return "NOAA: US-only. Open-Meteo, Pirate Weather, Apple Weather: global.\nTomorrow.io and AccuWeather require Premium.\nNearest Station and Consensus Mode override the source selector above."
         }
         return nil
     }
@@ -393,6 +395,12 @@ class SettingsViewController: UITableViewController {
             case 2:
                 config.text = "Rate on App Store"
                 cell.accessoryType = .disclosureIndicator
+            case 3:
+                config.text = "Privacy Policy"
+                cell.accessoryType = .disclosureIndicator
+            case 4:
+                config.text = "Terms & Conditions"
+                cell.accessoryType = .disclosureIndicator
             default:
                 break
             }
@@ -439,6 +447,8 @@ class SettingsViewController: UITableViewController {
             #endif
         case 1: sendFeedbackEmail()
         case 2: openAppStore()
+        case 3: showLegalText(title: "Privacy Policy", text: Self.privacyPolicyText)
+        case 4: showLegalText(title: "Terms & Conditions", text: Self.termsAndConditionsText)
         default: break
         }
     }
@@ -453,26 +463,30 @@ class SettingsViewController: UITableViewController {
     // MARK: - Actions
 
     @objc private func sourceChanged(_ sender: UISegmentedControl) {
-        let premiumIndices: Set<Int> = [0, 3, 4]  // Tomorrow.io, Pirate, Apple
+        let premiumIndices: Set<Int> = [4, 5]  // Tomorrow.io, AccuWeather
         if premiumIndices.contains(sender.selectedSegmentIndex)
             && !SubscriptionManager.shared.isPremiumCached {
             // Revert to current selection
             let active = WeatherDataSourceManager.shared.activeSource
-            if active is NOAADataSource              { sender.selectedSegmentIndex = 1 }
-            else if active is OpenMeteoDataSource    { sender.selectedSegmentIndex = 2 }
-            else if active is PirateWeatherDataSource { sender.selectedSegmentIndex = 3 }
-            else if active is AppleWeatherDataSource  { sender.selectedSegmentIndex = 4 }
-            else                                      { sender.selectedSegmentIndex = 0 }
+            if active is NOAADataSource                { sender.selectedSegmentIndex = 0 }
+            else if active is OpenMeteoDataSource      { sender.selectedSegmentIndex = 1 }
+            else if active is PirateWeatherDataSource  { sender.selectedSegmentIndex = 2 }
+            else if active is AppleWeatherDataSource   { sender.selectedSegmentIndex = 3 }
+            else if active is TomorrowIODataSource     { sender.selectedSegmentIndex = 4 }
+            else if active is AccuWeatherDataSource    { sender.selectedSegmentIndex = 5 }
+            else                                        { sender.selectedSegmentIndex = 0 }
             presentPaywall()
             return
         }
 
         switch sender.selectedSegmentIndex {
-        case 1:  WeatherDataSourceManager.shared.activeSource = NOAADataSource()
-        case 2:  WeatherDataSourceManager.shared.activeSource = OpenMeteoDataSource()
-        case 3:  WeatherDataSourceManager.shared.activeSource = PirateWeatherDataSource()
-        case 4:  WeatherDataSourceManager.shared.activeSource = AppleWeatherDataSource()
-        default: WeatherDataSourceManager.shared.activeSource = TomorrowIODataSource()
+        case 0:  WeatherDataSourceManager.shared.activeSource = NOAADataSource()
+        case 1:  WeatherDataSourceManager.shared.activeSource = OpenMeteoDataSource()
+        case 2:  WeatherDataSourceManager.shared.activeSource = PirateWeatherDataSource()
+        case 3:  WeatherDataSourceManager.shared.activeSource = AppleWeatherDataSource()
+        case 4:  WeatherDataSourceManager.shared.activeSource = TomorrowIODataSource()
+        case 5:  WeatherDataSourceManager.shared.activeSource = AccuWeatherDataSource()
+        default: WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         }
         triggerRefetch()
     }
@@ -595,12 +609,14 @@ class SettingsViewController: UITableViewController {
             let message = !isEnabled ? "Demo Mode Enabled" : "Demo Mode Disabled"
             let toast = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             present(toast, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                toast.dismiss(animated: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                toast.dismiss(animated: true) {
+                    // Reload after the toast is fully dismissed to avoid
+                    // conflicting with the reloadSections triggered by
+                    // the premiumStatusChanged notification.
+                    self?.tableView.reloadData()
+                }
             }
-
-            // Reload to update version label and subscription section
-            tableView.reloadData()
         }
     }
     #endif
@@ -772,6 +788,117 @@ class SettingsViewController: UITableViewController {
             UIApplication.shared.open(url)
         }
     }
+
+    private func showLegalText(title: String, text: String) {
+        let vc = LegalTextViewController(title: title, text: text)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    // MARK: - Legal text
+
+    static let privacyPolicyText = """
+    HappyGiraffe built the Cloudship Weather app as a Free appw ith optional Premium feature. This SERVICE is provided by HappyGiraffe at no cost and is intended for use as is.
+
+    This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.
+
+    If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.
+
+    The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at Cloudship Weather unless otherwise defined in this Privacy Policy.
+
+    Information Collection and Use
+
+    For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to Location(GPS). The information that I request will be retained on your device and is not collected by me in any way.
+
+    The app does use third party services that may collect information used to identify you.
+    
+    Premium Subscriptions and Payments
+
+    Cloudship Weather offers a paid Premium version. By subscribing to the Premium Service, you agree to the pricing and payment terms as updated from time to time.
+
+    * Payment Processing: All payments are handled securely through the respective App Store. Please refer to the Apple or Google Privacy Policies for details on how your payment information is managed.
+
+    * Subscription Management: Users can manage or cancel their subscriptions through their device account settings.
+
+    Log Data
+
+    I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol ("IP") address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.
+
+    Cookies
+
+    Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device's internal memory.
+
+    This Service does not use these "cookies" explicitly. However, the app may use third party code and libraries that use "cookies" to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.
+
+    Service Providers
+
+    I may employ third-party companies and individuals due to the following reasons:
+    \u{2022} To facilitate our Service;
+    \u{2022} To provide the Service on our behalf;
+    \u{2022} To perform Service-related services; or
+    \u{2022} To assist us in analyzing how our Service is used.
+
+    I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.
+
+    Security
+
+    I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.
+
+    Links to Other Sites
+
+    This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
+
+    Children's Privacy
+
+    These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.
+
+    Changes to This Privacy Policy
+
+    I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page. These changes are effective immediately after they are posted on this page.
+
+    Contact Us
+
+    If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me.
+    """
+
+    static let termsAndConditionsText = """
+    By downloading or using the app, these terms will automatically apply to you – you should make sure therefore that you read them carefully before using the app. You're not allowed to copy, or modify the app, any part of the app, or our trademarks in any way. You're not allowed to attempt to extract the source code of the app, and you also shouldn't try to translate the app into other languages, or make derivative versions. The app itself, and all the trade marks, copyright, database rights and other intellectual property rights related to it, still belong to HappyGiraffe.
+
+    HappyGiraffe is committed to ensuring that the app is as useful and efficient as possible. For that reason, we reserve the right to make changes to the app or to charge for its services, at any time and for any reason.
+
+    * Free vs. Premium: We offer both free and paid (Premium) versions of the app.
+
+    * Clear Billing: We will never charge you for the app or its services without making it very clear to you exactly what you're paying for.
+
+    * Subscription Management: All Premium subscriptions are handled via the Apple App Store. You are responsible for managing your subscriptions and cancellations through your Apple ID settings.
+
+    The Cloudship Weather app stores and processes personal data that you have provided to us, in order to provide my Service. It's your responsibility to keep your phone and access to the app secure. We therefore recommend that you do not jailbreak or root your phone, which is the process of removing software restrictions and limitations imposed by the official operating system of your device. It could make your phone vulnerable to malware/viruses/malicious programs, compromise your phone's security features and it could mean that the Cloudship Weather app won't work properly or at all.
+
+    You should be aware that there are certain things that HappyGiraffe will not take responsibility for. Certain functions of the app will require the app to have an active internet connection. The connection can be Wi-Fi, or provided by your mobile network provider, but HappyGiraffe cannot take responsibility for the app not working at full functionality if you don't have access to Wi-Fi, and you don't have any of your data allowance left.
+
+    If you're using the app outside of an area with Wi-Fi, you should remember that your terms of the agreement with your mobile network provider will still apply. As a result, you may be charged by your mobile provider for the cost of data for the duration of the connection while accessing the app, or other third party charges. In using the app, you're accepting responsibility for any such charges, including roaming data charges if you use the app outside of your home territory (i.e. region or country) without turning off data roaming. If you are not the bill payer for the device on which you're using the app, please be aware that we assume that you have received permission from the bill payer for using the app.
+
+    Along the same lines, HappyGiraffe cannot always take responsibility for the way you use the app i.e. You need to make sure that your device stays charged – if it runs out of battery and you can't turn it on to avail the Service, HappyGiraffe cannot accept responsibility.
+    
+    Limitation of Liability and Weather Data
+
+    While we endeavour to ensure that the app is updated and correct at all times, we rely on third-party weather data providers to supply information. Cloudship Weather is for informational purposes only.
+
+    * HappyGiraffe accepts no liability for any loss, direct or indirect, you experience as a result of relying wholly on the weather forecasts or alerts provided by the app.
+
+    * We do not guarantee the absolute accuracy of weather data and advise users to exercise common sense during severe weather events.
+
+    With respect to HappyGiraffe's responsibility for your use of the app, when you're using the app, it's important to bear in mind that although we endeavour to ensure that it is updated and correct at all times, we do rely on third parties to provide information to us so that we can make it available to you. HappyGiraffe accepts no liability for any loss, direct or indirect, you experience as a result of relying wholly on this functionality of the app.
+
+    At some point, we may wish to update the app. The app is currently available on iOS – the requirements for system (and for any additional systems we decide to extend the availability of the app to) may change, and you'll need to download the updates if you want to keep using the app. HappyGiraffe does not promise that it will always update the app so that it is relevant to you and/or works with the iOS version that you have installed on your device. However, you promise to always accept updates to the application when offered to you. We may also wish to stop providing the app, and may terminate use of it at any time without giving notice of termination to you. Unless we tell you otherwise, upon any termination, (a) the rights and licenses granted to you in these terms will end; (b) you must stop using the app, and (if needed) delete it from your device.
+
+    Changes to This Terms and Conditions
+
+    I may update our Terms and Conditions from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Terms and Conditions on this page. These changes are effective immediately after they are posted on this page.
+
+    Contact Us
+
+    If you have any questions or suggestions about my Terms and Conditions, do not hesitate to contact me.
+    """
 }
 
 // MARK: - MFMailComposeViewControllerDelegate
@@ -866,6 +993,45 @@ private class CardTintPickerCell: UITableViewCell {
                 btn.transform = isSelected ? CGAffineTransform(scaleX: 1.20, y: 1.20) : .identity
             }
         }
+    }
+}
+
+// MARK: - Legal text viewer
+
+private class LegalTextViewController: UIViewController {
+
+    private let legalText: String
+
+    init(title: String, text: String) {
+        self.legalText = text
+        super.init(nibName: nil, bundle: nil)
+        self.title = title
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        let textView = UITextView()
+        textView.text = legalText
+        textView.font = .systemFont(ofSize: 14)
+        textView.textColor = .label
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.textContainerInset = UIEdgeInsets(top: 16, left: 12, bottom: 16, right: 12)
+
+        view.addSubview(textView)
+        NSLayoutConstraint.activate([
+            textView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            textView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }
 

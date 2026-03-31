@@ -52,6 +52,7 @@ class WeatherDataSourceManager: NSObject {
             else if activeSource is OpenMeteoDataSource    { id = .openMeteo }
             else if activeSource is PirateWeatherDataSource { id = .pirateWeather }
             else if activeSource is AppleWeatherDataSource  { id = .appleWeather }
+            else if activeSource is AccuWeatherDataSource   { id = .accuWeather }
             else                                            { id = .tomorrowIO }
             UserDefaults.standard.set(id.rawValue, forKey: "WeatherSource")
             WeatherCacheManager.shared.clear()
@@ -70,7 +71,7 @@ class WeatherDataSourceManager: NSObject {
         let sourceID = WeatherSourceID(rawValue: raw)
 
         // Premium sources require an active subscription
-        let premiumSources: Set<WeatherSourceID> = [.tomorrowIO, .pirateWeather, .appleWeather]
+        let premiumSources: Set<WeatherSourceID> = [.tomorrowIO, .accuWeather]
         if let id = sourceID, premiumSources.contains(id),
            !SubscriptionManager.shared.isPremiumCached {
             // Fall back to a free source and flag for migration alert
@@ -89,6 +90,7 @@ class WeatherDataSourceManager: NSObject {
         case .openMeteo:      activeSource = OpenMeteoDataSource()
         case .pirateWeather:  activeSource = PirateWeatherDataSource()
         case .appleWeather:   activeSource = AppleWeatherDataSource()
+        case .accuWeather:    activeSource = AccuWeatherDataSource()
         default:              activeSource = TomorrowIODataSource()
         }
     }
@@ -190,9 +192,9 @@ class WeatherDataSourceManager: NSObject {
                 NotificationCenter.default.post(name: WeatherDataSourceManager.weatherDataParseComplete, object: nil)
             }
         } catch let error as NOAAError where error == .outsideUS {
-            // Silently fall back to Tomorrow.io for non-US locations when NOAA is selected
-            print("NOAAError.outsideUS — falling back to Tomorrow.io")
-            let fallback = TomorrowIODataSource()
+            // Silently fall back to Open-Meteo for non-US locations when NOAA is selected
+            print("NOAAError.outsideUS — falling back to Open-Meteo")
+            let fallback = OpenMeteoDataSource()
             do {
                 async let weatherTask = fallback.fetchWeather(lat: lat, lon: lon, units: units)
                 async let alertsTask  = fetchNOAAAlerts(lat: lat, lon: lon)

@@ -131,7 +131,7 @@ class PaywallViewController: UIViewController {
         // Features
         let features: [(String, String)] = [
             ("sparkles", "Premium AI weather summaries & chat"),
-            ("cloud.sun.rain.fill", "Apple, Tomorrow.io & Pirate Weather sources"),
+            ("cloud.sun.rain.fill", "Tomorrow.io & AccuWeather premium sources"),
             ("bell.badge.fill", "Rain alerts for multiple locations"),
             ("drop.fill", "Precipitation Live Activity in Dynamic Island"),
         ]

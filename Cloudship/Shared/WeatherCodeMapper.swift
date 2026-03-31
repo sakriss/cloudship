@@ -128,6 +128,53 @@ enum WeatherCodeMapper {
         }
     }
 
+    // MARK: - AccuWeather icon number → WeatherCondition
+
+    /// Maps AccuWeather icon numbers (1-44) to WeatherCondition.
+    /// Reference: https://developer.accuweather.com/weather-icons
+    static func condition(fromAccuWeatherIcon icon: Int?) -> WeatherCondition {
+        guard let icon = icon else { return .unknown }
+        switch icon {
+        case 1, 2:            return .clear          // Sunny, Mostly Sunny
+        case 33, 34:          return .clear          // Clear (night), Mostly Clear (night)
+        case 3, 4:            return .partlyCloudy   // Partly Sunny, Intermittent Clouds
+        case 35, 36:          return .partlyCloudy   // Partly Cloudy (night), Intermittent Clouds (night)
+        case 5:               return .lightFog       // Hazy Sunshine
+        case 6:               return .mostlyCloudy   // Mostly Cloudy
+        case 38:              return .mostlyCloudy   // Mostly Cloudy (night)
+        case 7:               return .cloudy         // Cloudy
+        case 8:               return .cloudy         // Dreary (Overcast)
+        case 37:              return .lightFog       // Hazy Moonlight (night)
+        case 11:              return .fog            // Fog
+        case 12:              return .rain           // Showers
+        case 13:              return .rain           // Mostly Cloudy w/ Showers
+        case 14:              return .rain           // Partly Sunny w/ Showers
+        case 39:              return .rain           // Partly Cloudy w/ Showers (night)
+        case 40:              return .rain           // Mostly Cloudy w/ Showers (night)
+        case 15:              return .thunderstorm   // T-Storms
+        case 16:              return .thunderstorm   // Mostly Cloudy w/ T-Storms
+        case 17:              return .thunderstorm   // Partly Sunny w/ T-Storms
+        case 41:              return .thunderstorm   // Partly Cloudy w/ T-Storms (night)
+        case 42:              return .thunderstorm   // Mostly Cloudy w/ T-Storms (night)
+        case 18:              return .heavyRain      // Rain
+        case 19:              return .lightSnow      // Flurries
+        case 20:              return .lightSnow      // Mostly Cloudy w/ Flurries
+        case 21:              return .lightSnow      // Partly Sunny w/ Flurries
+        case 43:              return .lightSnow      // Mostly Cloudy w/ Flurries (night)
+        case 22:              return .snow           // Snow
+        case 23:              return .snow           // Mostly Cloudy w/ Snow
+        case 44:              return .snow           // Mostly Cloudy w/ Snow (night)
+        case 24:              return .sleet          // Ice
+        case 25:              return .sleet          // Sleet
+        case 26:              return .sleet          // Freezing Rain
+        case 29:              return .sleet          // Rain and Snow
+        case 30:              return .clear          // Hot
+        case 31:              return .clear          // Cold
+        case 32:              return .windy          // Windy
+        default:              return .unknown
+        }
+    }
+
     // MARK: - WMO code (Open-Meteo) → WeatherCondition
 
     static func condition(fromWMOCode code: Int?) -> WeatherCondition {
