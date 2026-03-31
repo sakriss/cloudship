@@ -102,6 +102,35 @@ class SettingsViewController: UITableViewController {
         return sc
     }()
 
+    // MARK: - Reload debouncing
+
+    private var pendingReloadWorkItem: DispatchWorkItem?
+    private var pendingSettingsChangedWorkItem: DispatchWorkItem?
+
+    private func debounceReloadSections(_ sections: IndexSet, delay: TimeInterval = 0.15) {
+        pendingReloadWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.tableView.reloadSections(sections, with: .none)
+        }
+        pendingReloadWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+    }
+
+    private func postSettingsChangedDebounced(delay: TimeInterval = 0.2) {
+        pendingSettingsChangedWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
+        }
+        pendingSettingsChangedWorkItem = work
+        if tableView.isDragging || tableView.isDecelerating {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: work)
+        }
+    }
+
     // MARK: - Notification row helpers
 
     /// Dynamic row count for the notifications section.
@@ -512,13 +541,9 @@ class SettingsViewController: UITableViewController {
 
     @objc private func nearestStationResolved() {
         let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
-        guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        var config = cell.defaultContentConfiguration()
-        config.text = "Nearest Active Station"
-        config.secondaryText = nearestStationSubtitle
-        config.secondaryTextProperties.color = .secondaryLabel
-        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
-        cell.contentConfiguration = config
+        if let visible = tableView.indexPathsForVisibleRows, visible.contains(indexPath) {
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
     }
 
     /// Updates the nearest-station cell's subtitle in place (no row reload).
@@ -526,13 +551,9 @@ class SettingsViewController: UITableViewController {
     @objc private func reloadNearestStationRow() {
         guard UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey) else { return }
         let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
-        guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        var config = cell.defaultContentConfiguration()
-        config.text = "Nearest Active Station"
-        config.secondaryText = nearestStationSubtitle
-        config.secondaryTextProperties.color = .secondaryLabel
-        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
-        cell.contentConfiguration = config
+        if let visible = tableView.indexPathsForVisibleRows, visible.contains(indexPath) {
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
     }
 
     private var nearestStationSubtitle: String {
@@ -578,8 +599,9 @@ class SettingsViewController: UITableViewController {
 
     @objc private func premiumStatusChanged() {
         DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadSections(IndexSet(integer: Section.dataSource.rawValue), with: .none)
-            self?.tableView.reloadSections(IndexSet(integer: Section.subscription.rawValue), with: .none)
+            guard let self else { return }
+            let sections = IndexSet([Section.dataSource.rawValue, Section.subscription.rawValue])
+            self.debounceReloadSections(sections)
         }
     }
 
@@ -622,12 +644,20 @@ class SettingsViewController: UITableViewController {
     #endif
 
     private func presentPaywall() {
-        let paywall = PaywallViewController()
-        paywall.modalPresentationStyle = .pageSheet
-        if let sheet = paywall.sheetPresentationController {
-            sheet.detents = [.large()]
+        let presentBlock = { [weak self] in
+            guard let self else { return }
+            let paywall = PaywallViewController()
+            paywall.modalPresentationStyle = .pageSheet
+            if let sheet = paywall.sheetPresentationController {
+                sheet.detents = [.large()]
+            }
+            self.present(paywall, animated: true)
         }
-        present(paywall, animated: true)
+        if tableView.isDragging || tableView.isDecelerating {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: presentBlock)
+        } else {
+            presentBlock()
+        }
     }
 
     @objc private func unitsChanged(_ sender: UISegmentedControl) {
@@ -641,6 +671,7 @@ class SettingsViewController: UITableViewController {
         if sender.isOn {
             BackgroundTaskManager.shared.scheduleNextRefresh()
         }
+        postSettingsChangedDebounced()
     }
 
     @objc private func liveActivityChanged(_ sender: UISwitch) {
@@ -672,12 +703,23 @@ class SettingsViewController: UITableViewController {
         }
         // Insert or delete only the time-picker row; leave the toggle cell untouched
         // so the UISwitch isn't destroyed mid-touch.
-        if sender.isOn && !wasEnabled {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.tableView.beginUpdates()
             let timeRow = IndexPath(row: 4, section: Section.notifications.rawValue)
-            tableView.insertRows(at: [timeRow], with: .automatic)
-        } else if !sender.isOn && wasEnabled {
-            let timeRow = IndexPath(row: 4, section: Section.notifications.rawValue)
-            tableView.deleteRows(at: [timeRow], with: .automatic)
+            if sender.isOn && !wasEnabled {
+                self.tableView.insertRows(at: [timeRow], with: .automatic)
+            } else if !sender.isOn && wasEnabled {
+                self.tableView.deleteRows(at: [timeRow], with: .automatic)
+            }
+            self.tableView.endUpdates()
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let toggleIndex = IndexPath(row: 3, section: Section.notifications.rawValue)
+                if let visible = self.tableView.indexPathsForVisibleRows, visible.contains(toggleIndex) {
+                    self.tableView.reloadRows(at: [toggleIndex], with: .none)
+                }
+            }
         }
     }
 
@@ -697,12 +739,23 @@ class SettingsViewController: UITableViewController {
         // Insert or delete only the time-picker row; leave the toggle cell untouched.
         let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         let timeRowIndex = morningEnabled ? 6 : 5
-        if sender.isOn && !wasEnabled {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.tableView.beginUpdates()
             let timeRow = IndexPath(row: timeRowIndex, section: Section.notifications.rawValue)
-            tableView.insertRows(at: [timeRow], with: .automatic)
-        } else if !sender.isOn && wasEnabled {
-            let timeRow = IndexPath(row: timeRowIndex, section: Section.notifications.rawValue)
-            tableView.deleteRows(at: [timeRow], with: .automatic)
+            if sender.isOn && !wasEnabled {
+                self.tableView.insertRows(at: [timeRow], with: .automatic)
+            } else if !sender.isOn && wasEnabled {
+                self.tableView.deleteRows(at: [timeRow], with: .automatic)
+            }
+            self.tableView.endUpdates()
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let toggleIndex = IndexPath(row: morningEnabled ? 5 : 4, section: Section.notifications.rawValue)
+                if let visible = self.tableView.indexPathsForVisibleRows, visible.contains(toggleIndex) {
+                    self.tableView.reloadRows(at: [toggleIndex], with: .none)
+                }
+            }
         }
     }
 
@@ -736,7 +789,7 @@ class SettingsViewController: UITableViewController {
             } else {
                 PrecipitationNotificationService.shared.scheduleEveningBrief()
             }
-            self?.tableView.reloadSections(IndexSet(integer: Section.notifications.rawValue), with: .none)
+            self?.debounceReloadSections(IndexSet(integer: Section.notifications.rawValue))
         })
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
@@ -759,12 +812,11 @@ class SettingsViewController: UITableViewController {
         let idx = min(sender.selectedSegmentIndex, styles.count - 1)
         view.window?.overrideUserInterfaceStyle = styles[idx]
         // Notify forecast to update weather-reactive theme
-        NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
+        postSettingsChangedDebounced()
     }
 
     private func triggerRefetch() {
-        // Ask the main forecast VC to re-fetch via notification or direct call
-        NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
+        postSettingsChangedDebounced()
     }
 
     // MARK: - Helpers
@@ -1048,34 +1100,52 @@ private class ControlCell: UITableViewCell {
         return l
     }()
 
-    private var embeddedControl: UIView?
-    private var controlConstraints: [NSLayoutConstraint] = []
+    private let controlContainer: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
 
-    func configure(label: String, control: UIView) {
-        nameLabel.text = label
+    private var currentControl: UIView?
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
-        control.translatesAutoresizingMaskIntoConstraints = false
-
-        // Remove old control and constraints
-        NSLayoutConstraint.deactivate(controlConstraints)
-        embeddedControl?.removeFromSuperview()
-        nameLabel.removeFromSuperview()
 
         contentView.addSubview(nameLabel)
-        contentView.addSubview(control)
-        embeddedControl = control
+        contentView.addSubview(controlContainer)
 
-        // Stack label above control so nothing gets truncated
-        controlConstraints = [
+        NSLayoutConstraint.activate([
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
 
-            control.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
-            control.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            control.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            control.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
-        ]
-        NSLayoutConstraint.activate(controlConstraints)
+            controlContainer.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            controlContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            controlContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            controlContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(label: String, control: UIView) {
+        nameLabel.text = label
+        control.translatesAutoresizingMaskIntoConstraints = false
+
+        if currentControl !== control {
+            currentControl?.removeFromSuperview()
+            controlContainer.addSubview(control)
+            NSLayoutConstraint.activate([
+                control.topAnchor.constraint(equalTo: controlContainer.topAnchor),
+                control.leadingAnchor.constraint(equalTo: controlContainer.leadingAnchor),
+                control.trailingAnchor.constraint(equalTo: controlContainer.trailingAnchor),
+                control.bottomAnchor.constraint(equalTo: controlContainer.bottomAnchor)
+            ])
+            currentControl = control
+        }
     }
 }
+

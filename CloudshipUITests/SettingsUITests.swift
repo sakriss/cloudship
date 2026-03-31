@@ -33,6 +33,13 @@ final class SettingsUITests: XCTestCase {
             settingsTab.tap()
         }
     }
+    
+    private func navigateToForecast() {
+        let forecastTab = app.tabBars.buttons["Forecast"]
+        if forecastTab.waitForExistence(timeout: 5) {
+            forecastTab.tap()
+        }
+    }
 
     /// Finds a UISwitch accessory in the cell that contains the given label text.
     private func findSwitch(near label: String) -> XCUIElement {
@@ -97,25 +104,43 @@ final class SettingsUITests: XCTestCase {
         let table = app.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible")
 
-        // Try to find the Rain Alerts cell/toggle; scroll if necessary
-        var toggle = findSwitch(near: "Rain Alerts")
-
-        // If not found quickly, attempt to scroll a couple of times to surface it
-        if !toggle.waitForExistence(timeout: 2) {
-            for _ in 0..<3 {
-                table.swipeUp()
-                toggle = findSwitch(near: "Rain Alerts")
-                if toggle.waitForExistence(timeout: 2) { break }
+        // Helper to (re)locate the Rain Alerts switch reliably
+        func locateRainAlertsSwitch() -> XCUIElement? {
+            var toggle = findSwitch(near: "Rain Alerts")
+            if !toggle.waitForExistence(timeout: 2) {
+                for _ in 0..<4 {
+                    if table.isHittable { table.swipeUp() } else { app.swipeUp() }
+                    toggle = findSwitch(near: "Rain Alerts")
+                    if toggle.waitForExistence(timeout: 1.5) { break }
+                }
             }
+            return toggle.exists ? toggle : nil
         }
 
-        guard toggle.waitForExistence(timeout: 3) else {
+        // Initial locate
+        guard var toggle = locateRainAlertsSwitch() else {
             XCTFail("Rain Alerts toggle not found after scrolling")
             return
         }
 
+        // Navigate away and back to reproduce the user flow
+        navigateToForecast()
+        navigateToSettings()
+
+        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible after returning")
+
+        // Re-locate the toggle after navigation to avoid stale references
+        if let fresh = locateRainAlertsSwitch() { toggle = fresh } else {
+            XCTFail("Rain Alerts toggle not found after returning to Settings")
+            return
+        }
+
+        // Ensure UI is idle before interacting
+        let idleExpectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true AND hittable == true"), object: toggle)
+        _ = XCTWaiter.wait(for: [idleExpectation], timeout: 3)
+
         // Use robust tap helper; accept either a state change or a responsive UI as success
-        let success = reliablyTapSwitch(toggle, in: table, expectedToChange: true, timeout: 4)
+        let success = reliablyTapSwitch(toggle, in: table, expectedToChange: true, timeout: 5)
         XCTAssertTrue(success, "Rain Alerts toggle interaction should change state or keep UI responsive")
     }
 
@@ -319,6 +344,12 @@ final class SettingsUITests: XCTestCase {
 
         systemButton.tap()
         XCTAssertTrue(systemButton.isSelected, "System should be selected after tap")
+    }
+    
+    func testSettingsLoads_smoke() {
+        navigateToSettings()
+        let table = app.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should load and exist")
     }
 }
 

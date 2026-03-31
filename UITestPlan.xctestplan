@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "289FDE5A-8091-49C7-85FB-E295E1576C8C",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Cloudship.xcodeproj",
+        "identifier" : "BB00000000000000000002",
+        "name" : "CloudshipUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
