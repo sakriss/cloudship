@@ -84,6 +84,7 @@ class TomorrowIODataSource: WeatherDataSource {
                                forecast: ClimacellV4.ForecastResponse,
                                units: String) -> UnifiedWeatherData {
         let rv = realtime.realtime?.values
+        let imperial = units == "imperial"
 
         let current = CurrentConditions(
             temperature:  rv?.temperature,
@@ -138,7 +139,7 @@ class TomorrowIODataSource: WeatherDataSource {
                 condition:        cond,
                 conditionNight:   condNight,
                 precipChance:     v?.precipitationProbabilityAvg ?? v?.precipitationProbability,
-                precipAmount:     v?.rainAccumulationSum,
+                precipAmount:     v?.rainAccumulationSum.map { imperial ? $0 / 25.4 : $0 },
                 sunrise:          DateFormatHelper.date(from: v?.sunriseTime),
                 sunset:           DateFormatHelper.date(from: v?.sunsetTime),
                 moonPhase:        nil,   // Not in free tier; use moonriseTime/moonsetTime
