@@ -586,15 +586,16 @@ class MainForecastViewController: UIViewController {
     private var locationTimeoutTask: Task<Void, Never>?
 
     private func setupLocation() {
-        locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
-        locationManager.distanceFilter = 1000   // update every 1km
+        locationManager.delegate = self
 
+        // locationManagerDidChangeAuthorization may or may not fire on delegate
+        // assignment depending on iOS version. Handle the current status explicitly.
         let status = locationManager.authorizationStatus
         if status == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         } else if status == .authorizedWhenInUse || status == .authorizedAlways {
-            locationManager.startUpdatingLocation()
+            locationManager.requestLocation()
             startLocationTimeout()
         }
     }
@@ -605,7 +606,6 @@ class MainForecastViewController: UIViewController {
         locationTimeoutTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
             guard !Task.isCancelled, let self = self, self.currentLocation == nil else { return }
-            self.locationManager.stopUpdatingLocation()
             self.activityIndicator.stopAnimating()
             self.showErrorAlert(message: "Unable to determine your location. Please try searching for a city instead.")
         }
@@ -1095,20 +1095,23 @@ extension MainForecastViewController: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            manager.startUpdatingLocation()
-            startLocationTimeout()
+            // Only request if we haven't already received a location
+            if currentLocation == nil {
+                manager.requestLocation()
+                startLocationTimeout()
+            }
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
         case .denied, .restricted:
             activityIndicator.stopAnimating()
             showErrorAlert(message: "Location access is required to show local weather. Enable it in Settings.")
-        default:
+        @unknown default:
             break
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let loc = locations.first else { return }
-        // Stop continuous updates — just need a single fix
-        manager.stopUpdatingLocation()
         locationTimeoutTask?.cancel()
         // Update the "Current Location" search row with the real GPS fix (only from here)
         updateGPSLocationInSearch(loc)

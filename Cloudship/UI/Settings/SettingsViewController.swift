@@ -517,7 +517,7 @@ class SettingsViewController: UITableViewController {
         case 5:  WeatherDataSourceManager.shared.activeSource = AccuWeatherDataSource()
         default: WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         }
-        triggerRefetch()
+        postSettingsChangedDebounced()
     }
 
     // MARK: - Nearest Station
@@ -536,7 +536,7 @@ class SettingsViewController: UITableViewController {
             WeatherDataSourceManager.shared.clearNearestStationCache()
         }
         updateSourceControlState()
-        triggerRefetch()
+        postSettingsChangedDebounced()
     }
 
     @objc private func nearestStationResolved() {
@@ -594,7 +594,7 @@ class SettingsViewController: UITableViewController {
 
         defaults.set(sender.isOn, forKey: WeatherDataSourceManager.consensusModeEnabledKey)
         updateSourceControlState()
-        triggerRefetch()
+        postSettingsChangedDebounced()
     }
 
     @objc private func premiumStatusChanged() {
@@ -669,7 +669,9 @@ class SettingsViewController: UITableViewController {
     @objc private func rainAlertsChanged(_ sender: UISwitch) {
         UserDefaults.standard.set(sender.isOn, forKey: "RainAlertsEnabled")
         if sender.isOn {
-            BackgroundTaskManager.shared.scheduleNextRefresh()
+            DispatchQueue.global(qos: .utility).async {
+                BackgroundTaskManager.shared.scheduleNextRefresh()
+            }
         }
         postSettingsChangedDebounced()
     }
@@ -683,9 +685,12 @@ class SettingsViewController: UITableViewController {
         if #available(iOS 16.1, *) {
             UserDefaults.standard.set(sender.isOn, forKey: PrecipitationLiveActivityManager.enabledKey)
             if !sender.isOn {
-                PrecipitationLiveActivityManager.shared.end()
+                DispatchQueue.global(qos: .utility).async {
+                    PrecipitationLiveActivityManager.shared.end()
+                }
             }
         }
+        postSettingsChangedDebounced()
     }
 
     @objc private func morningBriefChanged(_ sender: UISwitch) {
@@ -697,9 +702,13 @@ class SettingsViewController: UITableViewController {
         let wasEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "MorningBriefEnabled")
         if sender.isOn {
-            PrecipitationNotificationService.shared.scheduleMorningBrief()
+            DispatchQueue.global(qos: .utility).async {
+                PrecipitationNotificationService.shared.scheduleMorningBrief()
+            }
         } else {
-            PrecipitationNotificationService.shared.cancelBrief(identifier: "morningBrief")
+            DispatchQueue.global(qos: .utility).async {
+                PrecipitationNotificationService.shared.cancelBrief(identifier: "morningBrief")
+            }
         }
         // Insert or delete only the time-picker row; leave the toggle cell untouched
         // so the UISwitch isn't destroyed mid-touch.
@@ -732,9 +741,13 @@ class SettingsViewController: UITableViewController {
         let wasEnabled = UserDefaults.standard.bool(forKey: "EveningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "EveningBriefEnabled")
         if sender.isOn {
-            PrecipitationNotificationService.shared.scheduleEveningBrief()
+            DispatchQueue.global(qos: .utility).async {
+                PrecipitationNotificationService.shared.scheduleEveningBrief()
+            }
         } else {
-            PrecipitationNotificationService.shared.cancelBrief(identifier: "eveningBrief")
+            DispatchQueue.global(qos: .utility).async {
+                PrecipitationNotificationService.shared.cancelBrief(identifier: "eveningBrief")
+            }
         }
         // Insert or delete only the time-picker row; leave the toggle cell untouched.
         let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
@@ -785,9 +798,13 @@ class SettingsViewController: UITableViewController {
             UserDefaults.standard.set(selectedHour, forKey: key)
             // Re-schedule with new time
             if key == "MorningBriefHour" {
-                PrecipitationNotificationService.shared.scheduleMorningBrief()
+                DispatchQueue.global(qos: .utility).async {
+                    PrecipitationNotificationService.shared.scheduleMorningBrief()
+                }
             } else {
-                PrecipitationNotificationService.shared.scheduleEveningBrief()
+                DispatchQueue.global(qos: .utility).async {
+                    PrecipitationNotificationService.shared.scheduleEveningBrief()
+                }
             }
             self?.debounceReloadSections(IndexSet(integer: Section.notifications.rawValue))
         })
