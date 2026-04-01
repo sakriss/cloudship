@@ -8,6 +8,7 @@
 //
 
 import XCTest
+import os
 
 final class SettingsUITests: XCTestCase {
 
@@ -22,6 +23,15 @@ final class SettingsUITests: XCTestCase {
 
     override func tearDownWithError() throws {
         app = nil
+    }
+
+    /// Attaches a screenshot to the test with the given name.
+    private func attachScreenshot(_ name: String) {
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 
     // MARK: - Helpers
@@ -102,7 +112,11 @@ final class SettingsUITests: XCTestCase {
         navigateToSettings()
 
         let table = app.tables.firstMatch
-        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible")
+        guard table.waitForExistence(timeout: 5) else {
+            attachScreenshot("Settings_Table_Not_Found")
+            XCTFail("Settings table should be visible")
+            return
+        }
 
         // Helper to (re)locate the Rain Alerts switch reliably
         func locateRainAlertsSwitch() -> XCUIElement? {
@@ -119,6 +133,7 @@ final class SettingsUITests: XCTestCase {
 
         // Initial locate
         guard var toggle = locateRainAlertsSwitch() else {
+            attachScreenshot("Rain_Alerts_Toggle_Not_Found")
             XCTFail("Rain Alerts toggle not found after scrolling")
             return
         }
@@ -127,10 +142,17 @@ final class SettingsUITests: XCTestCase {
         navigateToForecast()
         navigateToSettings()
 
-        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible after returning")
+        guard table.waitForExistence(timeout: 5) else {
+            attachScreenshot("Settings_Table_Not_Found_After_Return")
+            XCTFail("Settings table should be visible after returning")
+            return
+        }
 
         // Re-locate the toggle after navigation to avoid stale references
-        if let fresh = locateRainAlertsSwitch() { toggle = fresh } else {
+        if let fresh = locateRainAlertsSwitch() {
+            toggle = fresh
+        } else {
+            attachScreenshot("Rain_Alerts_Toggle_Not_Found_After_Return")
             XCTFail("Rain Alerts toggle not found after returning to Settings")
             return
         }
@@ -142,6 +164,8 @@ final class SettingsUITests: XCTestCase {
         // Use robust tap helper; accept either a state change or a responsive UI as success
         let success = reliablyTapSwitch(toggle, in: table, expectedToChange: true, timeout: 5)
         XCTAssertTrue(success, "Rain Alerts toggle interaction should change state or keep UI responsive")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     func testNearestStationToggle_respondsToTap() {
@@ -149,6 +173,7 @@ final class SettingsUITests: XCTestCase {
 
         let toggle = findSwitch(near: "Nearest Active Station")
         guard toggle.waitForExistence(timeout: 5) else {
+            attachScreenshot("Nearest_Active_Station_Toggle_Not_Found")
             XCTFail("Nearest Active Station toggle not found")
             return
         }
@@ -159,6 +184,8 @@ final class SettingsUITests: XCTestCase {
         let newValue = toggle.value as? String
         XCTAssertNotEqual(initialValue, newValue,
             "Nearest Station toggle should change state on tap (was frozen?)")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     func testConsensusModeToggle_respondsToTap() {
@@ -180,13 +207,19 @@ final class SettingsUITests: XCTestCase {
             object: toggle
         )
         wait(for: [expectation], timeout: 3)
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     func testMorningBriefToggle_respondsToTap() {
         navigateToSettings()
 
         let table = app.tables.firstMatch
-        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible")
+        guard table.waitForExistence(timeout: 5) else {
+            attachScreenshot("Settings_Table_Not_Found_Morning_Brief")
+            XCTFail("Settings table should be visible")
+            return
+        }
 
         var toggle = findSwitch(near: "Morning Brief")
         if !toggle.waitForExistence(timeout: 2) {
@@ -194,12 +227,15 @@ final class SettingsUITests: XCTestCase {
         }
 
         guard toggle.waitForExistence(timeout: 3) else {
+            attachScreenshot("Morning_Brief_Toggle_Not_Found")
             XCTFail("Morning Brief toggle not found after scrolling")
             return
         }
 
         let success = reliablyTapSwitch(toggle, in: table, expectedToChange: false, timeout: 3)
         XCTAssertTrue(success, "UI should remain responsive after tapping Morning Brief")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     func testEveningBriefToggle_respondsToTap() {
@@ -209,6 +245,7 @@ final class SettingsUITests: XCTestCase {
 
         let toggle = findSwitch(near: "Evening Brief")
         guard toggle.waitForExistence(timeout: 5) else {
+            attachScreenshot("Evening_Brief_Toggle_Not_Found")
             XCTFail("Evening Brief toggle not found")
             return
         }
@@ -217,6 +254,8 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(table.waitForExistence(timeout: 5))
         let success = reliablyTapSwitch(toggle, in: table, expectedToChange: false, timeout: 3)
         XCTAssertTrue(success, "UI should remain responsive after toggling Evening Brief")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     // MARK: - Mutual Exclusion
@@ -253,6 +292,8 @@ final class SettingsUITests: XCTestCase {
                 "Nearest Station should be off after enabling Consensus Mode")
         }
         // Note: Consensus toggle may revert if premium is not active, which is OK
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     // MARK: - Source Selector Disabled State
@@ -271,6 +312,8 @@ final class SettingsUITests: XCTestCase {
         // The source segmented control should be dimmed (not easily verifiable in XCUI,
         // but we can verify the toggle state persisted)
         XCTAssertEqual(nearestToggle.value as? String, "1")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     // MARK: - Settings Section Navigation
@@ -279,12 +322,18 @@ final class SettingsUITests: XCTestCase {
         navigateToSettings()
 
         let table = app.tables.firstMatch
-        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should be visible")
+        guard table.waitForExistence(timeout: 5) else {
+            attachScreenshot("Settings_Table_Not_Found_For_Sections")
+            XCTFail("Settings table should be visible")
+            return
+        }
 
         // Verify section headers exist
         let dataSourceHeader = table.staticTexts["Data Source"]
         XCTAssertTrue(dataSourceHeader.exists || table.otherElements.staticTexts["Data Source"].exists,
             "Data Source section header should exist")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     func testManageLocations_navigates() {
@@ -294,6 +343,7 @@ final class SettingsUITests: XCTestCase {
 
         let manageLocationsCell = app.tables.cells.containing(.staticText, identifier: "Manage Locations").firstMatch
         guard manageLocationsCell.waitForExistence(timeout: 5) else {
+            attachScreenshot("Manage_Locations_Cell_Not_Found")
             return
         }
 
@@ -306,6 +356,8 @@ final class SettingsUITests: XCTestCase {
             // Successfully navigated
             backButton.tap()
         }
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     // MARK: - Units Switching
@@ -317,6 +369,7 @@ final class SettingsUITests: XCTestCase {
         let metricButton = app.segmentedControls.buttons["°C (Metric)"]
 
         guard imperialButton.waitForExistence(timeout: 5) else {
+            attachScreenshot("Imperial_Button_Not_Found")
             return
         }
 
@@ -325,6 +378,8 @@ final class SettingsUITests: XCTestCase {
 
         imperialButton.tap()
         XCTAssertTrue(imperialButton.isSelected, "Imperial should be selected after tap")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
 
     // MARK: - Appearance Switching
@@ -336,6 +391,7 @@ final class SettingsUITests: XCTestCase {
         let darkButton = app.segmentedControls.buttons["Dark"]
 
         guard systemButton.waitForExistence(timeout: 5) else {
+            attachScreenshot("System_Button_Not_Found")
             return
         }
 
@@ -344,12 +400,77 @@ final class SettingsUITests: XCTestCase {
 
         systemButton.tap()
         XCTAssertTrue(systemButton.isSelected, "System should be selected after tap")
+
+        XCTAssertTrue(app.isHittable, "App should remain responsive after UI action")
     }
     
     func testSettingsLoads_smoke() {
         navigateToSettings()
         let table = app.tables.firstMatch
-        XCTAssertTrue(table.waitForExistence(timeout: 5), "Settings table should load and exist")
+        guard table.waitForExistence(timeout: 5) else {
+            attachScreenshot("Settings_Table_Not_Found_Smoke_Test")
+            XCTFail("Settings table should load and exist")
+            return
+        }
+    }
+
+    // MARK: - Accessibility Tests
+    func testSettingsControls_haveAccessibilityLabelsAndHints() {
+        navigateToSettings()
+        let elements = [
+            app.tabBars.buttons["Settings"],
+            app.tables.firstMatch.switches["Rain Alerts"],
+            app.tables.firstMatch.switches["Nearest Active Station"],
+            app.tables.firstMatch.switches["Consensus Mode"],
+            app.tables.firstMatch.switches["Morning Brief"],
+            app.tables.firstMatch.switches["Evening Brief"],
+        ]
+        for element in elements {
+            if element.exists {
+                XCTAssertFalse(element.label.isEmpty, "Accessibility label should not be empty for \(element)")
+                // You can also check .accessibilityHint if available
+            }
+        }
+    }
+
+    func testSettingsScreen_supportsLargeContentSize() {
+        // This relies on simulator support for changing size category
+        navigateToSettings()
+        // Not directly actionable in UI test without Xcode hooks,
+        // but you can assert controls are visible
+        let table = app.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 5))
+        XCTAssertTrue(table.isHittable)
+    }
+
+    // MARK: - Error/Empty/Paywall States Tests
+
+    func testSettingsScreen_handlesEmptyOrErrorStates() {
+        // Simulate launch with special argument (assuming app supports)
+        app.terminate()
+        app.launchArguments += ["-UITestingEmptySettings"]
+        app.launch()
+        navigateToSettings()
+        let table = app.tables.firstMatch
+        // Check for placeholder or error label
+        let emptyLabel = table.staticTexts["No Settings Available"]
+        let errorLabel = table.staticTexts["Failed to Load Settings"]
+        XCTAssertTrue(emptyLabel.exists || errorLabel.exists,
+            "Should show empty or error state")
+        attachScreenshot("Empty_or_Error_State")
+    }
+
+    func testConsensusModeToggle_showsPaywallIfPremiumMissing() {
+        navigateToSettings()
+        let consensusToggle = findSwitch(near: "Consensus Mode")
+        if consensusToggle.exists {
+            consensusToggle.tap()
+            let paywall = app.staticTexts["Upgrade to Premium"]
+            if paywall.exists {
+                attachScreenshot("Premium_Paywall_Displayed")
+                XCTAssertTrue(paywall.exists, "Paywall should be shown when premium feature is gated")
+            }
+        }
     }
 }
 

@@ -29,6 +29,8 @@ class SettingsViewController: UITableViewController {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: "RainAlertsEnabled")
         sw.addTarget(self, action: #selector(rainAlertsChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Rain Alerts"
+        sw.accessibilityHint = "Enable to receive notifications about rain events"
         return sw
     }()
 
@@ -41,6 +43,8 @@ class SettingsViewController: UITableViewController {
             sw.isEnabled = false
         }
         sw.addTarget(self, action: #selector(liveActivityChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Precipitation Live Activity"
+        sw.accessibilityHint = "Enable to see real-time rain tracking in Dynamic Island"
         return sw
     }()
 
@@ -48,6 +52,8 @@ class SettingsViewController: UITableViewController {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         sw.addTarget(self, action: #selector(morningBriefChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Morning Brief"
+        sw.accessibilityHint = "Enable to get a daily weather summary"
         return sw
     }()
 
@@ -55,6 +61,8 @@ class SettingsViewController: UITableViewController {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: "EveningBriefEnabled")
         sw.addTarget(self, action: #selector(eveningBriefChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Evening Brief"
+        sw.accessibilityHint = "Enable to get tonight and tomorrow's outlook"
         return sw
     }()
 
@@ -70,6 +78,8 @@ class SettingsViewController: UITableViewController {
         else if active is AccuWeatherDataSource    { sc.selectedSegmentIndex = 5 }
         else                                        { sc.selectedSegmentIndex = 0 }
         sc.addTarget(self, action: #selector(sourceChanged(_:)), for: .valueChanged)
+        sc.accessibilityLabel = "Weather Source"
+        sc.accessibilityHint = "Select the weather data source"
         return sc
     }()
 
@@ -77,6 +87,8 @@ class SettingsViewController: UITableViewController {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
         sw.addTarget(self, action: #selector(nearestStationChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Nearest Active Station"
+        sw.accessibilityHint = "Use the closest weather station for your forecasts"
         return sw
     }()
 
@@ -84,6 +96,8 @@ class SettingsViewController: UITableViewController {
         let sw = UISwitch()
         sw.isOn = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
         sw.addTarget(self, action: #selector(consensusModeChanged(_:)), for: .valueChanged)
+        sw.accessibilityLabel = "Consensus Mode"
+        sw.accessibilityHint = "Enable to use an average of all data sources (Premium required)"
         return sw
     }()
 
@@ -92,6 +106,8 @@ class SettingsViewController: UITableViewController {
         let sc = UISegmentedControl(items: ["°F (Imperial)", "°C (Metric)"])
         sc.selectedSegmentIndex = isMetric ? 1 : 0
         sc.addTarget(self, action: #selector(unitsChanged(_:)), for: .valueChanged)
+        sc.accessibilityLabel = "Temperature Units"
+        sc.accessibilityHint = "Choose between Fahrenheit and Celsius"
         return sc
     }()
 
@@ -99,6 +115,8 @@ class SettingsViewController: UITableViewController {
         let sc = UISegmentedControl(items: ["System", "Light", "Dark", "Auto"])
         sc.selectedSegmentIndex = savedAppearanceIndex()
         sc.addTarget(self, action: #selector(appearanceChanged(_:)), for: .valueChanged)
+        sc.accessibilityLabel = "Theme"
+        sc.accessibilityHint = "Change the app's appearance"
         return sc
     }()
 
@@ -112,6 +130,7 @@ class SettingsViewController: UITableViewController {
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
             self.tableView.reloadSections(sections, with: .none)
+            UIAccessibility.post(notification: .layoutChanged, argument: nil)
         }
         pendingReloadWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
@@ -224,14 +243,17 @@ class SettingsViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let title: String?
         switch Section(rawValue: section)! {
-        case .dataSource:     return "Data Source"
-        case .units:          return "Units"
-        case .appearance:     return "Appearance"
-        case .notifications:  return "Notifications"
-        case .subscription:   return "Subscription"
-        case .about:          return "About"
+        case .dataSource:     title = "Data Source"
+        case .units:          title = "Units"
+        case .appearance:     title = "Appearance"
+        case .notifications:  title = "Notifications"
+        case .subscription:   title = "Subscription"
+        case .about:          title = "About"
         }
+        UIAccessibility.post(notification: .layoutChanged, argument: nil)
+        return title
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
@@ -249,6 +271,8 @@ class SettingsViewController: UITableViewController {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_source", for: indexPath) as! ControlCell
                 cell.configure(label: "Weather Source", control: sourceControl)
+                sourceControl.accessibilityLabel = "Weather Source"
+                sourceControl.accessibilityHint = "Select the weather data source"
                 return cell
 
             case 1:
@@ -261,6 +285,8 @@ class SettingsViewController: UITableViewController {
                 cell.contentConfiguration = config
                 cell.accessoryView = nearestStationSwitch
                 cell.selectionStyle = .none
+                cell.accessoryView?.accessibilityLabel = "Nearest Active Station"
+                cell.accessoryView?.accessibilityHint = "Use the closest weather station for your forecasts"
                 return cell
 
             default:
@@ -281,18 +307,24 @@ class SettingsViewController: UITableViewController {
                 cell.contentConfiguration = config
                 cell.accessoryView = consensusModeSwitch
                 cell.selectionStyle = .none
+                cell.accessoryView?.accessibilityLabel = "Consensus Mode"
+                cell.accessoryView?.accessibilityHint = "Enable to use an average of all data sources (Premium required)"
                 return cell
             }
 
         case .units:
             let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_units", for: indexPath) as! ControlCell
             cell.configure(label: "Temperature", control: unitsControl)
+            unitsControl.accessibilityLabel = "Temperature Units"
+            unitsControl.accessibilityHint = "Choose between Fahrenheit and Celsius"
             return cell
 
         case .appearance:
             if indexPath.row == 0 {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_appearance", for: indexPath) as! ControlCell
                 cell.configure(label: "Theme", control: appearanceControl)
+                appearanceControl.accessibilityLabel = "Theme"
+                appearanceControl.accessibilityHint = "Change the app's appearance"
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "CardTintPickerCell", for: indexPath) as! CardTintPickerCell
@@ -318,6 +350,8 @@ class SettingsViewController: UITableViewController {
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = rainAlertsSwitch
+                cell.accessoryView?.accessibilityLabel = "Rain Alerts"
+                cell.accessoryView?.accessibilityHint = "Enable to receive notifications about rain events"
 
             case .manageLocations:
                 config.text = "Manage Locations"
@@ -336,6 +370,8 @@ class SettingsViewController: UITableViewController {
                 cell.contentConfiguration = config
                 if #available(iOS 16.1, *) {
                     cell.accessoryView = liveActivitySwitch
+                    cell.accessoryView?.accessibilityLabel = "Precipitation Live Activity"
+                    cell.accessoryView?.accessibilityHint = "Enable to see real-time rain tracking in Dynamic Island"
                 } else {
                     var unavailConfig = cell.defaultContentConfiguration()
                     unavailConfig.text = "Precipitation Live Activity"
@@ -352,6 +388,8 @@ class SettingsViewController: UITableViewController {
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = morningBriefSwitch
+                cell.accessoryView?.accessibilityLabel = "Morning Brief"
+                cell.accessoryView?.accessibilityHint = "Enable to get a daily weather summary"
 
             case .morningBriefTime:
                 config.text = "Morning Brief Time"
@@ -370,6 +408,8 @@ class SettingsViewController: UITableViewController {
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = eveningBriefSwitch
+                cell.accessoryView?.accessibilityLabel = "Evening Brief"
+                cell.accessoryView?.accessibilityHint = "Enable to get tonight and tomorrow's outlook"
 
             case .eveningBriefTime:
                 config.text = "Evening Brief Time"
@@ -991,6 +1031,8 @@ private class CardTintPickerCell: UITableViewCell {
         l.text = "Card Color"
         l.font = .systemFont(ofSize: 16)
         l.translatesAutoresizingMaskIntoConstraints = false
+        l.isAccessibilityElement = true
+        l.accessibilityTraits = .header
         return l
     }()
 
@@ -1027,6 +1069,12 @@ private class CardTintPickerCell: UITableViewCell {
             }
             btn.addAction(action, for: .touchUpInside)
 
+            // Accessibility
+            let baseLabel = tint.displayName ?? "Color"
+            let selected = (tint.rawValue == CardTintStyle.saved.rawValue)
+            btn.accessibilityLabel = selected ? "\(baseLabel), Selected" : baseLabel
+            btn.accessibilityHint = "Tap to select card color"
+
             swatchStack.addArrangedSubview(btn)
             swatchButtons.append(btn)
 
@@ -1060,6 +1108,11 @@ private class CardTintPickerCell: UITableViewCell {
             UIView.animate(withDuration: 0.15) {
                 btn.layer.borderColor = isSelected ? UIColor.label.cgColor : UIColor.clear.cgColor
                 btn.transform = isSelected ? CGAffineTransform(scaleX: 1.20, y: 1.20) : .identity
+            }
+            // Update accessibility label on selection change
+            if let tint = CardTintStyle(rawValue: i) {
+                let baseLabel = tint.displayName ?? "Color"
+                btn.accessibilityLabel = isSelected ? "\(baseLabel), Selected" : baseLabel
             }
         }
     }
@@ -1163,6 +1216,7 @@ private class ControlCell: UITableViewCell {
             ])
             currentControl = control
         }
+        control.accessibilityLabel = label
     }
 }
 

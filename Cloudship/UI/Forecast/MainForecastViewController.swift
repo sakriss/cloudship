@@ -106,6 +106,7 @@ class MainForecastViewController: UIViewController {
         let ai = UIActivityIndicatorView(style: .large)
         ai.hidesWhenStopped = true
         ai.translatesAutoresizingMaskIntoConstraints = false
+        ai.accessibilityLabel = "Loading weather data"
         return ai
     }()
 
@@ -125,6 +126,8 @@ class MainForecastViewController: UIViewController {
         sb.searchBarStyle = .minimal
         sb.delegate = self
         sb.translatesAutoresizingMaskIntoConstraints = false
+        sb.accessibilityLabel = "Search City"
+        sb.accessibilityHint = "Tap to search for a city"
         return sb
     }()
 
@@ -181,6 +184,8 @@ class MainForecastViewController: UIViewController {
             target: self,
             action: #selector(openTimeMachine)
         )
+        calendarButton.accessibilityLabel = "Time Machine"
+        calendarButton.accessibilityHint = "Tap to choose a past date for historical weather"
         navigationItem.leftBarButtonItem = calendarButton
 
         // AI chat button (right)
@@ -190,6 +195,8 @@ class MainForecastViewController: UIViewController {
             target: self,
             action: #selector(openAIChat)
         )
+        aiButton.accessibilityLabel = "AI Chat"
+        aiButton.accessibilityHint = "Ask about your weather with AI assistance"
         navigationItem.rightBarButtonItem = aiButton
     }
 
@@ -199,6 +206,7 @@ class MainForecastViewController: UIViewController {
                                           message: "Weather data not loaded yet. Please wait a moment.",
                                           preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
+            alert.accessibilityLabel = "Weather error: Weather data not loaded yet"
             present(alert, animated: true)
             return
         }
@@ -300,6 +308,12 @@ class MainForecastViewController: UIViewController {
         banner.onBackToToday = { [weak self] in
             self?.backToToday()
         }
+
+        // Accessibility for time machine banner
+        banner.isAccessibilityElement = true
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        banner.accessibilityLabel = "Historical weather mode for " + formatter.string(from: date)
 
         // Insert banner after sourceLabel (index 1) or at top
         let insertIndex = min(2, stackView.arrangedSubviews.count)
@@ -410,6 +424,10 @@ class MainForecastViewController: UIViewController {
         for card in reorderableCards {
             let pan = UIPanGestureRecognizer(target: self, action: #selector(handleCardDrag(_:)))
             card.reorderHandle.addGestureRecognizer(pan)
+            // Accessibility for reorder handle
+            card.reorderHandle.isAccessibilityElement = true
+            card.reorderHandle.accessibilityLabel = "Reorder card"
+            card.reorderHandle.accessibilityTraits = .button
         }
     }
 
@@ -449,9 +467,16 @@ class MainForecastViewController: UIViewController {
 
         // Inline search bar scrolls with content — disappears naturally when scrolling down
         stackView.addArrangedSubview(inlineSearchBar)
+        inlineSearchBar.isAccessibilityElement = true
+        inlineSearchBar.accessibilityTraits = .header
 
         // Source label sits above the header card (not a CardView, so added separately)
         stackView.addArrangedSubview(sourceLabel)
+        sourceLabel.isAccessibilityElement = true
+        if let label = sourceLabel.viewWithTag(99) as? UILabel {
+            sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
+        }
+        sourceLabel.accessibilityTraits = .header
 
         // Fixed cards first, then reorderable in saved order
         let allCards: [CardView] = [headerCard, alertBannerCard] + reorderableCards
@@ -459,6 +484,43 @@ class MainForecastViewController: UIViewController {
             $0.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview($0)
         }
+
+        // Accessibility for cards: provide labels or placeholders
+        // HeaderCardView sets its own accessibilityLabel in configure()
+        headerCard.isAccessibilityElement = true
+        if headerCard.accessibilityLabel == nil {
+            headerCard.accessibilityLabel = "Current weather card"
+        }
+
+        alertBannerCard.isAccessibilityElement = true
+        alertBannerCard.accessibilityLabel = "Weather alerts"
+
+        minutelyCard.isAccessibilityElement = true
+        minutelyCard.accessibilityLabel = "Minutely forecast"
+
+        hourlyCard.isAccessibilityElement = true
+        hourlyCard.accessibilityLabel = "Hourly forecast"
+
+        dailyCard.isAccessibilityElement = true
+        dailyCard.accessibilityLabel = "Daily forecast"
+
+        detailsCard.isAccessibilityElement = true
+        detailsCard.accessibilityLabel = "Weather details"
+
+        windGustCard.isAccessibilityElement = true
+        windGustCard.accessibilityLabel = "Wind gust information"
+
+        airQualityCard.isAccessibilityElement = true
+        airQualityCard.accessibilityLabel = "Air quality information"
+
+        pollenCard.isAccessibilityElement = true
+        pollenCard.accessibilityLabel = "Pollen levels"
+
+        activityScoresCard.isAccessibilityElement = true
+        activityScoresCard.accessibilityLabel = "Activity scores"
+
+        aiSummaryCard.isAccessibilityElement = true
+        aiSummaryCard.accessibilityLabel = "AI daily weather summary"
 
         view.addSubview(activityIndicator)
 
@@ -607,7 +669,12 @@ class MainForecastViewController: UIViewController {
             try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
             guard !Task.isCancelled, let self = self, self.currentLocation == nil else { return }
             self.activityIndicator.stopAnimating()
-            self.showErrorAlert(message: "Unable to determine your location. Please try searching for a city instead.")
+            let alert = UIAlertController(title: "Unable to Load Weather",
+                                          message: "Unable to determine your location. Please try searching for a city instead.",
+                                          preferredStyle: .alert)
+            alert.accessibilityLabel = "Weather error: Unable to determine your location"
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
         }
     }
 
@@ -759,7 +826,18 @@ class MainForecastViewController: UIViewController {
             self.activityIndicator.stopAnimating()
             self.refreshControl.endRefreshing()
             let message = (notification.object as? String) ?? "Unable to fetch weather data."
-            self.showErrorAlert(message: message)
+            let alert = UIAlertController(
+                title: "Unable to Load Weather",
+                message: message,
+                preferredStyle: .alert
+            )
+            alert.accessibilityLabel = "Weather error: Unable to Load Weather"
+            alert.addAction(UIAlertAction(title: "Retry", style: .default) { [weak self] _ in
+                guard let loc = self?.currentLocation else { return }
+                self?.fetchWeather(for: loc)
+            })
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            self.present(alert, animated: true)
         }
     }
 
@@ -942,6 +1020,9 @@ class MainForecastViewController: UIViewController {
             label.text = WeatherDataSourceManager.shared.activeSource.name
         }
 
+        // Accessibility update for sourceLabel
+        sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
+
         // Allow tapping the pill when consensus is active to show the breakdown sheet
         sourceLabel.isUserInteractionEnabled = isConsensus
         if isConsensus {
@@ -1050,6 +1131,7 @@ class MainForecastViewController: UIViewController {
             message: message,
             preferredStyle: .alert
         )
+        alert.accessibilityLabel = "Weather error: Unable to Load Weather"
         alert.addAction(UIAlertAction(title: "Retry", style: .default) { [weak self] _ in
             guard let loc = self?.currentLocation else { return }
             self?.fetchWeather(for: loc)
@@ -1064,6 +1146,7 @@ class MainForecastViewController: UIViewController {
             message: "NOAA is US-only. Showing Tomorrow.io data for this location.",
             preferredStyle: .alert
         )
+        banner.accessibilityLabel = "Weather info: Using NOAA fallback data"
         banner.addAction(UIAlertAction(title: "OK", style: .default))
         present(banner, animated: true)
     }
@@ -1104,7 +1187,12 @@ extension MainForecastViewController: CLLocationManagerDelegate {
             manager.requestWhenInUseAuthorization()
         case .denied, .restricted:
             activityIndicator.stopAnimating()
-            showErrorAlert(message: "Location access is required to show local weather. Enable it in Settings.")
+            let alert = UIAlertController(title: "Unable to Load Weather",
+                                          message: "Location access is required to show local weather. Enable it in Settings.",
+                                          preferredStyle: .alert)
+            alert.accessibilityLabel = "Weather error: Location access denied"
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
         @unknown default:
             break
         }
@@ -1126,7 +1214,12 @@ extension MainForecastViewController: CLLocationManagerDelegate {
             return
         }
         activityIndicator.stopAnimating()
-        showErrorAlert(message: "Unable to determine your location. Please try searching for a city instead.")
+        let alert = UIAlertController(title: "Unable to Load Weather",
+                                      message: "Unable to determine your location. Please try searching for a city instead.",
+                                      preferredStyle: .alert)
+        alert.accessibilityLabel = "Weather error: Unable to determine your location"
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -1337,3 +1430,4 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         }
     }
 }
+
