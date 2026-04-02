@@ -99,6 +99,9 @@ private class HourlyCurveView: UIView {
         setNeedsDisplay()
     }
 
+    /// The width of each hourly column cell — must match `HourlyCardView.itemWidth`.
+    var itemWidth: CGFloat = 64 { didSet { setNeedsDisplay() } }
+
     override func draw(_ rect: CGRect) {
         let nonNil = values.compactMap { $0 }
         guard nonNil.count >= 2, let ctx = UIGraphicsGetCurrentContext() else { return }
@@ -107,8 +110,8 @@ private class HourlyCurveView: UIView {
         let minV = nonNil.min()!
         let maxV = nonNil.max()!
         let range = maxV - minV
-        // Each column is evenly spaced — step matches itemWidth so dots align with columns
-        let step = n > 1 ? rect.width / CGFloat(n - 1) : rect.width
+        // Each dot sits at the horizontal center of its column cell
+        let step = itemWidth
 
         func yPos(_ v: Double) -> CGFloat {
             if range > 0 {
@@ -131,17 +134,18 @@ private class HourlyCurveView: UIView {
         if current.count >= 2 { segments.append(current) }
 
         // Draw each segment
+        let halfStep = step / 2
         for seg in segments {
             let path = UIBezierPath()
             for (j, i) in seg.enumerated() {
-                let x = CGFloat(i) * step
+                let x = CGFloat(i) * step + halfStep
                 let y = yPos(values[i]!)
                 let pt = CGPoint(x: x, y: y)
                 if j == 0 {
                     path.move(to: pt)
                 } else {
                     let prevI = seg[j - 1]
-                    let prevX = CGFloat(prevI) * step
+                    let prevX = CGFloat(prevI) * step + halfStep
                     let prevY = yPos(values[prevI]!)
                     let prev = CGPoint(x: prevX, y: prevY)
                     let cp1 = CGPoint(x: prev.x + step * 0.4, y: prev.y)
@@ -153,8 +157,8 @@ private class HourlyCurveView: UIView {
             // Gradient fill under each segment
             let fillPath = path.copy() as! UIBezierPath
             let lastI = seg.last!
-            fillPath.addLine(to: CGPoint(x: CGFloat(lastI) * step, y: rect.height))
-            fillPath.addLine(to: CGPoint(x: CGFloat(seg.first!) * step, y: rect.height))
+            fillPath.addLine(to: CGPoint(x: CGFloat(lastI) * step + halfStep, y: rect.height))
+            fillPath.addLine(to: CGPoint(x: CGFloat(seg.first!) * step + halfStep, y: rect.height))
             fillPath.close()
 
             ctx.saveGState()
@@ -176,7 +180,7 @@ private class HourlyCurveView: UIView {
 
             // Dots at each data point in this segment
             for i in seg {
-                let x = CGFloat(i) * step
+                let x = CGFloat(i) * step + halfStep
                 let y = yPos(values[i]!)
                 let dot = UIBezierPath(arcCenter: CGPoint(x: x, y: y),
                                        radius: 3, startAngle: 0, endAngle: .pi * 2, clockwise: true)
@@ -385,6 +389,7 @@ class HourlyCardView: CardView {
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: Self.itemWidth, height: totalCellHeight)
         layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: p, bottom: 0, right: p)
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -461,14 +466,16 @@ class HourlyCardView: CardView {
         let vals = entries.map { activeMetric.value(from: $0) }
         curveView.values = vals
         curveView.color = activeMetric.accentColor
+        curveView.itemWidth = Self.itemWidth
 
-        // Position curve below the cells, spanning the full scrollable content width
+        // Position curve below the cells, spanning the full scrollable content width.
+        // x = sectionInset.left so column 0 in the curve aligns with cell 0 in the collection.
         let p = CardView.padding
-        let contentWidth = CGFloat(entries.count) * Self.itemWidth + p * 2
+        let curveWidth = CGFloat(entries.count) * Self.itemWidth
         curveView.frame = CGRect(
             x: p,
             y: 100 + 4,
-            width: max(contentWidth - p * 2, 0),
+            width: max(curveWidth, 0),
             height: Self.curveHeight - 4
         )
     }
