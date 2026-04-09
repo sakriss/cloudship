@@ -136,7 +136,7 @@ class SettingsViewController: UITableViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 
-    private func postSettingsChangedDebounced(delay: TimeInterval = 0.2) {
+    private func postSettingsChangedDebounced(delay: TimeInterval = 0.35) {
         pendingSettingsChangedWorkItem?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
@@ -146,8 +146,12 @@ class SettingsViewController: UITableViewController {
         if tableView.isDragging || tableView.isDecelerating {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: work)
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         }
+    }
+
+    private func performAfterToggleSettles(delay: TimeInterval = 0.25, _ work: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
     }
 
     // MARK: - Notification row helpers
@@ -189,6 +193,27 @@ class SettingsViewController: UITableViewController {
         case 6: return .eveningBriefTime
         default: return .rainAlerts
         }
+    }
+
+    private func configureNearestStationCell(_ cell: UITableViewCell) {
+        var config = cell.defaultContentConfiguration()
+        config.text = "Nearest Active Station"
+        config.secondaryText = nearestStationSubtitle
+        config.secondaryTextProperties.color = .secondaryLabel
+        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+        cell.contentConfiguration = config
+        cell.accessoryView = nearestStationSwitch
+        cell.selectionStyle = .none
+        cell.accessoryView?.accessibilityLabel = "Nearest Active Station"
+        cell.accessoryView?.accessibilityHint = "Use the closest weather station for your forecasts"
+    }
+
+    private func refreshNearestStationCellIfVisible() {
+        let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
+        guard let visible = tableView.indexPathsForVisibleRows,
+              visible.contains(indexPath),
+              let cell = tableView.cellForRow(at: indexPath) else { return }
+        configureNearestStationCell(cell)
     }
 
     // MARK: - Lifecycle
@@ -252,7 +277,6 @@ class SettingsViewController: UITableViewController {
         case .subscription:   title = "Subscription"
         case .about:          title = "About"
         }
-        UIAccessibility.post(notification: .layoutChanged, argument: nil)
         return title
     }
 
@@ -277,16 +301,7 @@ class SettingsViewController: UITableViewController {
 
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                var config = cell.defaultContentConfiguration()
-                config.text = "Nearest Active Station"
-                config.secondaryText = nearestStationSubtitle
-                config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
-                cell.contentConfiguration = config
-                cell.accessoryView = nearestStationSwitch
-                cell.selectionStyle = .none
-                cell.accessoryView?.accessibilityLabel = "Nearest Active Station"
-                cell.accessoryView?.accessibilityHint = "Use the closest weather station for your forecasts"
+                configureNearestStationCell(cell)
                 return cell
 
             default:
@@ -575,25 +590,21 @@ class SettingsViewController: UITableViewController {
             // Clear any stale station cache so the next fetch triggers a fresh lookup
             WeatherDataSourceManager.shared.clearNearestStationCache()
         }
-        updateSourceControlState()
-        postSettingsChangedDebounced()
+        performAfterToggleSettles { [weak self] in
+            self?.updateSourceControlState()
+            self?.postSettingsChangedDebounced()
+        }
     }
 
     @objc private func nearestStationResolved() {
-        let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
-        if let visible = tableView.indexPathsForVisibleRows, visible.contains(indexPath) {
-            tableView.reloadRows(at: [indexPath], with: .none)
-        }
+        refreshNearestStationCellIfVisible()
     }
 
     /// Updates the nearest-station cell's subtitle in place (no row reload).
     /// Called when settingsChanged fires so the km/mi label tracks the unit preference.
     @objc private func reloadNearestStationRow() {
         guard UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey) else { return }
-        let indexPath = IndexPath(row: 1, section: Section.dataSource.rawValue)
-        if let visible = tableView.indexPathsForVisibleRows, visible.contains(indexPath) {
-            tableView.reloadRows(at: [indexPath], with: .none)
-        }
+        refreshNearestStationCellIfVisible()
     }
 
     private var nearestStationSubtitle: String {
@@ -633,8 +644,10 @@ class SettingsViewController: UITableViewController {
         }
 
         defaults.set(sender.isOn, forKey: WeatherDataSourceManager.consensusModeEnabledKey)
-        updateSourceControlState()
-        postSettingsChangedDebounced()
+        performAfterToggleSettles { [weak self] in
+            self?.updateSourceControlState()
+            self?.postSettingsChangedDebounced()
+        }
     }
 
     @objc private func premiumStatusChanged() {
@@ -713,7 +726,9 @@ class SettingsViewController: UITableViewController {
                 BackgroundTaskManager.shared.scheduleNextRefresh()
             }
         }
-        postSettingsChangedDebounced()
+        performAfterToggleSettles { [weak self] in
+            self?.postSettingsChangedDebounced()
+        }
     }
 
     @objc private func liveActivityChanged(_ sender: UISwitch) {
@@ -730,7 +745,9 @@ class SettingsViewController: UITableViewController {
                 }
             }
         }
-        postSettingsChangedDebounced()
+        performAfterToggleSettles { [weak self] in
+            self?.postSettingsChangedDebounced()
+        }
     }
 
     @objc private func morningBriefChanged(_ sender: UISwitch) {
@@ -750,9 +767,7 @@ class SettingsViewController: UITableViewController {
                 PrecipitationNotificationService.shared.cancelBrief(identifier: "morningBrief")
             }
         }
-        // Insert or delete only the time-picker row; leave the toggle cell untouched
-        // so the UISwitch isn't destroyed mid-touch.
-        DispatchQueue.main.async { [weak self] in
+        performAfterToggleSettles { [weak self] in
             guard let self else { return }
             self.tableView.beginUpdates()
             let timeRow = IndexPath(row: 4, section: Section.notifications.rawValue)
@@ -762,13 +777,7 @@ class SettingsViewController: UITableViewController {
                 self.tableView.deleteRows(at: [timeRow], with: .automatic)
             }
             self.tableView.endUpdates()
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                let toggleIndex = IndexPath(row: 3, section: Section.notifications.rawValue)
-                if let visible = self.tableView.indexPathsForVisibleRows, visible.contains(toggleIndex) {
-                    self.tableView.reloadRows(at: [toggleIndex], with: .none)
-                }
-            }
+            self.postSettingsChangedDebounced()
         }
     }
 
@@ -789,10 +798,9 @@ class SettingsViewController: UITableViewController {
                 PrecipitationNotificationService.shared.cancelBrief(identifier: "eveningBrief")
             }
         }
-        // Insert or delete only the time-picker row; leave the toggle cell untouched.
         let morningEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         let timeRowIndex = morningEnabled ? 6 : 5
-        DispatchQueue.main.async { [weak self] in
+        performAfterToggleSettles { [weak self] in
             guard let self else { return }
             self.tableView.beginUpdates()
             let timeRow = IndexPath(row: timeRowIndex, section: Section.notifications.rawValue)
@@ -802,13 +810,7 @@ class SettingsViewController: UITableViewController {
                 self.tableView.deleteRows(at: [timeRow], with: .automatic)
             }
             self.tableView.endUpdates()
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                let toggleIndex = IndexPath(row: morningEnabled ? 5 : 4, section: Section.notifications.rawValue)
-                if let visible = self.tableView.indexPathsForVisibleRows, visible.contains(toggleIndex) {
-                    self.tableView.reloadRows(at: [toggleIndex], with: .none)
-                }
-            }
+            self.postSettingsChangedDebounced()
         }
     }
 
@@ -1219,4 +1221,3 @@ private class ControlCell: UITableViewCell {
         control.accessibilityLabel = label
     }
 }
-
