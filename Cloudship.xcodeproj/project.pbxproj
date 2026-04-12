@@ -365,86 +365,182 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		162DC6032020FAAB00C19DCE /* Cloudship */ = {
+		A10000000000000000000001 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				D21908F826278F0100FFB366 /* Tomorrow.io */,
-				16C5224C214C566D007F9935 /* Cloudship.entitlements */,
-				162DC61A2020FDC500C19DCE /* Alerts */,
-				162DC6192020FDBE00C19DCE /* Daily */,
-				162DC6182020FDB700C19DCE /* Hourly */,
-				162DC6172020FDAD00C19DCE /* Minutely */,
-				162DC6162020FD9F00C19DCE /* Currently */,
 				162DC6042020FAAB00C19DCE /* AppDelegate.swift */,
-				162DC6062020FAAB00C19DCE /* ViewController.swift */,
-				16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */,
-				87D5680F4DA24E25AD61EE9E /* NOAADataSource.swift */,
-				161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */,
-				16695921215EAF60002BC386 /* UI/Radar/RadarViewController.swift */,
+				A34FCE7E1E9241D089FE3F4D /* UI/MainTabBarController.swift */,
+				16C5224C214C566D007F9935 /* Cloudship.entitlements */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000002 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
 				162DC6082020FAAB00C19DCE /* Main.storyboard */,
 				162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
 				162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
 				162DC6102020FAAB00C19DCE /* Info.plist */,
-				1620611320AF69A6004E00BD /* WeatherController.swift */,
-				5036433DBE614771979DE8B6 /* DataSources/UnifiedWeatherModels.swift */,
-				BB001001001001001001BB01 /* DataSources/WeatherCache.swift */,
-				CC010101010101010101CC01 /* DataSources/OpenRouterService.swift */,
-				FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */,
-				12D7A2FD05E9477FAB8BD805 /* DataSources/TomorrowIODataSource.swift */,
-				8879DB8906CB4BD2B1C3A4B3 /* DataSources/NOAAModels.swift */,
-				766A94256EAD495AAC3A5AC9 /* DataSources/NOAAAlertModels.swift */,
-				AD98DF9827CE48369FA9C14C /* DataSources/WeatherDataSourceManager.swift */,
-				BB23CD45EF67089A12345678 /* DataSources/OpenMeteoModels.swift */,
-				DD45EF6789AB01BC3456789A /* DataSources/OpenMeteoDataSource.swift */,
-				5DEAD06BEC734AD881E3BD9F /* DataSources/PrecipitationAnalyzer.swift */,
-				AA1B2C3D4E5F6A7B8C9D0E1F /* DataSources/PirateWeatherModels.swift */,
-				1A2B3C4D5E6F7A8B9C0D1E2F /* DataSources/PirateWeatherDataSource.swift */,
-				CC3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift */,
-				B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */,
-				FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */,
-				A34FCE7E1E9241D089FE3F4D /* UI/MainTabBarController.swift */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000003 /* Forecast */ = {
+			isa = PBXGroup;
+			children = (
 				B8419FDDA87C4DCC9A676651 /* UI/Forecast/MainForecastViewController.swift */,
-				C5B395E9DE2E4BEE99AB9E60 /* TemperatureFormatter.swift */,
-				A7DEABC4FD344E8682753FF2 /* UI/Forecast/Cards/CardView.swift */,
 				80DC2BC32A6B44DC95C8D4BB /* HeaderCardView.swift */,
+				68F6815BC68C443DAD8AE3EF /* UI/Forecast/DailyDetailViewController.swift */,
+				92A37C062F745A950090F977 /* DailyBriefCardView.swift */,
+				C2D3E4F5A6B7C8D9E0F1A2B3 /* UI/Forecast/TimeMachineBannerView.swift */,
+				EE0505050505050505EE05 /* UI/Forecast/WeatherAnimationView.swift */,
+				A7DEABC4FD344E8682753FF2 /* UI/Forecast/Cards/CardView.swift */,
+				C3739D4B5AF2401DB4F0949E /* UI/Forecast/Cards/AlertBannerCardView.swift */,
 				82215DD8F53049A6AEED17F6 /* UI/Forecast/Cards/DailyCardView.swift */,
 				2936012EBFF64B6798B8AF71 /* UI/Forecast/Cards/HourlyCardView.swift */,
 				F1A5DFCBB162407A9EE45CD2 /* UI/Forecast/Cards/MinutelyCardView.swift */,
+				3C8BA9853D214D04BAA086AB /* DetailsCardView.swift */,
+				434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */,
 				623E1BB68FEC4BD6BF3F583C /* UI/Forecast/Cards/AirQualityCardView.swift */,
 				349D9A52185E40BB96946278 /* UI/Forecast/Cards/PollenCardView.swift */,
-				68F6815BC68C443DAD8AE3EF /* UI/Forecast/DailyDetailViewController.swift */,
-				CC030303030303030303CC03 /* UI/AI/AIWeatherChatViewController.swift */,
-				CC050505050505050505CC05 /* Scoring/ActivityScoreEngine.swift */,
 				CC070707070707070707CC07 /* UI/Forecast/Cards/ActivityScoresCardView.swift */,
-				DD0101010101010101DD01 /* DataSources/AISummaryService.swift */,
 				DD0303030303030303DD03 /* UI/Forecast/Cards/AISummaryCardView.swift */,
-				434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */,
-				C3739D4B5AF2401DB4F0949E /* UI/Forecast/Cards/AlertBannerCardView.swift */,
-				EE0505050505050505EE05 /* UI/Forecast/WeatherAnimationView.swift */,
-				3C8BA9853D214D04BAA086AB /* DetailsCardView.swift */,
-				AA1638EA54414FD5A2A6AF0A /* UI/Alert/AlertDetailViewController.swift */,
+			);
+			name = Forecast;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000004 /* Radar */ = {
+			isa = PBXGroup;
+			children = (
+				16695921215EAF60002BC386 /* UI/Radar/RadarViewController.swift */,
+			);
+			name = Radar;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000005 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				CC030303030303030303CC03 /* UI/AI/AIWeatherChatViewController.swift */,
+				DD0101010101010101DD01 /* DataSources/AISummaryService.swift */,
+				CC010101010101010101CC01 /* DataSources/OpenRouterService.swift */,
+			);
+			name = AI;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000006 /* Settings & Subscription */ = {
+			isa = PBXGroup;
+			children = (
 				0D9992EDB3DB49328AD8A066 /* UI/Settings/SettingsViewController.swift */,
+				E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */,
+				CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */,
+			);
+			name = "Settings & Subscription";
+			sourceTree = "<group>";
+		};
+		A10000000000000000000007 /* Weather Data */ = {
+			isa = PBXGroup;
+			children = (
+				5036433DBE614771979DE8B6 /* DataSources/UnifiedWeatherModels.swift */,
+				FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */,
+				AD98DF9827CE48369FA9C14C /* DataSources/WeatherDataSourceManager.swift */,
+				BB001001001001001001BB01 /* DataSources/WeatherCache.swift */,
+				12D7A2FD05E9477FAB8BD805 /* DataSources/TomorrowIODataSource.swift */,
+				D21908F826278F0100FFB366 /* Tomorrow.io */,
+				87D5680F4DA24E25AD61EE9E /* NOAADataSource.swift */,
+				8879DB8906CB4BD2B1C3A4B3 /* DataSources/NOAAModels.swift */,
+				766A94256EAD495AAC3A5AC9 /* DataSources/NOAAAlertModels.swift */,
+				BB23CD45EF67089A12345678 /* DataSources/OpenMeteoModels.swift */,
+				DD45EF6789AB01BC3456789A /* DataSources/OpenMeteoDataSource.swift */,
+				B1C2D3E4F5A6B7C8D9E0F1A2 /* DataSources/OpenMeteoHistoricalDataSource.swift */,
+				AA1B2C3D4E5F6A7B8C9D0E1F /* DataSources/PirateWeatherModels.swift */,
+				1A2B3C4D5E6F7A8B9C0D1E2F /* DataSources/PirateWeatherDataSource.swift */,
+				CC3344556677889900112233 /* DataSources/AppleWeatherDataSource.swift */,
+				B0B75167A62A545E6D8E45C0 /* AccuWeatherModels.swift */,
+				E374923DE9FB1E1B25F2F4F1 /* AccuWeatherDataSource.swift */,
+				5DEAD06BEC734AD881E3BD9F /* DataSources/PrecipitationAnalyzer.swift */,
+				D5E6F7A8B9C0D1E2F3A4B5C6 /* DataSources/SavedLocationStore.swift */,
+				AA001001001001001001AA01 /* DataSources/StationProximityService.swift */,
+				AA002002002002002002AA02 /* DataSources/ConsensusWeatherService.swift */,
+			);
+			name = "Weather Data";
+			sourceTree = "<group>";
+		};
+		A10000000000000000000008 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */,
+				C5B395E9DE2E4BEE99AB9E60 /* TemperatureFormatter.swift */,
+				FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */,
 				EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */,
 				FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */,
 				EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */,
 				A1B2C3D4E5F6A7B8C9D0E1F2 /* UI/Shared/WeatherColors.swift */,
 				D7E8F9A0B1C2D3E4F5A6B7C8 /* UI/Shared/WeatherTheme.swift */,
 				D8E9F0A1B2C3D4E5F6A7B8C9 /* UI/Shared/CardTintStyle.swift */,
-				B1C2D3E4F5A6B7C8D9E0F1A2 /* DataSources/OpenMeteoHistoricalDataSource.swift */,
-				C2D3E4F5A6B7C8D9E0F1A2B3 /* UI/Forecast/TimeMachineBannerView.swift */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000009 /* Services */ = {
+			isa = PBXGroup;
+			children = (
 				F1A2B3C4D5E6F7A8B9C0D1E2 /* Services/BackgroundTaskManager.swift */,
 				A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/PrecipitationNotificationService.swift */,
-				D5E6F7A8B9C0D1E2F3A4B5C6 /* DataSources/SavedLocationStore.swift */,
-				E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */,
-				CC1122334455667788990011 /* Services/SubscriptionManager.swift */,
 				FB0101010101010101FB01 /* Services/PrecipitationLiveActivityManager.swift */,
-				CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */,
-				92A37C062F745A950090F977 /* DailyBriefCardView.swift */,
-				AA001001001001001001AA01 /* DataSources/StationProximityService.swift */,
-				AA002002002002002002AA02 /* DataSources/ConsensusWeatherService.swift */,
+				CC1122334455667788990011 /* Services/SubscriptionManager.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000A /* Supporting UI */ = {
+			isa = PBXGroup;
+			children = (
+				AA1638EA54414FD5A2A6AF0A /* UI/Alert/AlertDetailViewController.swift */,
 				AA003003003003003003AA03 /* UI/Consensus/ConsensusBreakdownViewController.swift */,
-				B0B75167A62A545E6D8E45C0 /* AccuWeatherModels.swift */,
-				E374923DE9FB1E1B25F2F4F1 /* AccuWeatherDataSource.swift */,
+			);
+			name = "Supporting UI";
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000B /* Scoring */ = {
+			isa = PBXGroup;
+			children = (
+				CC050505050505050505CC05 /* Scoring/ActivityScoreEngine.swift */,
+			);
+			name = Scoring;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000000C /* Legacy */ = {
+			isa = PBXGroup;
+			children = (
+				162DC6062020FAAB00C19DCE /* ViewController.swift */,
+				1620611320AF69A6004E00BD /* WeatherController.swift */,
+				162DC6162020FD9F00C19DCE /* Currently */,
+				162DC6172020FDAD00C19DCE /* Minutely */,
+				162DC6182020FDB700C19DCE /* Hourly */,
+				162DC6192020FDBE00C19DCE /* Daily */,
+				162DC61A2020FDC500C19DCE /* Alerts */,
+				16D5C11520C6E83F00B5F44B /* CurrentlyTableViewCell.swift */,
+				161BCA7120E2D92300AE984F /* LookingAheadCollectionViewCell.swift */,
+			);
+			name = Legacy;
+			sourceTree = "<group>";
+		};
+		162DC6032020FAAB00C19DCE /* Cloudship */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000001 /* App */,
+				A10000000000000000000002 /* Resources */,
+				A10000000000000000000003 /* Forecast */,
+				A10000000000000000000004 /* Radar */,
+				A10000000000000000000005 /* AI */,
+				A10000000000000000000006 /* Settings & Subscription */,
+				A10000000000000000000007 /* Weather Data */,
+				A10000000000000000000008 /* Shared */,
+				A10000000000000000000009 /* Services */,
+				A1000000000000000000000A /* Supporting UI */,
+				A1000000000000000000000B /* Scoring */,
+				A1000000000000000000000C /* Legacy */,
 			);
 			path = Cloudship;
 			sourceTree = "<group>";
@@ -581,7 +677,6 @@
 				162DC5FF2020FAAB00C19DCE /* Resources */,
 				16C5224B214C4C9D007F9935 /* Embed App Extensions */,
 				B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */,
-				1665E0912243F59900CD9632 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -733,23 +828,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1665E0912243F59900CD9632 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# AerisWeather removed\n";
-		};
 		B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1082,6 +1160,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cloudship/Cloudship.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6QK74KTAZV;
 				ENABLE_DEBUG_DYLIB = NO;
 				INFOPLIST_FILE = Cloudship/Info.plist;
@@ -1163,6 +1242,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cloudship/Cloudship.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6QK74KTAZV;
 				ENABLE_DEBUG_DYLIB = NO;
 				INFOPLIST_FILE = Cloudship/Info.plist;
@@ -1264,7 +1344,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test.CloudshipWidget";
@@ -1308,7 +1388,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.5;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test.CloudshipWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";

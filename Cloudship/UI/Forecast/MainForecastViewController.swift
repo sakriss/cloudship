@@ -758,14 +758,19 @@ class MainForecastViewController: UIViewController {
             name: Notification.Name("nearestStationResolved"),
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAppDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
 
     @objc private func handleConsensusPaywall() {
-        guard let settingsNav = tabBarController?.viewControllers?.first(where: {
+        guard tabBarController?.viewControllers?.contains(where: {
             ($0 as? UINavigationController)?.viewControllers.first is SettingsViewController ||
             $0 is SettingsViewController
-        }) as? UINavigationController,
-        let settingsVC = settingsNav.viewControllers.first as? SettingsViewController else {
+        }) == true else {
             return
         }
         let paywall = PaywallViewController()
@@ -805,6 +810,19 @@ class MainForecastViewController: UIViewController {
     /// the weather fetch is already in progress inline (awaited in fetchWeather).
     @objc private func handleNearestStationResolved() {
         updateSourceLabel()
+    }
+
+    @objc private func handleAppDidBecomeActive() {
+        guard let loc = currentLocation else { return }
+        guard !WeatherDataSourceManager.shared.isShowingHistorical else { return }
+
+        Task {
+            await WeatherDataSourceManager.shared.fetchWeather(
+                lat: loc.coordinate.latitude,
+                lon: loc.coordinate.longitude,
+                updateWidget: isShowingGPSLocation
+            )
+        }
     }
 
     @objc private func handleDataReady(_ notification: Notification) {
@@ -1430,4 +1448,3 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         }
     }
 }
-

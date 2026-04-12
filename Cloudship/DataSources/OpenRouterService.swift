@@ -120,7 +120,8 @@ final class OpenRouterService {
         for today at \(location). Be specific about times and temperatures. Focus on what \
         matters most: precipitation timing, best time to go outside, what to wear. \
         Be conversational and helpful, not clinical. Use the \(unitSystem) system. \
-        Do not use emojis.
+        Do not use emojis. Do not start with greetings like "good morning", \
+        "good afternoon", or "good evening".
         """
 
         let weatherContext = systemPrompt(from: weatherData)

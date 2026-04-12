@@ -506,17 +506,11 @@ extension ViewController: UITableViewDataSource {
             
             // Hide alert view container initially
             cell.alertViewContainer.isHidden = true
-            print("GIVE ME THE TEMPERATURE PLEASE 1st")
-//            let weatherData = try await fetchCurrentWeather(lat: lat, lon: lon, units: units)
-            print(WeatherController.shared.climacellV4Weather?.realtime?.values)
-            print(WeatherController.shared.forecastWeather?.timelines?.hourly?.first?.values)
             // Access weather data
             guard let realtime = WeatherController.shared.climacellV4Weather?.realtime?.values.temperature else {
                             cell.currentTempLabel.text = "--"
                             return cell
                         }
-            print("GIVE ME THE TEMPERATURE PLEASE 2nd")
-            print(WeatherController.shared.climacellV4Weather?.realtime?.values.temperature)
             // Set current temperature
             if let forecastData = WeatherController.shared.climacellV4Weather?.realtime?.values,
                let currentWeather =  forecastData.temperature {
