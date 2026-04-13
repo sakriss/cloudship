@@ -658,8 +658,20 @@ class SettingsViewController: UITableViewController {
         }
     }
 
+    private func selectedSourceIndex() -> Int {
+        let active = WeatherDataSourceManager.shared.activeSource
+        if active is NOAADataSource                { return 0 }
+        if active is OpenMeteoDataSource           { return 1 }
+        if active is PirateWeatherDataSource       { return 2 }
+        if active is AppleWeatherDataSource        { return 3 }
+        if active is TomorrowIODataSource          { return 4 }
+        if active is AccuWeatherDataSource         { return 5 }
+        return 0
+    }
+
     /// Dims/enables the source segmented control based on whether an override mode is active.
     private func updateSourceControlState() {
+        sourceControl.selectedSegmentIndex = selectedSourceIndex()
         let overrideActive = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
                           || UserDefaults.standard.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
         sourceControl.isEnabled = !overrideActive
