@@ -31,3 +31,40 @@ enum WeatherSourceID: String, Codable {
     case appleWeather  = "appleWeather"
     case accuWeather   = "accuWeather"
 }
+
+extension WeatherSourceID {
+    static let forecastQuickSwitchOrder: [WeatherSourceID] = [
+        .noaa, .openMeteo, .pirateWeather, .appleWeather, .tomorrowIO, .accuWeather
+    ]
+
+    var requiresPremium: Bool {
+        switch self {
+        case .tomorrowIO, .accuWeather:
+            return true
+        case .noaa, .openMeteo, .pirateWeather, .appleWeather:
+            return false
+        }
+    }
+
+    var forecastMenuTitle: String {
+        switch self {
+        case .tomorrowIO:    return "Tomorrow.io"
+        case .noaa:          return "NOAA"
+        case .openMeteo:     return "Open-Meteo"
+        case .pirateWeather: return "Pirate Weather"
+        case .appleWeather:  return "Apple Weather"
+        case .accuWeather:   return "AccuWeather"
+        }
+    }
+
+    func makeWeatherDataSource() -> WeatherDataSource {
+        switch self {
+        case .tomorrowIO:    return TomorrowIODataSource()
+        case .noaa:          return NOAADataSource()
+        case .openMeteo:     return OpenMeteoDataSource()
+        case .pirateWeather: return PirateWeatherDataSource()
+        case .appleWeather:  return AppleWeatherDataSource()
+        case .accuWeather:   return AccuWeatherDataSource()
+        }
+    }
+}

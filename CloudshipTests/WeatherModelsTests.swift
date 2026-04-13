@@ -116,6 +116,56 @@ final class MoonPhaseTests: XCTestCase {
 
 final class WeatherConditionTests: XCTestCase {
 
+    private func makeTomorrowDailyValues(
+        weatherCodeFullDay: Int? = nil,
+        weatherCodeDay: Int? = nil,
+        weatherCodeNight: Int? = nil,
+        weatherCodeAvg: Int? = nil,
+        weatherCodeMax: Int? = nil,
+        weatherCodeMin: Int? = nil
+    ) -> ClimacellV4.ForecastValues {
+        ClimacellV4.ForecastValues(
+            cloudBase: nil,
+            cloudCeiling: nil,
+            cloudCover: nil,
+            dewPoint: nil,
+            freezingRainIntensity: nil,
+            humidity: nil,
+            precipitationProbability: nil,
+            precipitationProbabilityAvg: nil,
+            rainAccumulationSum: nil,
+            pressureSurfaceLevel: nil,
+            rainIntensity: nil,
+            sleetIntensity: nil,
+            snowIntensity: nil,
+            temperature: nil,
+            temperatureApparent: nil,
+            temperatureApparentMin: nil,
+            temperatureApparentMax: nil,
+            temperatureMax: nil,
+            temperatureMin: nil,
+            uvHealthConcern: nil,
+            uvIndex: nil,
+            visibility: nil,
+            weatherCode: nil,
+            weatherCodeFullDay: weatherCodeFullDay,
+            weatherCodeAvg: weatherCodeAvg,
+            weatherCodeDay: weatherCodeDay,
+            weatherCodeNight: weatherCodeNight,
+            weatherCodeMax: weatherCodeMax,
+            weatherCodeMin: weatherCodeMin,
+            windDirection: nil,
+            windGust: nil,
+            windSpeed: nil,
+            sunriseTime: nil,
+            sunsetTime: nil,
+            moonPhase: nil,
+            treeIndex: nil,
+            grassIndex: nil,
+            weedIndex: nil
+        )
+    }
+
     func testDescription_allCasesNonEmpty() {
         let allCases: [WeatherCondition] = [
             .clear, .mostlyClear, .partlyCloudy, .mostlyCloudy,
@@ -133,6 +183,20 @@ final class WeatherConditionTests: XCTestCase {
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(WeatherCondition.self, from: data)
         XCTAssertEqual(original, decoded)
+    }
+
+    func testTomorrowDailyCondition_fallsBackToMaxWhenAverageCodeIsUnknown() {
+        let values = makeTomorrowDailyValues(weatherCodeAvg: 2576, weatherCodeMax: 4200)
+        XCTAssertEqual(WeatherCodeMapper.condition(fromTomorrowDailyValues: values), .rain)
+    }
+
+    func testTomorrowNightCondition_prefersNightCodeWhenAvailable() {
+        let values = makeTomorrowDailyValues(weatherCodeNight: 5000, weatherCodeMax: 4200)
+        XCTAssertEqual(WeatherCodeMapper.nightCondition(fromTomorrowDailyValues: values), .snow)
+    }
+
+    func testUnknownIconDefaultsToCloudy() {
+        XCTAssertEqual(WeatherCodeMapper.iconName(for: .unknown), "cloudy")
     }
 }
 

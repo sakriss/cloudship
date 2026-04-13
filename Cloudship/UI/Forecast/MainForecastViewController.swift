@@ -60,7 +60,12 @@ class MainForecastViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.tag = 99  // used to find and update later
 
-        let stack = UIStackView(arrangedSubviews: [icon, label])
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down"))
+        chevron.tintColor = .tertiaryLabel
+        chevron.contentMode = .scaleAspectFit
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+
+        let stack = UIStackView(arrangedSubviews: [icon, label, chevron])
         stack.axis = .horizontal
         stack.spacing = 5
         stack.alignment = .center
@@ -70,6 +75,8 @@ class MainForecastViewController: UIViewController {
         NSLayoutConstraint.activate([
             icon.widthAnchor.constraint(equalToConstant: 14),
             icon.heightAnchor.constraint(equalToConstant: 12),
+            chevron.widthAnchor.constraint(equalToConstant: 8),
+            chevron.heightAnchor.constraint(equalToConstant: 12),
             stack.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             stack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             container.heightAnchor.constraint(equalToConstant: 24)
@@ -476,7 +483,10 @@ class MainForecastViewController: UIViewController {
         if let label = sourceLabel.viewWithTag(99) as? UILabel {
             sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
         }
-        sourceLabel.accessibilityTraits = .header
+        sourceLabel.accessibilityTraits = .button
+        sourceLabel.accessibilityHint = "Double tap to switch weather sources"
+        sourceLabel.isUserInteractionEnabled = true
+        sourceLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapSourceLabel)))
 
         // Fixed cards first, then reorderable in saved order
         let allCards: [CardView] = [headerCard, alertBannerCard] + reorderableCards
@@ -1040,23 +1050,84 @@ class MainForecastViewController: UIViewController {
 
         // Accessibility update for sourceLabel
         sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
-
-        // Allow tapping the pill when consensus is active to show the breakdown sheet
-        sourceLabel.isUserInteractionEnabled = isConsensus
-        if isConsensus {
-            if sourceLabel.gestureRecognizers?.isEmpty ?? true {
-                let tap = UITapGestureRecognizer(target: self, action: #selector(didTapSourceLabel))
-                sourceLabel.addGestureRecognizer(tap)
-            }
-        } else {
-            sourceLabel.gestureRecognizers?.forEach { sourceLabel.removeGestureRecognizer($0) }
-        }
+        sourceLabel.accessibilityHint = isConsensus
+            ? "Double tap to switch weather sources or view consensus breakdown"
+            : "Double tap to switch weather sources"
     }
 
     @objc private func didTapSourceLabel() {
-        guard let breakdown = WeatherDataSourceManager.shared.lastData?.consensusBreakdown else { return }
-        let vc = ConsensusBreakdownViewController(breakdown: breakdown)
-        present(vc, animated: true)
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            let alert = UIAlertController(
+                title: "Unavailable in Time Machine",
+                message: "Switch weather sources after returning to today's forecast.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            return
+        }
+
+        let defaults = UserDefaults.standard
+        let isConsensus = defaults.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        let isNearestStation = defaults.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+        let currentSource = WeatherDataSourceManager.shared.activeSource
+
+        let message: String? = {
+            if isConsensus {
+                return "Choosing a source will turn off Consensus Mode."
+            }
+            if isNearestStation {
+                return "Choosing a source will turn off Nearest Active Station."
+            }
+            return nil
+        }()
+
+        let sheet = UIAlertController(title: "Weather Source", message: message, preferredStyle: .actionSheet)
+
+        if isConsensus, let breakdown = WeatherDataSourceManager.shared.lastData?.consensusBreakdown {
+            sheet.addAction(UIAlertAction(title: "View Consensus Breakdown", style: .default) { [weak self] _ in
+                let vc = ConsensusBreakdownViewController(breakdown: breakdown)
+                self?.present(vc, animated: true)
+            })
+        }
+
+        for sourceID in WeatherSourceID.forecastQuickSwitchOrder {
+            let isCurrentSource =
+                (sourceID == .noaa && currentSource is NOAADataSource) ||
+                (sourceID == .openMeteo && currentSource is OpenMeteoDataSource) ||
+                (sourceID == .pirateWeather && currentSource is PirateWeatherDataSource) ||
+                (sourceID == .appleWeather && currentSource is AppleWeatherDataSource) ||
+                (sourceID == .tomorrowIO && currentSource is TomorrowIODataSource) ||
+                (sourceID == .accuWeather && currentSource is AccuWeatherDataSource)
+
+            let title = isCurrentSource ? "\(sourceID.forecastMenuTitle) ✓" : sourceID.forecastMenuTitle
+            sheet.addAction(UIAlertAction(title: title, style: .default) { [weak self] _ in
+                self?.switchForecastSource(to: sourceID)
+            })
+        }
+
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        sheet.popoverPresentationController?.sourceView = sourceLabel
+        sheet.popoverPresentationController?.sourceRect = sourceLabel.bounds
+        present(sheet, animated: true)
+    }
+
+    private func switchForecastSource(to sourceID: WeatherSourceID) {
+        if sourceID.requiresPremium && !SubscriptionManager.shared.isPremiumCached {
+            handleConsensusPaywall()
+            return
+        }
+
+        let defaults = UserDefaults.standard
+        defaults.set(false, forKey: WeatherDataSourceManager.consensusModeEnabledKey)
+        defaults.set(false, forKey: WeatherDataSourceManager.nearestStationEnabledKey)
+
+        WeatherDataSourceManager.shared.clearNearestStationCache()
+        WeatherDataSourceManager.shared.activeSource = sourceID.makeWeatherDataSource()
+
+        updateSourceLabel()
+        activityIndicator.startAnimating()
+        NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
     }
 
     private func configureCards(with data: UnifiedWeatherData) {

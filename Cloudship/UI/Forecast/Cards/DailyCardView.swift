@@ -103,6 +103,11 @@ private class DailyRangeBarView: UIView {
 
 private class DailyRowView: UIView {
 
+    private enum Layout {
+        static let detailColumnWidth: CGFloat = 62
+        static let minTempWidth: CGFloat = 34
+    }
+
     private let dayLabel: UILabel = {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .body)
@@ -126,6 +131,9 @@ private class DailyRowView: UIView {
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
         l.textAlignment = .right
+        l.adjustsFontSizeToFitWidth = true
+        l.minimumScaleFactor = 0.85
+        l.lineBreakMode = .byClipping
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -136,6 +144,9 @@ private class DailyRowView: UIView {
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .systemCyan
         l.textAlignment = .right
+        l.adjustsFontSizeToFitWidth = true
+        l.minimumScaleFactor = 0.85
+        l.lineBreakMode = .byClipping
         l.translatesAutoresizingMaskIntoConstraints = false
         l.isHidden = true
         return l
@@ -206,15 +217,15 @@ private class DailyRowView: UIView {
             // minTempLabel position is stable regardless of which one is visible.
             snowLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 2),
             snowLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            snowLabel.widthAnchor.constraint(equalToConstant: 48),
+            snowLabel.widthAnchor.constraint(equalToConstant: Layout.detailColumnWidth),
 
             precipLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 2),
             precipLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            precipLabel.widthAnchor.constraint(equalToConstant: 48),
+            precipLabel.widthAnchor.constraint(equalToConstant: Layout.detailColumnWidth),
 
             minTempLabel.leadingAnchor.constraint(equalTo: precipLabel.trailingAnchor, constant: 4),
             minTempLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            minTempLabel.widthAnchor.constraint(equalToConstant: 38),
+            minTempLabel.widthAnchor.constraint(equalToConstant: Layout.minTempWidth),
 
             rangeBar.leadingAnchor.constraint(equalTo: minTempLabel.trailingAnchor, constant: 6),
             rangeBar.centerYAnchor.constraint(equalTo: centerYAnchor),
@@ -241,6 +252,7 @@ private class DailyRowView: UIView {
         precipLabel.text  = entry.precipChance.map { "\(Int($0.rounded()))%" } ?? ""
         minTempLabel.text = TemperatureFormatter.format(entry.tempMin)
         maxTempLabel.text = TemperatureFormatter.format(entry.tempMax)
+        minTempLabel.isHidden = false
 
         // Accumulation label priority:
         //  1. Snow accumulation (frozen depth)   → "0.3" ❄"  / "0.8cm ❄"

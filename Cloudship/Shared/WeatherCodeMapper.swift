@@ -10,6 +10,16 @@ import Foundation
 
 enum WeatherCodeMapper {
 
+    private static func firstKnownCondition(from codes: [Int?]) -> WeatherCondition {
+        for code in codes {
+            let condition = condition(fromTomorrowCode: code)
+            if condition != .unknown {
+                return condition
+            }
+        }
+        return .unknown
+    }
+
     // MARK: - Tomorrow.io integer → WeatherCondition
 
     static func condition(fromTomorrowCode code: Int?) -> WeatherCondition {
@@ -36,6 +46,29 @@ enum WeatherCodeMapper {
         case 8000:           return .thunderstorm
         default:             return .unknown
         }
+    }
+
+    /// Daily timelines can emit mixed-condition codes that are not covered by the
+    /// basic weatherCode mapping. Prefer the richer day/full-day codes when present,
+    /// then fall back to avg/max/min until we find a known icon-safe condition.
+    static func condition(fromTomorrowDailyValues values: ClimacellV4.ForecastValues?) -> WeatherCondition {
+        firstKnownCondition(from: [
+            values?.weatherCodeFullDay,
+            values?.weatherCodeDay,
+            values?.weatherCodeAvg,
+            values?.weatherCodeMax,
+            values?.weatherCodeMin
+        ])
+    }
+
+    static func nightCondition(fromTomorrowDailyValues values: ClimacellV4.ForecastValues?) -> WeatherCondition {
+        firstKnownCondition(from: [
+            values?.weatherCodeNight,
+            values?.weatherCodeMax,
+            values?.weatherCodeFullDay,
+            values?.weatherCodeAvg,
+            values?.weatherCodeMin
+        ])
     }
 
     // MARK: - NOAA text description → WeatherCondition
@@ -84,7 +117,7 @@ enum WeatherCodeMapper {
         case .windy:
             return "wind"
         case .unknown:
-            return "sunny"
+            return "cloudy"
         }
     }
 

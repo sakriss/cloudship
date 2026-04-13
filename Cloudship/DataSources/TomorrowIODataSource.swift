@@ -125,11 +125,8 @@ class TomorrowIODataSource: WeatherDataSource {
         let daily: [DailyEntry] = (forecast.timelines?.daily ?? []).prefix(7).compactMap { entry in
             guard let time = DateFormatHelper.date(from: entry.time) else { return nil }
             let v = entry.values
-            // Daily uses weatherCodeAvg (not weatherCode which is hourly-only)
-            let dayCode   = v?.weatherCodeAvg
-            let nightCode = v?.weatherCodeMax   // closest proxy to "most severe" condition
-            let cond      = WeatherCodeMapper.condition(fromTomorrowCode: dayCode)
-            let condNight = WeatherCodeMapper.condition(fromTomorrowCode: nightCode)
+            let cond      = WeatherCodeMapper.condition(fromTomorrowDailyValues: v)
+            let condNight = WeatherCodeMapper.nightCondition(fromTomorrowDailyValues: v)
             return DailyEntry(
                 time:             time,
                 tempMin:          v?.temperatureMin,

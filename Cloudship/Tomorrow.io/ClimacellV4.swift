@@ -92,10 +92,12 @@ struct ClimacellV4: Codable {
         let uvIndex: Double?
         let visibility: Double?
         let weatherCode: Int?          // hourly
+        let weatherCodeFullDay: Int?   // daily mixed-condition summary when available
         let weatherCodeAvg: Int?       // daily average
+        let weatherCodeDay: Int?       // daily daylight summary when available
+        let weatherCodeNight: Int?     // daily nighttime summary when available
         let weatherCodeMax: Int?       // daily max (most severe)
-        let weatherCodeDay: Int?       // reserved / future
-        let weatherCodeNight: Int?     // reserved / future
+        let weatherCodeMin: Int?       // daily min / alternate mixed-condition code
         let windDirection: Double?
         let windGust: Double?
         let windSpeed: Double?

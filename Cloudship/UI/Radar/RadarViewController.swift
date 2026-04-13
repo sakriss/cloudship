@@ -10,6 +10,8 @@
 import UIKit
 import MapKit
 import CoreLocation
+import ImageIO
+import UniformTypeIdentifiers
 
 // MARK: - Data models
 
@@ -28,6 +30,22 @@ private struct RainViewerResponse: Codable {
     struct Frame: Codable {
         let time: Int
         let path: String
+    }
+}
+
+private struct OpenMeteoWindResponse: Codable {
+    let latitude: Double
+    let longitude: Double
+    let current: CurrentWind?
+
+    struct CurrentWind: Codable {
+        let windSpeed10m: Double?
+        let windDirection10m: Double?
+
+        private enum CodingKeys: String, CodingKey {
+            case windSpeed10m = "wind_speed_10m"
+            case windDirection10m = "wind_direction_10m"
+        }
     }
 }
 
@@ -58,6 +76,10 @@ enum RadarLayer: String, CaseIterable {
         case .precipitation, .satellite: return true
         case .temperature, .wind, .clouds, .pressure: return false
         }
+    }
+
+    var supportsColorSchemeSelection: Bool {
+        self == .precipitation
     }
 
     struct LegendInfo {
@@ -152,6 +174,192 @@ enum ColorScheme: Int, CaseIterable {
         case .meteored: return "Meteored"
         case .darkSky:  return "Dark Sky"
         }
+    }
+
+    /// RainViewer public tiles currently expose Universal Blue; custom schemes are
+    /// generated client-side from that source image.
+    static let sourceRadarValue = 2
+
+    var palette: [UIColor]? {
+        switch self {
+        case .blue:
+            return nil
+        case .nexrad:
+            return [
+                UIColor(red: 0.23, green: 0.70, blue: 0.95, alpha: 1),
+                UIColor(red: 0.06, green: 0.78, blue: 0.36, alpha: 1),
+                UIColor(red: 0.88, green: 0.89, blue: 0.08, alpha: 1),
+                UIColor(red: 0.99, green: 0.57, blue: 0.09, alpha: 1),
+                UIColor(red: 0.91, green: 0.14, blue: 0.09, alpha: 1),
+                UIColor(red: 0.74, green: 0.09, blue: 0.58, alpha: 1)
+            ]
+        case .titan:
+            return [
+                UIColor(red: 0.53, green: 0.82, blue: 1.00, alpha: 1),
+                UIColor(red: 0.29, green: 0.59, blue: 0.98, alpha: 1),
+                UIColor(red: 0.63, green: 0.74, blue: 0.22, alpha: 1),
+                UIColor(red: 1.00, green: 0.78, blue: 0.16, alpha: 1),
+                UIColor(red: 0.97, green: 0.36, blue: 0.12, alpha: 1),
+                UIColor(red: 0.73, green: 0.12, blue: 0.16, alpha: 1)
+            ]
+        case .twc:
+            return [
+                UIColor(red: 0.19, green: 0.85, blue: 0.93, alpha: 1),
+                UIColor(red: 0.11, green: 0.75, blue: 0.43, alpha: 1),
+                UIColor(red: 0.95, green: 0.87, blue: 0.16, alpha: 1),
+                UIColor(red: 0.95, green: 0.54, blue: 0.11, alpha: 1),
+                UIColor(red: 0.88, green: 0.16, blue: 0.13, alpha: 1),
+                UIColor(red: 0.78, green: 0.30, blue: 0.76, alpha: 1)
+            ]
+        case .meteored:
+            return [
+                UIColor(red: 0.64, green: 0.88, blue: 0.98, alpha: 1),
+                UIColor(red: 0.20, green: 0.78, blue: 0.93, alpha: 1),
+                UIColor(red: 0.36, green: 0.75, blue: 0.39, alpha: 1),
+                UIColor(red: 1.00, green: 0.82, blue: 0.24, alpha: 1),
+                UIColor(red: 1.00, green: 0.47, blue: 0.15, alpha: 1),
+                UIColor(red: 0.84, green: 0.11, blue: 0.27, alpha: 1)
+            ]
+        case .darkSky:
+            return [
+                UIColor(red: 0.51, green: 0.73, blue: 1.00, alpha: 1),
+                UIColor(red: 0.36, green: 0.57, blue: 0.98, alpha: 1),
+                UIColor(red: 0.69, green: 0.79, blue: 0.42, alpha: 1),
+                UIColor(red: 0.98, green: 0.74, blue: 0.27, alpha: 1),
+                UIColor(red: 0.92, green: 0.43, blue: 0.18, alpha: 1),
+                UIColor(red: 0.80, green: 0.27, blue: 0.68, alpha: 1)
+            ]
+        }
+    }
+}
+
+private final class RecoloredRadarTileOverlay: MKTileOverlay {
+    private let scheme: ColorScheme
+    private let session = URLSession(configuration: .ephemeral)
+    private static let tileCache = NSCache<NSString, NSData>()
+
+    init(urlTemplate: String, scheme: ColorScheme) {
+        self.scheme = scheme
+        super.init(urlTemplate: urlTemplate)
+        canReplaceMapContent = false
+    }
+
+    override func loadTile(at path: MKTileOverlayPath, result: @escaping (Data?, (any Error)?) -> Void) {
+        let url = url(forTilePath: path)
+        let cacheKey = url.absoluteString as NSString
+
+        if let cached = Self.tileCache.object(forKey: cacheKey) {
+            result(cached as Data, nil)
+            return
+        }
+
+        session.dataTask(with: url) { [scheme] data, _, error in
+            guard let data, error == nil else {
+                result(nil, error)
+                return
+            }
+
+            guard scheme != .blue, let recolored = Self.recoloredTileData(from: data, scheme: scheme) else {
+                Self.tileCache.setObject(data as NSData, forKey: cacheKey)
+                result(data, nil)
+                return
+            }
+
+            Self.tileCache.setObject(recolored as NSData, forKey: cacheKey)
+            result(recolored, nil)
+        }.resume()
+    }
+
+    private static func recoloredTileData(from data: Data, scheme: ColorScheme) -> Data? {
+        guard let palette = scheme.palette,
+              let image = UIImage(data: data),
+              let cgImage = image.cgImage else { return nil }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        let bitsPerComponent = 8
+        var pixels = [UInt8](repeating: 0, count: width * height * bytesPerPixel)
+
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: bitsPerComponent,
+            bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        for index in stride(from: 0, to: pixels.count, by: bytesPerPixel) {
+            let alpha = CGFloat(pixels[index + 3]) / 255
+            guard alpha > 0.02 else { continue }
+
+            let red = CGFloat(pixels[index]) / 255
+            let green = CGFloat(pixels[index + 1]) / 255
+            let blue = CGFloat(pixels[index + 2]) / 255
+
+            let maxComponent = max(red, green, blue)
+            let minComponent = min(red, green, blue)
+            let brightness = maxComponent
+            let saturation = maxComponent > 0 ? (maxComponent - minComponent) / maxComponent : 0
+            let intensity = min(1, max(0, pow((brightness * 0.70 + saturation * 0.30) * alpha, 0.90)))
+            let mapped = interpolateColor(in: palette, fraction: intensity)
+
+            var mappedRed: CGFloat = 0
+            var mappedGreen: CGFloat = 0
+            var mappedBlue: CGFloat = 0
+            var mappedAlpha: CGFloat = 0
+            mapped.getRed(&mappedRed, green: &mappedGreen, blue: &mappedBlue, alpha: &mappedAlpha)
+
+            pixels[index] = UInt8(clamping: Int((mappedRed * 255).rounded()))
+            pixels[index + 1] = UInt8(clamping: Int((mappedGreen * 255).rounded()))
+            pixels[index + 2] = UInt8(clamping: Int((mappedBlue * 255).rounded()))
+            pixels[index + 3] = UInt8(clamping: Int((max(alpha, intensity * 0.75) * 255).rounded()))
+        }
+
+        guard let outputImage = context.makeImage() else { return nil }
+        return pngData(from: outputImage)
+    }
+
+    private static func interpolateColor(in palette: [UIColor], fraction: CGFloat) -> UIColor {
+        guard let first = palette.first else { return .clear }
+        guard palette.count > 1 else { return first }
+
+        let normalized = min(max(fraction, 0), 1)
+        let segmentWidth = 1 / CGFloat(palette.count - 1)
+        let segment = min(Int(normalized / segmentWidth), palette.count - 2)
+        let start = palette[segment]
+        let end = palette[segment + 1]
+        let localFraction = (normalized - CGFloat(segment) * segmentWidth) / segmentWidth
+
+        var sr: CGFloat = 0, sg: CGFloat = 0, sb: CGFloat = 0, sa: CGFloat = 0
+        var er: CGFloat = 0, eg: CGFloat = 0, eb: CGFloat = 0, ea: CGFloat = 0
+        start.getRed(&sr, green: &sg, blue: &sb, alpha: &sa)
+        end.getRed(&er, green: &eg, blue: &eb, alpha: &ea)
+
+        let r = sr + (er - sr) * localFraction
+        let g = sg + (eg - sg) * localFraction
+        let b = sb + (eb - sb) * localFraction
+        let a = sa + (ea - sa) * localFraction
+        return UIColor(red: r, green: g, blue: b, alpha: a)
+    }
+
+    private static func pngData(from image: CGImage) -> Data? {
+        let output = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(
+            output,
+            UTType.png.identifier as CFString,
+            1,
+            nil
+        ) else { return nil }
+
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return output as Data
     }
 }
 
@@ -349,6 +557,7 @@ private extension UIFont {
 
 private class RadarSettingsViewController: UIViewController {
 
+    var activeLayer: RadarLayer = .precipitation
     var colorScheme: ColorScheme = .nexrad { didSet { updateColorUI() } }
     var animationSpeed: AnimationSpeed = .normal { didSet { updateSpeedUI() } }
     var loopRange: LoopRange = .all { didSet { updateLoopUI() } }
@@ -404,7 +613,9 @@ private class RadarSettingsViewController: UIViewController {
         ])
 
         stack.addArrangedSubview(makeSection("Radar Opacity", view: makeOpacityRow()))
-        stack.addArrangedSubview(makeSection("Color Scheme", view: makeColorRow()))
+        if activeLayer.supportsColorSchemeSelection {
+            stack.addArrangedSubview(makeSection("Color Scheme", view: makeColorRow()))
+        }
         stack.addArrangedSubview(makeSection("Animation Speed", view: makeSpeedRow()))
         stack.addArrangedSubview(makeSection("Loop Range", view: makeLoopRow()))
 
@@ -564,6 +775,10 @@ class RadarViewController: UIViewController {
     private let tileSize = 512
     private var tileHost = "https://tilecache.rainviewer.com"
     private var currentOverlay: MKTileOverlay?
+    private var overlayRefreshToken = UUID().uuidString
+    private var windAnnotations: [WindAnnotation] = []
+    private var pendingWindRefreshWorkItem: DispatchWorkItem?
+    private var windFetchTask: Task<Void, Never>?
 
     // MARK: UI
     private let mapView: MKMapView = {
@@ -666,6 +881,98 @@ class RadarViewController: UIViewController {
     private var mapTypes: [MKMapType] = [.standard, .satellite, .hybrid]
     private var mapTypeIndex = 0
 
+    private final class WindAnnotation: NSObject, MKAnnotation {
+        let coordinate: CLLocationCoordinate2D
+        let speed: Double
+        let direction: Double
+
+        init(coordinate: CLLocationCoordinate2D, speed: Double, direction: Double) {
+            self.coordinate = coordinate
+            self.speed = speed
+            self.direction = direction
+            super.init()
+        }
+
+        var title: String? { "\(Int(speed.rounded())) \(TemperatureFormatter.isMetric ? "km/h" : "mph")" }
+    }
+
+    private final class WindAnnotationView: MKAnnotationView {
+        static let reuseIdentifier = "WindAnnotationView"
+
+        private let glyphBackground = UIView()
+        private let arrowView = UIImageView()
+        private let speedLabel = UILabel()
+
+        override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
+            super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+            setup()
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError()
+        }
+
+        private func setup() {
+            frame = CGRect(x: 0, y: 0, width: 44, height: 44)
+            centerOffset = CGPoint(x: 0, y: -2)
+            backgroundColor = .clear
+            collisionMode = .rectangle
+            displayPriority = .defaultHigh
+
+            glyphBackground.backgroundColor = UIColor.black.withAlphaComponent(0.42)
+            glyphBackground.layer.cornerRadius = 14
+            glyphBackground.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(glyphBackground)
+
+            arrowView.image = UIImage(systemName: "location.north.fill")
+            arrowView.tintColor = .white
+            arrowView.contentMode = .scaleAspectFit
+            arrowView.translatesAutoresizingMaskIntoConstraints = false
+            glyphBackground.addSubview(arrowView)
+
+            speedLabel.font = .monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
+            speedLabel.textColor = .white
+            speedLabel.textAlignment = .center
+            speedLabel.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(speedLabel)
+
+            NSLayoutConstraint.activate([
+                glyphBackground.topAnchor.constraint(equalTo: topAnchor),
+                glyphBackground.centerXAnchor.constraint(equalTo: centerXAnchor),
+                glyphBackground.widthAnchor.constraint(equalToConstant: 28),
+                glyphBackground.heightAnchor.constraint(equalToConstant: 28),
+
+                arrowView.centerXAnchor.constraint(equalTo: glyphBackground.centerXAnchor),
+                arrowView.centerYAnchor.constraint(equalTo: glyphBackground.centerYAnchor),
+                arrowView.widthAnchor.constraint(equalToConstant: 16),
+                arrowView.heightAnchor.constraint(equalToConstant: 16),
+
+                speedLabel.topAnchor.constraint(equalTo: glyphBackground.bottomAnchor, constant: 2),
+                speedLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
+                speedLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
+                speedLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+        }
+
+        func configure(with annotation: WindAnnotation) {
+            speedLabel.text = "\(Int(annotation.speed.rounded()))"
+
+            // Meteorological direction indicates where the wind comes from.
+            // Rotate the arrow to show where the wind is moving toward.
+            let heading = CGFloat((annotation.direction + 180) * .pi / 180)
+            arrowView.transform = CGAffineTransform(rotationAngle: heading)
+
+            let tint: UIColor
+            switch annotation.speed {
+            case ..<10: tint = UIColor(red: 0.55, green: 0.85, blue: 0.15, alpha: 1)
+            case ..<20: tint = UIColor(red: 1.00, green: 0.90, blue: 0.00, alpha: 1)
+            case ..<30: tint = UIColor(red: 1.00, green: 0.55, blue: 0.00, alpha: 1)
+            default:    tint = UIColor(red: 0.90, green: 0.15, blue: 0.15, alpha: 1)
+            }
+            arrowView.tintColor = tint
+        }
+    }
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -721,6 +1028,7 @@ class RadarViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopAnimation()
+        windFetchTask?.cancel()
     }
 
     // MARK: - Control panel layout
@@ -858,6 +1166,9 @@ class RadarViewController: UIViewController {
 
     private func reloadFrames() {
         if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
+        if activeLayer != .wind {
+            clearWindAnnotations()
+        }
 
         let animatable = activeLayer.isAnimatable
 
@@ -867,6 +1178,12 @@ class RadarViewController: UIViewController {
         prevButton.isHidden = !animatable
         nextButton.isHidden = !animatable
         liveBadge.isHidden = true
+
+        if activeLayer == .wind {
+            timeLabel.text = activeLayer.rawValue
+            scheduleWindRefresh(for: mapView.region, force: true)
+            return
+        }
 
         let frames = activeFrames
         guard !frames.isEmpty else {
@@ -901,13 +1218,13 @@ class RadarViewController: UIViewController {
     private func overlayTemplate(for frame: RainViewerResponse.Frame) -> String? {
         switch activeLayer {
         case .precipitation:
-            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(colorScheme.rawValue)/1_1.png"
+            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/\(ColorScheme.sourceRadarValue)/1_1.png?refresh=\(overlayRefreshToken)"
         case .satellite:
-            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png"
+            return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png?refresh=\(overlayRefreshToken)"
         case .temperature:
             return "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         case .wind:
-            return "https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
+            return nil
         case .clouds:
             return "https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         case .pressure:
@@ -930,15 +1247,27 @@ class RadarViewController: UIViewController {
         // Keep old overlay visible while new one loads (simple crossfade)
         let oldOverlay = currentOverlay
 
-        let overlay = MKTileOverlay(urlTemplate: template)
-        overlay.canReplaceMapContent = false
+        let overlay: MKTileOverlay
+        if activeLayer == .precipitation {
+            overlay = RecoloredRadarTileOverlay(urlTemplate: template, scheme: colorScheme)
+        } else {
+            overlay = MKTileOverlay(urlTemplate: template)
+            overlay.canReplaceMapContent = false
+        }
         overlay.tileSize = CGSize(width: tileSize, height: tileSize)
         mapView.addOverlay(overlay, level: .aboveLabels)
         currentOverlay = overlay
 
         // Remove old overlay after short delay so tiles have time to appear
         if let old = oldOverlay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            let removalDelay: TimeInterval
+            if activeLayer == .precipitation && colorScheme != .blue {
+                removalDelay = max(1.1, animationSpeed.rawValue + 0.7)
+            } else {
+                removalDelay = 0.4
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + removalDelay) { [weak self] in
                 self?.mapView.removeOverlay(old)
             }
         }
@@ -1014,6 +1343,7 @@ class RadarViewController: UIViewController {
         // Tear down old layer
         stopAnimation()
         if let old = currentOverlay { mapView.removeOverlay(old); currentOverlay = nil }
+        clearWindAnnotations()
 
         activeLayer = newLayer
         updateLayerUI()
@@ -1060,6 +1390,7 @@ class RadarViewController: UIViewController {
 
     @objc private func openSettings() {
         let vc = RadarSettingsViewController()
+        vc.activeLayer     = activeLayer
         vc.colorScheme    = colorScheme
         vc.animationSpeed = animationSpeed
         vc.loopRange      = loopRange
@@ -1068,6 +1399,7 @@ class RadarViewController: UIViewController {
         vc.onColorSchemeChanged = { [weak self] scheme in
             guard let self else { return }
             self.colorScheme = scheme
+            self.overlayRefreshToken = UUID().uuidString
             // Color scheme changes the URL template, so rebuild all overlays
             self.stopAnimation()
             if let old = self.currentOverlay { self.mapView.removeOverlay(old); self.currentOverlay = nil }
@@ -1086,6 +1418,7 @@ class RadarViewController: UIViewController {
         vc.onOpacityChanged = { [weak self] opacity in
             guard let self else { return }
             self.radarOpacity = opacity
+            self.overlayRefreshToken = UUID().uuidString
             // Re-add current overlay to pick up new opacity via rendererFor delegate
             if let overlay = self.currentOverlay {
                 self.mapView.removeOverlay(overlay)
@@ -1100,6 +1433,110 @@ class RadarViewController: UIViewController {
         }
         present(nav, animated: true)
     }
+
+    private func clearWindAnnotations() {
+        pendingWindRefreshWorkItem?.cancel()
+        windFetchTask?.cancel()
+        if !windAnnotations.isEmpty {
+            mapView.removeAnnotations(windAnnotations)
+            windAnnotations.removeAll()
+        }
+    }
+
+    private func scheduleWindRefresh(for region: MKCoordinateRegion, force: Bool = false) {
+        guard activeLayer == .wind else { return }
+
+        pendingWindRefreshWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.fetchWindAnnotations(for: region, force: force)
+        }
+        pendingWindRefreshWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + (force ? 0.05 : 0.35), execute: workItem)
+    }
+
+    private func fetchWindAnnotations(for region: MKCoordinateRegion, force: Bool) {
+        guard activeLayer == .wind else { return }
+
+        let points = windSampleCoordinates(for: region)
+        guard !points.isEmpty else { return }
+
+        windFetchTask?.cancel()
+        windFetchTask = Task { [weak self] in
+            guard let self else { return }
+
+            let latitudes = points.map { String(format: "%.4f", $0.latitude) }.joined(separator: ",")
+            let longitudes = points.map { String(format: "%.4f", $0.longitude) }.joined(separator: ",")
+            let speedUnit = TemperatureFormatter.isMetric ? "kmh" : "mph"
+            let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(latitudes)&longitude=\(longitudes)&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=\(speedUnit)&timezone=GMT"
+
+            guard let url = URL(string: urlString) else { return }
+
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                guard !Task.isCancelled else { return }
+
+                let decoder = JSONDecoder()
+                let responses: [OpenMeteoWindResponse]
+                if let list = try? decoder.decode([OpenMeteoWindResponse].self, from: data) {
+                    responses = list
+                } else {
+                    responses = [try decoder.decode(OpenMeteoWindResponse.self, from: data)]
+                }
+
+                let annotations = responses.compactMap { item -> WindAnnotation? in
+                    guard let current = item.current,
+                          let speed = current.windSpeed10m,
+                          let direction = current.windDirection10m else { return nil }
+                    return WindAnnotation(
+                        coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude),
+                        speed: speed,
+                        direction: direction
+                    )
+                }
+
+                await MainActor.run {
+                    guard self.activeLayer == .wind else { return }
+                    self.mapView.removeAnnotations(self.windAnnotations)
+                    self.windAnnotations = annotations
+                    self.mapView.addAnnotations(annotations)
+                    self.timeLabel.text = annotations.isEmpty ? "Wind unavailable" : "Wind Direction"
+                }
+            } catch {
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    if self.activeLayer == .wind {
+                        self.timeLabel.text = "Wind unavailable"
+                    }
+                }
+            }
+        }
+    }
+
+    private func windSampleCoordinates(for region: MKCoordinateRegion) -> [CLLocationCoordinate2D] {
+        let rows = 4
+        let columns = 5
+
+        let latDelta = max(region.span.latitudeDelta, 0.8)
+        let lonDelta = max(region.span.longitudeDelta, 0.8)
+        let minLat = max(region.center.latitude - latDelta * 0.42, -85)
+        let maxLat = min(region.center.latitude + latDelta * 0.42, 85)
+        let minLon = region.center.longitude - lonDelta * 0.42
+        let maxLon = region.center.longitude + lonDelta * 0.42
+
+        guard maxLat > minLat, maxLon > minLon else { return [] }
+
+        var coords: [CLLocationCoordinate2D] = []
+        for row in 0..<rows {
+            let latProgress = rows == 1 ? 0.5 : Double(row) / Double(rows - 1)
+            let lat = maxLat - (maxLat - minLat) * latProgress
+            for column in 0..<columns {
+                let lonProgress = columns == 1 ? 0.5 : Double(column) / Double(columns - 1)
+                let lon = minLon + (maxLon - minLon) * lonProgress
+                coords.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+            }
+        }
+        return coords
+    }
 }
 
 // MARK: - MKMapViewDelegate
@@ -1110,6 +1547,24 @@ extension RadarViewController: MKMapViewDelegate {
         let renderer = MKTileOverlayRenderer(tileOverlay: tile)
         renderer.alpha = CGFloat(radarOpacity)
         return renderer
+    }
+
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        scheduleWindRefresh(for: mapView.region)
+    }
+
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        guard let windAnnotation = annotation as? WindAnnotation else { return nil }
+
+        let view = mapView.dequeueReusableAnnotationView(
+            withIdentifier: WindAnnotationView.reuseIdentifier
+        ) as? WindAnnotationView ?? WindAnnotationView(
+            annotation: windAnnotation,
+            reuseIdentifier: WindAnnotationView.reuseIdentifier
+        )
+        view.annotation = windAnnotation
+        view.configure(with: windAnnotation)
+        return view
     }
 
 }
