@@ -14,7 +14,7 @@ private class DetailTileView: UIView {
 
     private let iconView: UIImageView = {
         let iv = UIImageView()
-        iv.tintColor = .secondaryLabel
+        iv.tintColor = CardView.textColor(for: .secondary)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
@@ -24,7 +24,7 @@ private class DetailTileView: UIView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .label
+        l.textColor = CardView.textColor(for: .primary)
         l.adjustsFontSizeToFitWidth = true
         l.minimumScaleFactor = 0.7
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -35,7 +35,7 @@ private class DetailTileView: UIView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -69,8 +69,15 @@ private class DetailTileView: UIView {
     required init?(coder: NSCoder) { fatalError() }
 
     func update(value: String) {
+        applyTextPalette()
         valueLabel.text = value
         accessibilityLabel = "\(nameLabel.text ?? ""): \(value)"
+    }
+
+    func applyTextPalette() {
+        iconView.tintColor = CardView.textColor(for: .secondary)
+        valueLabel.textColor = CardView.textColor(for: .primary)
+        nameLabel.textColor = CardView.textColor(for: .secondary)
     }
 }
 
@@ -124,7 +131,7 @@ private class SunArcView: UIView {
         }
 
         // Dashed arc line
-        UIColor.secondaryLabel.withAlphaComponent(0.3).setStroke()
+        CardView.textColor(for: .secondary).withAlphaComponent(0.3).setStroke()
         arcPath.lineWidth = 1.5
         arcPath.setLineDash([4, 4], count: 2, phase: 0)
         arcPath.stroke()
@@ -133,7 +140,10 @@ private class SunArcView: UIView {
         let horizonPath = UIBezierPath()
         horizonPath.move(to: CGPoint(x: arcLeft - 8, y: arcBottom))
         horizonPath.addLine(to: CGPoint(x: arcRight + 8, y: arcBottom))
-        UIColor.separator.resolvedColor(with: traitCollection).setStroke()
+        let horizonColor: UIColor = WeatherDataSourceManager.shared.isShowingHistorical
+            ? CardView.textColor(for: .tertiary).withAlphaComponent(0.3)
+            : UIColor.separator.resolvedColor(with: traitCollection)
+        horizonColor.setStroke()
         horizonPath.lineWidth = 1
         horizonPath.setLineDash([1], count: 0, phase: 0)  // solid
         horizonPath.stroke()
@@ -186,7 +196,7 @@ private class SunArcView: UIView {
 
         let attrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.preferredFont(forTextStyle: .caption2),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: CardView.textColor(for: .secondary)
         ]
         let riseSize = sunriseStr.size(withAttributes: attrs)
         let riseX = max(4, arcLeft - riseSize.width / 2)
@@ -198,7 +208,7 @@ private class SunArcView: UIView {
         // Dawn/dusk labels (Pirate Weather)
         let dawnDuskAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.preferredFont(forTextStyle: .caption2),
-            .foregroundColor: UIColor.tertiaryLabel
+            .foregroundColor: CardView.textColor(for: .tertiary)
         ]
         if let dawn = dawn {
             let dawnStr = "Dawn " + timeString(from: dawn)
@@ -230,6 +240,8 @@ class DetailsCardView: CardView {
     private var tiles: [DetailTileView] = []
     private let sunArcView = SunArcView()
     private var sunArcHeightConstraint: NSLayoutConstraint!
+    private var titleLabel: UILabel!
+    private var separatorViews: [UIView] = []
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -243,7 +255,7 @@ class DetailsCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "DETAILS")
+        titleLabel = makeTitleLabel(text: "DETAILS")
         addSubview(titleLabel)
 
         let tileData: [(icon: String, value: String, name: String)] = [
@@ -272,8 +284,9 @@ class DetailsCardView: CardView {
             row.translatesAutoresizingMaskIntoConstraints = false
 
             let vSep = UIView()            // thin vertical line between columns
-            vSep.backgroundColor = .separator
+            vSep.backgroundColor = separatorColor()
             vSep.translatesAutoresizingMaskIntoConstraints = false
+            separatorViews.append(vSep)
 
             row.addSubview(left)
             row.addSubview(vSep)
@@ -328,9 +341,10 @@ class DetailsCardView: CardView {
             outer.addArrangedSubview(row)
             if i < rowViews.count - 1 {
                 let hSep = UIView()
-                hSep.backgroundColor = .separator
+                hSep.backgroundColor = separatorColor()
                 hSep.translatesAutoresizingMaskIntoConstraints = false
                 hSep.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+                separatorViews.append(hSep)
                 outer.addArrangedSubview(hSep)
             }
         }
@@ -362,6 +376,7 @@ class DetailsCardView: CardView {
 
     func configure(with current: CurrentConditions, sunrise: Date? = nil, sunset: Date? = nil,
                    dawn: Date? = nil, dusk: Date? = nil, todayDaily: DailyEntry? = nil) {
+        applyTextPalette()
         // Moon phase (from daily data)
         if tiles.count > 8 {
             let moonStr: String
@@ -406,6 +421,18 @@ class DetailsCardView: CardView {
         zip(tiles, values).forEach { $0.update(value: $1) }
     }
 
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        applyTextPalette()
+        sunArcView.setNeedsDisplay()
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        applyTextPalette()
+        sunArcView.setNeedsDisplay()
+    }
+
     private func uvLabel(for uv: Double) -> String {
         let i = Int(uv.rounded())
         switch i {
@@ -415,5 +442,18 @@ class DetailsCardView: CardView {
         case 8...10: return "\(i) Very High"
         default:     return "\(i) Extreme"
         }
+    }
+
+    private func applyTextPalette() {
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        tiles.forEach { $0.applyTextPalette() }
+        separatorViews.forEach { $0.backgroundColor = separatorColor() }
+    }
+
+    private func separatorColor() -> UIColor {
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            return CardView.textColor(for: .tertiary).withAlphaComponent(0.28)
+        }
+        return .separator
     }
 }

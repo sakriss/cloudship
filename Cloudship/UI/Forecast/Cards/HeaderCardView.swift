@@ -16,7 +16,7 @@ class HeaderCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -26,7 +26,7 @@ class HeaderCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .largeTitle)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .label
+        l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .center
         l.adjustsFontSizeToFitWidth = true
         l.minimumScaleFactor = 0.6
@@ -38,7 +38,7 @@ class HeaderCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -48,7 +48,7 @@ class HeaderCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -58,7 +58,7 @@ class HeaderCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -123,6 +123,7 @@ class HeaderCardView: CardView {
     // MARK: - Configure
 
     func configure(with data: UnifiedWeatherData, todayDaily: DailyEntry?) {
+        applyTextPalette()
         let c = data.current
         locationLabel.text = data.locationName ?? "—"
         temperatureLabel.text = TemperatureFormatter.format(c.temperature)
@@ -141,12 +142,12 @@ class HeaderCardView: CardView {
                     : UIColor.systemCyan     // feels colder
             } else {
                 feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
-                feelsLikeLabel.textColor = .secondaryLabel
+                feelsLikeLabel.textColor = CardView.textColor(for: .secondary)
             }
         } else if let fl = c.feelsLike {
             feelsLikeLabel.text = "Feels like \(TemperatureFormatter.format(fl))"
             feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
-            feelsLikeLabel.textColor = .secondaryLabel
+            feelsLikeLabel.textColor = CardView.textColor(for: .secondary)
         } else {
             feelsLikeLabel.text = nil
         }
@@ -191,6 +192,16 @@ class HeaderCardView: CardView {
         accessibilityLabel = accessibilityParts.joined(separator: ", ")
     }
 
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        applyTextPalette()
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        applyTextPalette()
+    }
+
     // MARK: - Storm helpers
 
     private static func cardinalDirection(from bearing: Double?) -> String {
@@ -205,8 +216,18 @@ class HeaderCardView: CardView {
         case ..<10:  return .systemRed
         case ..<20:  return .systemOrange
         case ..<50:  return .systemYellow
-        default:     return .secondaryLabel
+        default:     return CardView.textColor(for: .secondary)
+        }
+    }
+
+    private func applyTextPalette() {
+        locationLabel.textColor = CardView.textColor(for: .secondary)
+        temperatureLabel.textColor = CardView.textColor(for: .primary)
+        conditionLabel.textColor = CardView.textColor(for: .secondary)
+        hiLoLabel.textColor = CardView.textColor(for: .secondary)
+
+        if feelsLikeLabel.textColor != .systemOrange && feelsLikeLabel.textColor != .systemCyan {
+            feelsLikeLabel.textColor = CardView.textColor(for: .secondary)
         }
     }
 }
-

@@ -17,6 +17,8 @@ class ActivityScoresCardView: CardView {
     private let row4 = ActivityRowView()
 
     private var rows: [ActivityRowView] { [row1, row2, row3, row4] }
+    private var titleLabel: UILabel!
+    private var separatorViews: [UIView] = []
 
     // MARK: - Init
 
@@ -34,7 +36,7 @@ class ActivityScoresCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "ACTIVITY SCORES")
+        titleLabel = makeTitleLabel(text: "ACTIVITY SCORES")
         addSubview(titleLabel)
 
         let stack = UIStackView(arrangedSubviews: rows)
@@ -46,9 +48,10 @@ class ActivityScoresCardView: CardView {
         // Add separators between rows
         for i in 0..<(rows.count - 1) {
             let sep = UIView()
-            sep.backgroundColor = .separator
+            sep.backgroundColor = separatorColor()
             sep.translatesAutoresizingMaskIntoConstraints = false
             addSubview(sep)
+            separatorViews.append(sep)
 
             let rowView = rows[i]
             NSLayoutConstraint.activate([
@@ -73,10 +76,34 @@ class ActivityScoresCardView: CardView {
     // MARK: - Configure
 
     func configure(with data: UnifiedWeatherData) {
+        applyTextPalette()
         let scores = ActivityScoreEngine.scores(from: data)
         for (i, score) in scores.enumerated() where i < rows.count {
             rows[i].configure(with: score)
         }
+    }
+
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        applyTextPalette()
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        applyTextPalette()
+    }
+
+    private func applyTextPalette() {
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        separatorViews.forEach { $0.backgroundColor = separatorColor() }
+        rows.forEach { $0.applyTextPalette() }
+    }
+
+    private func separatorColor() -> UIColor {
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            return CardView.textColor(for: .tertiary).withAlphaComponent(0.28)
+        }
+        return .separator
     }
 }
 
@@ -98,7 +125,7 @@ private class ActivityRowView: UIView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .label
+        l.textColor = CardView.textColor(for: .primary)
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return l
@@ -110,7 +137,7 @@ private class ActivityRowView: UIView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .label
+        l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .right
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.required, for: .horizontal)
@@ -133,7 +160,7 @@ private class ActivityRowView: UIView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .tertiaryLabel
+        l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -198,6 +225,7 @@ private class ActivityRowView: UIView {
     }
 
     func configure(with score: ActivityScore) {
+        applyTextPalette()
         emojiLabel.text = score.activity.emoji
         nameLabel.text = score.activity.displayName
         scoreLabel.text = "\(score.score)"
@@ -226,6 +254,13 @@ private class ActivityRowView: UIView {
         case 20..<40:  return .systemOrange
         default:       return .systemRed
         }
+    }
+
+    func applyTextPalette() {
+        nameLabel.textColor = CardView.textColor(for: .primary)
+        scoreLabel.textColor = CardView.textColor(for: .primary)
+        factorLabel.textColor = CardView.textColor(for: .tertiary)
+        scoreBar.setNeedsLayout()
     }
 }
 
@@ -264,7 +299,7 @@ private class ScoreBarView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         trackLayer.frame = bounds
-        trackLayer.backgroundColor = UIColor.tertiarySystemFill.cgColor
+        trackLayer.backgroundColor = trackColor().cgColor
         trackLayer.cornerRadius = 3
 
         let fillWidth = bounds.width * min(1, max(0, progress))
@@ -274,6 +309,13 @@ private class ScoreBarView: UIView {
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        trackLayer.backgroundColor = UIColor.tertiarySystemFill.cgColor
+        trackLayer.backgroundColor = trackColor().cgColor
+    }
+
+    private func trackColor() -> UIColor {
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            return CardView.textColor(for: .tertiary).withAlphaComponent(0.18)
+        }
+        return .tertiarySystemFill
     }
 }

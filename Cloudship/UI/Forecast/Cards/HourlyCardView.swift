@@ -201,7 +201,7 @@ private class HourlyItemCell: UICollectionViewCell {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .secondaryLabel
+        l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -218,7 +218,7 @@ private class HourlyItemCell: UICollectionViewCell {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .label
+        l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .center
         l.adjustsFontSizeToFitWidth = true
         l.minimumScaleFactor = 0.7
@@ -258,6 +258,7 @@ private class HourlyItemCell: UICollectionViewCell {
     required init?(coder: NSCoder) { fatalError() }
 
     func configure(entry: HourlyEntry, metric: HourlyMetric) {
+        hourLabel.textColor = CardView.textColor(for: .secondary)
         hourLabel.text = DateFormatHelper.hourLabel(from: entry.time)
         iconView.image = UIImage(named: WeatherCodeMapper.iconName(for: entry.condition,
                                                                     isNight: WeatherCodeMapper.isNighttime()))
@@ -268,7 +269,7 @@ private class HourlyItemCell: UICollectionViewCell {
             valueLabel.textColor = metric.accentColor
         } else {
             valueLabel.text = "—"
-            valueLabel.textColor = .tertiaryLabel
+            valueLabel.textColor = CardView.textColor(for: .tertiary)
         }
 
         // Always show precip % underneath when not already showing it
@@ -315,13 +316,14 @@ private class MetricPillButton: UIButton {
 
     func updateAppearance() {
         if isSelected {
-            backgroundColor = metric.accentColor.withAlphaComponent(0.20)
+            let fillAlpha: CGFloat = WeatherDataSourceManager.shared.isShowingHistorical ? 0.26 : 0.20
+            backgroundColor = metric.accentColor.withAlphaComponent(fillAlpha)
             layer.borderColor = metric.accentColor.cgColor
             setTitleColor(metric.accentColor, for: .normal)
         } else {
             backgroundColor = .clear
-            layer.borderColor = UIColor.separator.cgColor
-            setTitleColor(.secondaryLabel, for: .normal)
+            layer.borderColor = CardView.textColor(for: .tertiary).withAlphaComponent(0.35).cgColor
+            setTitleColor(CardView.textColor(for: .secondary), for: .normal)
         }
     }
 
@@ -346,6 +348,7 @@ class HourlyCardView: CardView {
     private var collectionView: UICollectionView!
     private var pillScrollView: UIScrollView!
     private var pillStack: UIStackView!
+    private var titleLabel: UILabel!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -362,7 +365,7 @@ class HourlyCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "Hourly Forecast")
+        titleLabel = makeTitleLabel(text: "Hourly Forecast")
 
         // Pill scroll view
         pillScrollView = UIScrollView()
@@ -432,6 +435,7 @@ class HourlyCardView: CardView {
     }
 
     func configure(hourly: [HourlyEntry]) {
+        applyTextPalette()
         entries = Array(hourly.prefix(24))
 
         // Reveal only pills that have data; select first available
@@ -454,7 +458,20 @@ class HourlyCardView: CardView {
         updateCurve()
     }
 
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        applyTextPalette()
+        collectionView.reloadData()
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        applyTextPalette()
+        collectionView.reloadData()
+    }
+
     private func updateSelection() {
+        titleLabel.textColor = CardView.textColor(for: .secondary)
         for btn in pillButtons {
             btn.isSelected = btn.metric == activeMetric
             btn.updateAppearance()
@@ -489,6 +506,11 @@ class HourlyCardView: CardView {
             self.updateCurve()
         }
         onMetricChanged?(activeMetric)
+    }
+
+    private func applyTextPalette() {
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        pillButtons.forEach { $0.updateAppearance() }
     }
 }
 

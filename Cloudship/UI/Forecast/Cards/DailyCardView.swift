@@ -43,7 +43,10 @@ private class DailyRangeBarView: UIView {
         // Full-width background track
         let trackRect = CGRect(x: 0, y: h / 2 - 3, width: w, height: 6)
         let trackPath = UIBezierPath(roundedRect: trackRect, cornerRadius: 3)
-        UIColor.tertiarySystemFill.resolvedColor(with: traitCollection).setFill()
+        let trackColor: UIColor = WeatherDataSourceManager.shared.isShowingHistorical
+            ? CardView.textColor(for: .tertiary).withAlphaComponent(0.18)
+            : UIColor.tertiarySystemFill.resolvedColor(with: traitCollection)
+        trackColor.setFill()
         trackPath.fill()
 
         if let fraction = progressFraction {
@@ -246,6 +249,7 @@ private class DailyRowView: UIView {
     required init?(coder: NSCoder) { fatalError() }
 
     func configure(entry: DailyEntry, absMin: Double, absMax: Double, currentTemp: Double? = nil) {
+        applyTextPalette()
         dayLabel.text  = DateFormatHelper.dailyLabel(from: entry.time)
         iconView.image = UIImage(named: WeatherCodeMapper.iconName(for: entry.condition,
                                                                     isNight: false))
@@ -476,6 +480,15 @@ private class DailyRowView: UIView {
             }
         }
     }
+
+    private func applyTextPalette() {
+        dayLabel.textColor = CardView.textColor(for: .primary)
+        precipLabel.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
+        minTempLabel.textColor = CardView.textColor(for: .secondary)
+        maxTempLabel.textColor = CardView.textColor(for: .primary)
+        noDataLabel.textColor = CardView.textColor(for: .tertiary)
+        rangeBar.setNeedsDisplay()
+    }
 }
 
 // MARK: - Card
@@ -490,6 +503,7 @@ class DailyCardView: CardView {
     private var absMin: Double = 0
     private var absMax: Double = 0
     private var storedCurrentTemp: Double?
+    private var titleLabel: UILabel!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -503,7 +517,7 @@ class DailyCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "7-Day Forecast")
+        titleLabel = makeTitleLabel(text: "7-Day Forecast")
         addSubview(titleLabel)
 
         rowViews = (0..<7).map { _ in DailyRowView() }
@@ -532,6 +546,7 @@ class DailyCardView: CardView {
 
     func configure(daily: [DailyEntry], currentTemp: Double? = nil) {
         guard !daily.isEmpty else { return }
+        titleLabel.textColor = CardView.textColor(for: .secondary)
         dailyEntries = daily
         storedCurrentTemp = currentTemp
         let allMins = daily.compactMap(\.tempMin)
@@ -551,6 +566,23 @@ class DailyCardView: CardView {
             } else {
                 row.isHidden = true
             }
+        }
+    }
+
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        rowViews.forEach { $0.setNeedsLayout() }
+        if !dailyEntries.isEmpty {
+            configure(daily: dailyEntries, currentTemp: storedCurrentTemp)
+        }
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        if !dailyEntries.isEmpty {
+            configure(daily: dailyEntries, currentTemp: storedCurrentTemp)
         }
     }
 

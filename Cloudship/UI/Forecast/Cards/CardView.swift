@@ -10,6 +10,12 @@ import UIKit
 
 class CardView: UIView {
 
+    enum TextRole {
+        case primary
+        case secondary
+        case tertiary
+    }
+
     // MARK: - Configuration
 
     /// Inner padding applied by subclasses to their content.
@@ -24,7 +30,7 @@ class CardView: UIView {
         container.translatesAutoresizingMaskIntoConstraints = false
 
         let iv = UIImageView(image: UIImage(systemName: "line.3.horizontal"))
-        iv.tintColor = .tertiaryLabel
+        iv.tintColor = CardView.textColor(for: .tertiary)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(iv)
@@ -75,6 +81,7 @@ class CardView: UIView {
             reorderHandle.widthAnchor.constraint(equalToConstant: 44),
             reorderHandle.heightAnchor.constraint(equalToConstant: 44)
         ])
+        updateChromeColors()
     }
 
     // MARK: - Tint & vintage styling
@@ -88,11 +95,39 @@ class CardView: UIView {
     /// Overrides any user tint for the duration of the historical session.
     func applyVintageStyle() {
         backgroundColor = UIColor(red: 0.94, green: 0.87, blue: 0.70, alpha: 1)
+        updateChromeColors()
     }
 
     /// Restore the card to the user's currently saved tint preference.
     func restoreTint() {
         applyTint(CardTintStyle.saved)
+        updateChromeColors()
+    }
+
+    func updateChromeColors() {
+        (reorderHandle.subviews.first as? UIImageView)?.tintColor = Self.textColor(for: .tertiary)
+    }
+
+    static func textColor(for role: TextRole) -> UIColor {
+        if WeatherDataSourceManager.shared.isShowingHistorical {
+            switch role {
+            case .primary:
+                return WeatherTheme.timeMachineTheme.textPrimary
+            case .secondary:
+                return WeatherTheme.timeMachineTheme.textSecondary
+            case .tertiary:
+                return WeatherTheme.timeMachineTheme.textSecondary.withAlphaComponent(0.78)
+            }
+        }
+
+        switch role {
+        case .primary:
+            return .label
+        case .secondary:
+            return .secondaryLabel
+        case .tertiary:
+            return .tertiaryLabel
+        }
     }
 
     // MARK: - Helpers
@@ -103,7 +138,7 @@ class CardView: UIView {
         label.text = text.uppercased()
         label.font = .preferredFont(forTextStyle: .caption1)
         label.adjustsFontForContentSizeCategory = true
-        label.textColor = .secondaryLabel
+        label.textColor = Self.textColor(for: .secondary)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }

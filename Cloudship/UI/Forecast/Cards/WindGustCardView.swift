@@ -23,7 +23,7 @@ private class WindGustChartView: UIView {
     }
 
     private let accentColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
-    private let arrowColor  = UIColor.secondaryLabel
+    private var arrowColor: UIColor { CardView.textColor(for: .secondary) }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -92,7 +92,10 @@ private class WindGustChartView: UIView {
         dashPath.move(to: CGPoint(x: 0, y: meanY))
         dashPath.addLine(to: CGPoint(x: rect.width, y: meanY))
         dashPath.setLineDash([4, 4], count: 2, phase: 0)
-        UIColor.quaternaryLabel.resolvedColor(with: traitCollection).setStroke()
+        let meanLineColor: UIColor = WeatherDataSourceManager.shared.isShowingHistorical
+            ? CardView.textColor(for: .tertiary).withAlphaComponent(0.55)
+            : UIColor.quaternaryLabel.resolvedColor(with: traitCollection)
+        meanLineColor.setStroke()
         dashPath.lineWidth = 1
         dashPath.stroke()
 
@@ -152,11 +155,12 @@ private class WindGustChartView: UIView {
 class WindGustCardView: CardView {
 
     private let chartView = WindGustChartView()
+    private var titleLabel: UILabel!
     private let maxLabel: UILabel = {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .tertiaryLabel
+        l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -164,7 +168,7 @@ class WindGustCardView: CardView {
         let l = UILabel()
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .tertiaryLabel
+        l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -180,7 +184,7 @@ class WindGustCardView: CardView {
         l.text = text
         l.font = .preferredFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
-        l.textColor = .tertiaryLabel
+        l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }
@@ -197,7 +201,7 @@ class WindGustCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "Wind Gusts")
+        titleLabel = makeTitleLabel(text: "Wind Gusts")
         addSubview(titleLabel)
 
         chartView.translatesAutoresizingMaskIntoConstraints = false
@@ -251,6 +255,7 @@ class WindGustCardView: CardView {
     }
 
     func configure(hourly: [HourlyEntry]) {
+        applyTextPalette()
         let entries = Array(hourly.prefix(24))
         let gustData = entries.compactMap(\.windGust)
         guard !gustData.isEmpty else { return }
@@ -291,5 +296,28 @@ class WindGustCardView: CardView {
         } else {
             accessibilityLabel = "Wind Gusts chart"
         }
+    }
+
+    override func applyVintageStyle() {
+        super.applyVintageStyle()
+        applyTextPalette()
+        chartView.setNeedsDisplay()
+    }
+
+    override func restoreTint() {
+        super.restoreTint()
+        applyTextPalette()
+        chartView.setNeedsDisplay()
+    }
+
+    private func applyTextPalette() {
+        titleLabel?.textColor = CardView.textColor(for: .secondary)
+        let tertiary = CardView.textColor(for: .tertiary)
+        maxLabel.textColor = tertiary
+        minLabel.textColor = tertiary
+        nowTickLabel.textColor = tertiary
+        mid1TickLabel.textColor = tertiary
+        mid2TickLabel.textColor = tertiary
+        endTickLabel.textColor = tertiary
     }
 }
