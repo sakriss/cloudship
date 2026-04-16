@@ -553,6 +553,138 @@ private extension UIFont {
     }
 }
 
+private final class RadarCrosshairView: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        translatesAutoresizingMaskIntoConstraints = false
+        isUserInteractionEnabled = false
+        backgroundColor = .clear
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+
+    override func draw(_ rect: CGRect) {
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        let stroke = UIColor.white.withAlphaComponent(0.95)
+        let shadow = UIColor.black.withAlphaComponent(0.45)
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let lineLength: CGFloat = 12
+        let gap: CGFloat = 5
+
+        func drawLine(color: UIColor, width: CGFloat, from start: CGPoint, to end: CGPoint) {
+            context.setStrokeColor(color.cgColor)
+            context.setLineWidth(width)
+            context.setLineCap(.round)
+            context.move(to: start)
+            context.addLine(to: end)
+            context.strokePath()
+        }
+
+        let segments: [(CGPoint, CGPoint)] = [
+            (CGPoint(x: center.x - lineLength, y: center.y), CGPoint(x: center.x - gap, y: center.y)),
+            (CGPoint(x: center.x + gap, y: center.y), CGPoint(x: center.x + lineLength, y: center.y)),
+            (CGPoint(x: center.x, y: center.y - lineLength), CGPoint(x: center.x, y: center.y - gap)),
+            (CGPoint(x: center.x, y: center.y + gap), CGPoint(x: center.x, y: center.y + lineLength))
+        ]
+
+        for (start, end) in segments {
+            drawLine(color: shadow, width: 4, from: start, to: end)
+            drawLine(color: stroke, width: 2, from: start, to: end)
+        }
+
+        context.setFillColor(shadow.cgColor)
+        context.fillEllipse(in: CGRect(x: center.x - 4, y: center.y - 4, width: 8, height: 8))
+        context.setFillColor(stroke.cgColor)
+        context.fillEllipse(in: CGRect(x: center.x - 2.5, y: center.y - 2.5, width: 5, height: 5))
+    }
+}
+
+private final class RadarTotalsCardView: UIVisualEffectView {
+    private let titleLabel = UILabel()
+    private let valueLabel = UILabel()
+    private let subtitleLabel = UILabel()
+    private let spinner = UIActivityIndicatorView(style: .medium)
+
+    override init(effect: UIVisualEffect?) {
+        super.init(effect: effect)
+        translatesAutoresizingMaskIntoConstraints = false
+        layer.cornerRadius = 18
+        layer.masksToBounds = true
+        isHidden = true
+
+        titleLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        titleLabel.textColor = .secondaryLabel
+        titleLabel.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        valueLabel.font = .monospacedDigitSystemFont(ofSize: 26, weight: .bold)
+        valueLabel.textColor = .label
+        valueLabel.textAlignment = .center
+        valueLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        subtitleLabel.font = .systemFont(ofSize: 11, weight: .medium)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.textAlignment = .center
+        subtitleLabel.numberOfLines = 2
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.hidesWhenStopped = true
+
+        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel, subtitleLabel])
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.spacing = 4
+        stack.translatesAutoresizingMaskIntoConstraints = false
+
+        contentView.addSubview(stack)
+        contentView.addSubview(spinner)
+
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 14),
+            stack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            stack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
+
+            spinner.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            spinner.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+
+    func showLoading(title: String, subtitle: String) {
+        isHidden = false
+        titleLabel.text = title
+        valueLabel.text = "Loading…"
+        subtitleLabel.text = subtitle
+        subtitleLabel.textColor = .secondaryLabel
+        spinner.startAnimating()
+    }
+
+    func showResult(title: String, value: String, subtitle: String) {
+        isHidden = false
+        titleLabel.text = title
+        valueLabel.text = value
+        subtitleLabel.text = subtitle
+        subtitleLabel.textColor = .secondaryLabel
+        spinner.stopAnimating()
+    }
+
+    func showError(title: String, subtitle: String) {
+        isHidden = false
+        titleLabel.text = title
+        valueLabel.text = "Unavailable"
+        subtitleLabel.text = subtitle
+        subtitleLabel.textColor = .systemRed
+        spinner.stopAnimating()
+    }
+}
+
 // MARK: - Settings sheet
 
 private class RadarSettingsViewController: UIViewController {
@@ -755,12 +887,27 @@ private class RadarSettingsViewController: UIViewController {
 
 class RadarViewController: UIViewController {
 
+    private enum InteractionMode: Int {
+        case radar
+        case totals
+    }
+
     // MARK: Settings state
     private var activeLayer: RadarLayer = .precipitation
     private var colorScheme: ColorScheme = .nexrad
     private var animationSpeed: AnimationSpeed = .normal
     private var loopRange: LoopRange = .all
     private var radarOpacity: Float = 0.75
+    private var interactionMode: InteractionMode = .radar
+    private var totalsDirection: MapPrecipitationDirection = .past
+    private var totalsWindow: MapPrecipitationWindow = .hours24
+    private var totalsFetchTask: Task<Void, Never>?
+    private var pendingTotalsRefreshWorkItem: DispatchWorkItem?
+    private var totalsRequestID = UUID()
+    private var lastTotals: MapPrecipitationTotals?
+    private let geocoder = CLGeocoder()
+    private var locationNameCache: [String: String] = [:]
+    private var geocodeTask: Task<Void, Never>?
 
     // MARK: OpenWeatherMap
     private let owmAPIKey = "028172b81ffd68d6beb18b4ccf434ad4"
@@ -797,7 +944,60 @@ class RadarViewController: UIViewController {
         return v
     }()
 
+    private lazy var modeControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: ["Radar", "Rain Totals"])
+        control.selectedSegmentIndex = InteractionMode.radar.rawValue
+        control.translatesAutoresizingMaskIntoConstraints = false
+        control.addTarget(self, action: #selector(modeChanged), for: .valueChanged)
+        return control
+    }()
+
     private var layerButtons: [UIButton] = []
+    private var totalsWindowButtons: [UIButton] = []
+    private let crosshairView = RadarCrosshairView()
+    private let totalsCard = RadarTotalsCardView(effect: UIBlurEffect(style: .systemThickMaterial))
+    private let totalsDirectionControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: ["Past", "Future"])
+        control.selectedSegmentIndex = 0
+        control.translatesAutoresizingMaskIntoConstraints = false
+        return control
+    }()
+    private let totalsWindowRow: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.alignment = .fill
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    private let layerScroll: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.showsHorizontalScrollIndicator = false
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        return scroll
+    }()
+    private lazy var timeRow: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [liveBadge, timeLabel])
+        stack.axis = .horizontal
+        stack.spacing = 6
+        stack.alignment = .center
+        return stack
+    }()
+    private lazy var playbackRow: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [prevButton, playPauseButton, nextButton, UIView(), settingsButton])
+        stack.axis = .horizontal
+        stack.spacing = 20
+        stack.alignment = .center
+        return stack
+    }()
+    private let totalsControlsStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
 
     private func makeLayerButtons() -> [UIButton] {
         return RadarLayer.allCases.enumerated().map { index, layer in
@@ -1000,8 +1200,11 @@ class RadarViewController: UIViewController {
         ])
 
         setupControlPanel()
+        setupCrosshair()
         setupLegend()
         updateLayerUI()
+        updateTotalsSelectionUI()
+        updateInteractionUI()
 
         NotificationCenter.default.addObserver(self, selector: #selector(settingsChanged),
                                                name: Notification.Name("settingsChanged"), object: nil)
@@ -1023,24 +1226,47 @@ class RadarViewController: UIViewController {
             mapView.setRegion(region, animated: animated)
             didCenterOnUser = true   // skip GPS centering since we have a coordinate
         }
+        if interactionMode == .totals {
+            scheduleTotalsRefresh(force: true)
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopAnimation()
         windFetchTask?.cancel()
+        totalsFetchTask?.cancel()
+        geocodeTask?.cancel()
+        pendingTotalsRefreshWorkItem?.cancel()
     }
 
     // MARK: - Control panel layout
+
+    private func setupCrosshair() {
+        crosshairView.isHidden = true
+        totalsCard.isHidden = true
+
+        view.addSubview(crosshairView)
+        view.addSubview(totalsCard)
+
+        NSLayoutConstraint.activate([
+            crosshairView.centerXAnchor.constraint(equalTo: mapView.centerXAnchor),
+            crosshairView.centerYAnchor.constraint(equalTo: mapView.centerYAnchor, constant: -14),
+            crosshairView.widthAnchor.constraint(equalToConstant: 36),
+            crosshairView.heightAnchor.constraint(equalToConstant: 36),
+
+            totalsCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            totalsCard.bottomAnchor.constraint(equalTo: controlPanel.topAnchor, constant: -10),
+            totalsCard.widthAnchor.constraint(lessThanOrEqualToConstant: 260),
+            totalsCard.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
+            totalsCard.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20)
+        ])
+    }
 
     private func setupControlPanel() {
         view.addSubview(controlPanel)
 
         // Layer scroll
-        let layerScroll = UIScrollView()
-        layerScroll.showsHorizontalScrollIndicator = false
-        layerScroll.translatesAutoresizingMaskIntoConstraints = false
-
         let layerRow = UIStackView(arrangedSubviews: layerButtons)
         layerRow.axis = .horizontal; layerRow.spacing = 8
         layerRow.translatesAutoresizingMaskIntoConstraints = false
@@ -1054,17 +1280,26 @@ class RadarViewController: UIViewController {
             layerScroll.heightAnchor.constraint(equalToConstant: 34)
         ])
 
-        // Time row
-        let timeRow = UIStackView(arrangedSubviews: [liveBadge, timeLabel])
-        timeRow.axis = .horizontal; timeRow.spacing = 6; timeRow.alignment = .center
+        totalsDirectionControl.addTarget(self, action: #selector(totalsDirectionChanged), for: .valueChanged)
 
-        // Playback row
-        let playbackRow = UIStackView(arrangedSubviews: [prevButton, playPauseButton, nextButton,
-                                                          UIView(), settingsButton])
-        playbackRow.axis = .horizontal; playbackRow.spacing = 20; playbackRow.alignment = .center
+        for (index, window) in MapPrecipitationWindow.allCases.enumerated() {
+            let button = UIButton(type: .system)
+            button.tag = index
+            button.setTitle(window.title, for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
+            button.layer.cornerRadius = 14
+            button.layer.borderWidth = 1
+            button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 10, bottom: 7, right: 10)
+            button.addTarget(self, action: #selector(totalsWindowTapped(_:)), for: .touchUpInside)
+            totalsWindowButtons.append(button)
+            totalsWindowRow.addArrangedSubview(button)
+        }
+
+        totalsControlsStack.addArrangedSubview(totalsDirectionControl)
+        totalsControlsStack.addArrangedSubview(totalsWindowRow)
 
         // Main vertical stack
-        let inner = UIStackView(arrangedSubviews: [layerScroll, timeRow, frameSlider, playbackRow])
+        let inner = UIStackView(arrangedSubviews: [modeControl, layerScroll, totalsControlsStack, timeRow, frameSlider, playbackRow])
         inner.axis = .vertical; inner.spacing = 10; inner.alignment = .fill
         inner.translatesAutoresizingMaskIntoConstraints = false
 
@@ -1116,6 +1351,62 @@ class RadarViewController: UIViewController {
         b.translatesAutoresizingMaskIntoConstraints = false
         b.addTarget(self, action: action, for: .touchUpInside)
         return b
+    }
+
+    private func updateTotalsSelectionUI() {
+        let accent = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
+        totalsDirectionControl.selectedSegmentIndex = totalsDirection == .past ? 0 : 1
+        for (index, button) in totalsWindowButtons.enumerated() {
+            let selected = MapPrecipitationWindow.allCases[index] == totalsWindow
+            button.backgroundColor = selected ? accent : .secondarySystemBackground
+            button.setTitleColor(selected ? .white : .label, for: .normal)
+            button.layer.borderColor = selected ? accent.cgColor : UIColor.separator.cgColor
+        }
+    }
+
+    private func updateInteractionUI() {
+        let isTotalsMode = interactionMode == .totals
+        totalsControlsStack.isHidden = !isTotalsMode
+        crosshairView.isHidden = !isTotalsMode
+        layerScroll.isHidden = isTotalsMode
+        totalsCard.isHidden = !isTotalsMode && lastTotals == nil
+
+        if isTotalsMode {
+            stopAnimation()
+            timeRow.isHidden = true
+            frameSlider.isHidden = true
+            playbackRow.isHidden = true
+            if let totals = lastTotals {
+                renderTotals(totals)
+            } else {
+                totalsCard.showLoading(
+                    title: "\(totalsDirection.rawValue) \(totalsWindow.title)",
+                    subtitle: displayLocation(for: mapView.centerCoordinate)
+                )
+            }
+            scheduleTotalsRefresh(force: true)
+        } else {
+            totalsFetchTask?.cancel()
+            pendingTotalsRefreshWorkItem?.cancel()
+            totalsCard.isHidden = true
+            updatePlaybackVisibility()
+            if activeLayer.isAnimatable, !activeFrames.isEmpty {
+                startAnimation()
+            }
+        }
+    }
+
+    private func updatePlaybackVisibility() {
+        let showPlayback = interactionMode == .radar && activeLayer.isAnimatable
+        timeRow.isHidden = !showPlayback
+        frameSlider.isHidden = !showPlayback
+        playPauseButton.isHidden = !showPlayback
+        prevButton.isHidden = !showPlayback
+        nextButton.isHidden = !showPlayback
+        playbackRow.isHidden = interactionMode != .radar
+        if !showPlayback {
+            liveBadge.isHidden = true
+        }
     }
 
     // MARK: - Layer chip styling
@@ -1172,16 +1463,12 @@ class RadarViewController: UIViewController {
 
         let animatable = activeLayer.isAnimatable
 
-        // Hide animation controls for static (OWM) layers
-        frameSlider.isHidden = !animatable
-        playPauseButton.isHidden = !animatable
-        prevButton.isHidden = !animatable
-        nextButton.isHidden = !animatable
         liveBadge.isHidden = true
 
         if activeLayer == .wind {
             timeLabel.text = activeLayer.rawValue
             scheduleWindRefresh(for: mapView.region, force: true)
+            updatePlaybackVisibility()
             return
         }
 
@@ -1190,6 +1477,7 @@ class RadarViewController: UIViewController {
             timeLabel.text = activeLayer == .satellite
                 ? "Satellite data unavailable from RainViewer"
                 : "No radar data available"
+            updatePlaybackVisibility()
             return
         }
         frameSlider.maximumValue = Float(frames.count - 1)
@@ -1197,11 +1485,12 @@ class RadarViewController: UIViewController {
         frameSlider.value = Float(currentIndex)
         showCurrentFrame()
 
-        if animatable {
+        if interactionMode == .radar && animatable {
             startAnimation()
-        } else {
+        } else if interactionMode == .radar {
             timeLabel.text = activeLayer.rawValue
         }
+        updatePlaybackVisibility()
     }
 
     private var activeFrames: [RainViewerResponse.Frame] {
@@ -1349,6 +1638,14 @@ class RadarViewController: UIViewController {
         updateLayerUI()
         updateLegend()
         reloadFrames()
+        if interactionMode == .totals {
+            scheduleTotalsRefresh(force: true)
+        }
+    }
+
+    @objc private func modeChanged() {
+        interactionMode = InteractionMode(rawValue: modeControl.selectedSegmentIndex) ?? .radar
+        updateInteractionUI()
     }
 
     @objc private func togglePlayback() {
@@ -1386,6 +1683,20 @@ class RadarViewController: UIViewController {
         let icons = ["map", "globe.americas.fill", "map.fill"]
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
         mapTypeButton.setImage(UIImage(systemName: icons[mapTypeIndex], withConfiguration: config), for: .normal)
+    }
+
+    @objc private func totalsDirectionChanged() {
+        totalsDirection = totalsDirectionControl.selectedSegmentIndex == 0 ? .past : .forecast
+        updateTotalsSelectionUI()
+        scheduleTotalsRefresh(force: true)
+    }
+
+    @objc private func totalsWindowTapped(_ sender: UIButton) {
+        let selected = MapPrecipitationWindow.allCases[sender.tag]
+        guard selected != totalsWindow else { return }
+        totalsWindow = selected
+        updateTotalsSelectionUI()
+        scheduleTotalsRefresh(force: true)
     }
 
     @objc private func openSettings() {
@@ -1441,6 +1752,140 @@ class RadarViewController: UIViewController {
             mapView.removeAnnotations(windAnnotations)
             windAnnotations.removeAll()
         }
+    }
+
+    private func scheduleTotalsRefresh(force: Bool = false) {
+        guard interactionMode == .totals else { return }
+
+        pendingTotalsRefreshWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.fetchTotalsForMapCenter()
+        }
+        pendingTotalsRefreshWorkItem = workItem
+        let delay: TimeInterval = force ? 0.05 : 0.4
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
+    }
+
+    private func fetchTotalsForMapCenter() {
+        guard interactionMode == .totals else { return }
+
+        let coordinate = mapView.centerCoordinate
+        let title = "\(totalsDirection.rawValue) \(totalsWindow.title)"
+        totalsCard.showLoading(title: title, subtitle: displayLocation(for: coordinate))
+
+        totalsFetchTask?.cancel()
+        let requestID = UUID()
+        totalsRequestID = requestID
+        let units = TemperatureFormatter.apiUnits
+
+        totalsFetchTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let totals = try await MapPrecipitationTotalsService.shared.fetchTotals(
+                    coordinate: coordinate,
+                    direction: self.totalsDirection,
+                    window: self.totalsWindow,
+                    units: units
+                )
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    guard self.interactionMode == .totals,
+                          self.totalsRequestID == requestID else { return }
+                    self.lastTotals = totals
+                    self.renderTotals(totals)
+                }
+            } catch {
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    guard self.interactionMode == .totals,
+                          self.totalsRequestID == requestID else { return }
+                    self.totalsCard.showError(
+                        title: title,
+                        subtitle: error.localizedDescription
+                    )
+                }
+            }
+        }
+    }
+
+    private func renderTotals(_ totals: MapPrecipitationTotals) {
+        let unitLabel = TemperatureFormatter.isMetric ? "mm" : "in"
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = totals.totalPrecipitation < 10 ? 2 : 1
+        formatter.maximumFractionDigits = totals.totalPrecipitation < 10 ? 2 : 1
+        let value = formatter.string(from: NSNumber(value: totals.totalPrecipitation)) ?? String(format: "%.2f", totals.totalPrecipitation)
+        let title = "\(totals.direction.rawValue) \(totals.window.title)"
+        let subtitle = "\(displayLocation(for: totals.coordinate))\n\(totals.sourceName) model estimate"
+        totalsCard.showResult(title: title, value: "\(value) \(unitLabel)", subtitle: subtitle)
+        resolveLocationName(for: totals.coordinate)
+    }
+
+    private func displayLocation(for coordinate: CLLocationCoordinate2D) -> String {
+        let coordinateText = coordinateSubtitle(for: coordinate)
+        let key = locationCacheKey(for: coordinate)
+        if let cached = locationNameCache[key] {
+            return "\(cached) • \(coordinateText)"
+        }
+        resolveLocationName(for: coordinate)
+        return coordinateText
+    }
+
+    private func resolveLocationName(for coordinate: CLLocationCoordinate2D) {
+        let key = locationCacheKey(for: coordinate)
+        if locationNameCache[key] != nil {
+            return
+        }
+
+        geocodeTask?.cancel()
+        geocodeTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let placemarks = try await geocoder.reverseGeocodeLocation(
+                    CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+                )
+                guard !Task.isCancelled else { return }
+                let name = placemarks.first.flatMap(Self.makeLocationName(from:))
+                await MainActor.run {
+                    guard let name else { return }
+                    self.locationNameCache[key] = name
+                    if let totals = self.lastTotals,
+                       abs(totals.coordinate.latitude - coordinate.latitude) < 0.01,
+                       abs(totals.coordinate.longitude - coordinate.longitude) < 0.01 {
+                        self.renderTotals(totals)
+                    } else if self.interactionMode == .totals {
+                        self.totalsCard.showLoading(
+                            title: "\(self.totalsDirection.rawValue) \(self.totalsWindow.title)",
+                            subtitle: self.displayLocation(for: coordinate)
+                        )
+                    }
+                }
+            } catch {
+                // Leave coordinates visible as the fallback label.
+            }
+        }
+    }
+
+    private static func makeLocationName(from placemark: CLPlacemark) -> String? {
+        if let city = placemark.locality, let state = placemark.administrativeArea {
+            return "\(city), \(state)"
+        }
+        if let city = placemark.locality, let country = placemark.country {
+            return "\(city), \(country)"
+        }
+        if let name = placemark.locality ?? placemark.name ?? placemark.subAdministrativeArea {
+            return name
+        }
+        return nil
+    }
+
+    private func locationCacheKey(for coordinate: CLLocationCoordinate2D) -> String {
+        let lat = round(coordinate.latitude * 100) / 100
+        let lon = round(coordinate.longitude * 100) / 100
+        return String(format: "%.2f,%.2f", lat, lon)
+    }
+
+    private func coordinateSubtitle(for coordinate: CLLocationCoordinate2D) -> String {
+        String(format: "%.2f, %.2f", coordinate.latitude, coordinate.longitude)
     }
 
     private func scheduleWindRefresh(for region: MKCoordinateRegion, force: Bool = false) {
@@ -1527,10 +1972,10 @@ class RadarViewController: UIViewController {
 
         var coords: [CLLocationCoordinate2D] = []
         for row in 0..<rows {
-            let latProgress = rows == 1 ? 0.5 : Double(row) / Double(rows - 1)
+            let latProgress = Double(row) / Double(rows - 1)
             let lat = maxLat - (maxLat - minLat) * latProgress
             for column in 0..<columns {
-                let lonProgress = columns == 1 ? 0.5 : Double(column) / Double(columns - 1)
+                let lonProgress = Double(column) / Double(columns - 1)
                 let lon = minLon + (maxLon - minLon) * lonProgress
                 coords.append(CLLocationCoordinate2D(latitude: lat, longitude: lon))
             }
@@ -1551,6 +1996,7 @@ extension RadarViewController: MKMapViewDelegate {
 
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         scheduleWindRefresh(for: mapView.region)
+        scheduleTotalsRefresh()
     }
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
