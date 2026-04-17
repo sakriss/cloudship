@@ -30,6 +30,7 @@ class AlertBannerCardView: CardView {
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .white
         l.numberOfLines = 1
+        l.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -39,7 +40,9 @@ class AlertBannerCardView: CardView {
         l.font = .preferredFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.85)
-        l.numberOfLines = 1
+        l.numberOfLines = 0
+        l.lineBreakMode = .byWordWrapping
+        l.setContentCompressionResistancePriority(.required, for: .vertical)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -90,6 +93,7 @@ class AlertBannerCardView: CardView {
         let textStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         textStack.axis = .vertical
         textStack.spacing = 2
+        textStack.alignment = .fill
         textStack.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(iconImageView)
@@ -101,17 +105,17 @@ class AlertBannerCardView: CardView {
 
         NSLayoutConstraint.activate([
             iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),
+            iconImageView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: p),
             iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             iconImageView.widthAnchor.constraint(equalToConstant: 24),
             iconImageView.heightAnchor.constraint(equalToConstant: 24),
 
             textStack.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 10),
-            textStack.centerYAnchor.constraint(equalTo: centerYAnchor),
-            textStack.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: p),
-            textStack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -p),
+            textStack.topAnchor.constraint(equalTo: topAnchor, constant: p),
+            textStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -p),
 
             alertCountBadge.leadingAnchor.constraint(equalTo: textStack.trailingAnchor, constant: 8),
-            alertCountBadge.centerYAnchor.constraint(equalTo: centerYAnchor),
+            alertCountBadge.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             alertCountBadge.widthAnchor.constraint(greaterThanOrEqualToConstant: 20),
             alertCountBadge.heightAnchor.constraint(equalToConstant: 20),
 
@@ -121,6 +125,10 @@ class AlertBannerCardView: CardView {
             chevronImageView.widthAnchor.constraint(equalToConstant: 12),
             chevronImageView.heightAnchor.constraint(equalToConstant: 16)
         ])
+
+        titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        subtitleLabel.setContentHuggingPriority(.required, for: .vertical)
+        textStack.setContentCompressionResistancePriority(.required, for: .vertical)
 
         // Tap gesture
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))

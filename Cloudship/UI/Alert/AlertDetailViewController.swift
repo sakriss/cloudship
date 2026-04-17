@@ -37,6 +37,8 @@ class AlertDetailViewController: UITableViewController {
         tableView.register(AlertTextCell.self, forCellReuseIdentifier: "text")
         tableView.separatorStyle = .none
         tableView.backgroundColor = .systemGroupedBackground
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 180
     }
 
     // MARK: - UITableViewDataSource
@@ -124,7 +126,8 @@ private class AlertHeaderCell: UITableViewCell {
         let l = UILabel()
         l.font = .systemFont(ofSize: 13, weight: .regular)
         l.textColor = .secondaryLabel
-        l.numberOfLines = 3
+        l.numberOfLines = 0
+        l.lineBreakMode = .byWordWrapping
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -143,7 +146,7 @@ private class AlertHeaderCell: UITableViewCell {
         let stack = UIStackView(arrangedSubviews: [severityBadge, eventLabel, sourceLabel, onsetLabel, areaLabel])
         stack.axis = .vertical
         stack.spacing = 6
-        stack.alignment = .leading
+        stack.alignment = .fill
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         contentView.addSubview(stack)

@@ -49,14 +49,22 @@ class MainForecastViewController: UIViewController {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
+        let capsule = UIView()
+        capsule.translatesAutoresizingMaskIntoConstraints = false
+        capsule.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.78)
+        capsule.layer.cornerRadius = 12
+        capsule.layer.cornerCurve = .continuous
+        capsule.layer.borderWidth = 1 / UIScreen.main.scale
+        capsule.layer.borderColor = UIColor.separator.withAlphaComponent(0.18).cgColor
+
         let icon = UIImageView(image: UIImage(systemName: "antenna.radiowaves.left.and.right"))
-        icon.tintColor = .secondaryLabel
+        icon.tintColor = .label
         icon.contentMode = .scaleAspectFit
         icon.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = .secondaryLabel
+        label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         label.tag = 99  // used to find and update later
 
@@ -71,15 +79,22 @@ class MainForecastViewController: UIViewController {
         stack.alignment = .center
         stack.translatesAutoresizingMaskIntoConstraints = false
 
-        container.addSubview(stack)
+        container.addSubview(capsule)
+        capsule.addSubview(stack)
         NSLayoutConstraint.activate([
             icon.widthAnchor.constraint(equalToConstant: 14),
             icon.heightAnchor.constraint(equalToConstant: 12),
             chevron.widthAnchor.constraint(equalToConstant: 8),
             chevron.heightAnchor.constraint(equalToConstant: 12),
-            stack.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            container.heightAnchor.constraint(equalToConstant: 24)
+            capsule.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            capsule.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            capsule.topAnchor.constraint(equalTo: container.topAnchor),
+            capsule.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            stack.topAnchor.constraint(equalTo: capsule.topAnchor, constant: 6),
+            stack.bottomAnchor.constraint(equalTo: capsule.bottomAnchor, constant: -6),
+            stack.leadingAnchor.constraint(equalTo: capsule.leadingAnchor, constant: 10),
+            stack.trailingAnchor.constraint(equalTo: capsule.trailingAnchor, constant: -10),
+            container.heightAnchor.constraint(greaterThanOrEqualToConstant: 28)
         ])
         return container
     }()
