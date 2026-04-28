@@ -191,6 +191,7 @@ class MainForecastViewController: UIViewController {
         // Search — controller used for results, presented on demand
         searchResultsVC = SearchResultsViewController()
         searchResultsVC.delegate = self
+        searchResultsVC.locationManager = locationManager
         searchController = UISearchController(searchResultsController: searchResultsVC)
         searchController.searchResultsUpdater = searchResultsVC
         searchController.searchBar.placeholder = "Search for a city"
@@ -676,34 +677,36 @@ class MainForecastViewController: UIViewController {
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
         locationManager.delegate = self
 
+        if let lastForecast = LastForecastLocationStore.shared.location {
+            navigationItem.title = lastForecast.name
+            WeatherDataSourceManager.shared.locationName = lastForecast.name
+            fetchWeather(for: lastForecast.location, displayName: lastForecast.name)
+        }
+
         // locationManagerDidChangeAuthorization may or may not fire on delegate
         // assignment depending on iOS version. Handle the current status explicitly.
         let status = locationManager.authorizationStatus
-        if status == .notDetermined {
-            locationManager.requestWhenInUseAuthorization()
-        } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
             locationManager.requestLocation()
             startLocationTimeout()
+        } else if currentLocation == nil {
+            activityIndicator.stopAnimating()
         }
     }
 
-    /// If no location arrives within 10 seconds, stop waiting and show an error.
+    /// If no location arrives promptly, stop waiting without blocking city search.
     private func startLocationTimeout() {
         locationTimeoutTask?.cancel()
         locationTimeoutTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 10_000_000_000) // 10 seconds
+            try? await Task.sleep(nanoseconds: 20_000_000_000) // 20 seconds
             guard !Task.isCancelled, let self = self, self.currentLocation == nil else { return }
+            self.locationManager.stopUpdatingLocation()
             self.activityIndicator.stopAnimating()
-            let alert = UIAlertController(title: "Unable to Load Weather",
-                                          message: "Unable to determine your location. Please try searching for a city instead.",
-                                          preferredStyle: .alert)
-            alert.accessibilityLabel = "Weather error: Unable to determine your location"
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            self.present(alert, animated: true)
+            print("Location lookup timed out; waiting for city search or a later location update.")
         }
     }
 
-    private func fetchWeather(for location: CLLocation, isGPSLocation: Bool = false) {
+    private func fetchWeather(for location: CLLocation, isGPSLocation: Bool = false, displayName: String? = nil) {
         currentLocation = location
         isShowingGPSLocation = isGPSLocation
         let lat = location.coordinate.latitude
@@ -722,8 +725,9 @@ class MainForecastViewController: UIViewController {
             let geo = CLGeocoder()
             if let placemarks = try? await geo.reverseGeocodeLocation(location),
                let pm = placemarks.first {
-                let name = pm.locality ?? pm.name ?? pm.administrativeArea ?? "My Location"
+                let name = displayName ?? pm.locality ?? pm.name ?? pm.administrativeArea ?? "My Location"
                 WeatherDataSourceManager.shared.locationName = name
+                LastForecastLocationStore.shared.save(name: name, location: location)
                 await MainActor.run {
                     self.navigationItem.title = name
                     if isGPSLocation {
@@ -731,6 +735,8 @@ class MainForecastViewController: UIViewController {
                         self.searchResultsVC.tableView.reloadData()
                     }
                 }
+            } else if let displayName {
+                LastForecastLocationStore.shared.save(name: displayName, location: location)
             }
 
             await WeatherDataSourceManager.shared.fetchWeather(lat: lat, lon: lon,
@@ -1288,7 +1294,7 @@ extension MainForecastViewController: CLLocationManagerDelegate {
                 startLocationTimeout()
             }
         case .notDetermined:
-            manager.requestWhenInUseAuthorization()
+            activityIndicator.stopAnimating()
         case .denied, .restricted:
             activityIndicator.stopAnimating()
             let alert = UIAlertController(title: "Unable to Load Weather",
@@ -1305,6 +1311,7 @@ extension MainForecastViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let loc = locations.first else { return }
         locationTimeoutTask?.cancel()
+        manager.stopUpdatingLocation()
         // Update the "Current Location" search row with the real GPS fix (only from here)
         updateGPSLocationInSearch(loc)
         fetchWeather(for: loc, isGPSLocation: true)
@@ -1312,18 +1319,35 @@ extension MainForecastViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error)")
-        // kCLErrorLocationUnknown is transient — the system may retry automatically.
-        // Only stop the spinner and show an error for persistent failures.
-        if let clError = error as? CLError, clError.code == .locationUnknown {
+        // kCLErrorLocationUnknown is transient. requestLocation() can fail before
+        // the simulator/device has a fix, so keep listening briefly instead of
+        // treating it as a user-facing load failure.
+        if isTransientLocationUnknown(error) {
+            manager.startUpdatingLocation()
+            startLocationTimeout()
             return
         }
+
+        locationTimeoutTask?.cancel()
+        manager.stopUpdatingLocation()
         activityIndicator.stopAnimating()
         let alert = UIAlertController(title: "Unable to Load Weather",
                                       message: "Unable to determine your location. Please try searching for a city instead.",
                                       preferredStyle: .alert)
         alert.accessibilityLabel = "Weather error: Unable to determine your location"
         alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        if presentedViewController == nil {
+            present(alert, animated: true)
+        }
+    }
+
+    private func isTransientLocationUnknown(_ error: Error) -> Bool {
+        if let clError = error as? CLError {
+            return clError.code == .locationUnknown
+        }
+
+        let nsError = error as NSError
+        return nsError.domain == kCLErrorDomain && nsError.code == CLError.Code.locationUnknown.rawValue
     }
 }
 
@@ -1348,7 +1372,7 @@ extension MainForecastViewController: SearchResultsDelegate {
         if saveToRecents {
             RecentSearchStore.shared.add(name: name, location: location)
         }
-        fetchWeather(for: location)
+        fetchWeather(for: location, displayName: name)
     }
 }
 
@@ -1365,6 +1389,36 @@ struct RecentSearch {
     let latitude: Double
     let longitude: Double
     var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
+}
+
+struct LastForecastLocation {
+    let name: String
+    let latitude: Double
+    let longitude: Double
+    var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
+}
+
+final class LastForecastLocationStore {
+    static let shared = LastForecastLocationStore()
+    private init() {}
+
+    private let key = "lastForecastLocation_v1"
+
+    var location: LastForecastLocation? {
+        guard let dict = UserDefaults.standard.dictionary(forKey: key),
+              let name = dict["name"] as? String,
+              let lat = dict["lat"] as? Double,
+              let lon = dict["lon"] as? Double else { return nil }
+        return LastForecastLocation(name: name, latitude: lat, longitude: lon)
+    }
+
+    func save(name: String, location: CLLocation) {
+        UserDefaults.standard.set([
+            "name": name,
+            "lat": location.coordinate.latitude,
+            "lon": location.coordinate.longitude
+        ], forKey: key)
+    }
 }
 
 final class RecentSearchStore {
@@ -1408,6 +1462,7 @@ final class RecentSearchStore {
 class SearchResultsViewController: UITableViewController, UISearchResultsUpdating {
 
     weak var delegate: SearchResultsDelegate?
+    weak var locationManager: CLLocationManager?
     private var results: [MKMapItem] = []
     private var isSearching = false
 
@@ -1450,7 +1505,7 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
-        case .currentLocation: return gpsLocation != nil ? 1 : 0
+        case .currentLocation: return 1
         case .recents:         return isSearching ? 0 : RecentSearchStore.shared.searches.count
         case .searchResults:   return isSearching ? results.count : 0
         default:               return 0
@@ -1474,7 +1529,7 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         switch Section(rawValue: indexPath.section) {
         case .currentLocation:
             config.text = gpsLocationName
-            config.secondaryText = "Your current location"
+            config.secondaryText = gpsLocation == nil ? "Use your current location" : "Your current location"
             config.image = UIImage(systemName: "location.fill")
             config.imageProperties.tintColor = .systemBlue
 
@@ -1504,7 +1559,16 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch Section(rawValue: indexPath.section) {
         case .currentLocation:
-            guard let loc = gpsLocation else { return }
+            guard let loc = gpsLocation else {
+                let status = locationManager?.authorizationStatus ?? CLLocationManager.authorizationStatus()
+                if status == .notDetermined {
+                    locationManager?.requestWhenInUseAuthorization()
+                } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+                    locationManager?.requestLocation()
+                }
+                dismiss(animated: true)
+                return
+            }
             delegate?.didSelectLocation(loc, name: gpsLocationName, saveToRecents: false)
 
         case .recents:

@@ -97,6 +97,9 @@ class HeaderCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
+        accessibilityIdentifier = "forecastHeaderCard"
+        locationLabel.accessibilityIdentifier = "forecastLocationLabel"
+        temperatureLabel.accessibilityIdentifier = "forecastTemperatureLabel"
 
         let stack = UIStackView(arrangedSubviews: [
             locationLabel,
@@ -174,6 +177,9 @@ class HeaderCardView: CardView {
         // VoiceOver: combine key info into a single accessibility element
         isAccessibilityElement = true
         var accessibilityParts: [String] = []
+        if let location = locationLabel.text, !location.isEmpty {
+            accessibilityParts.append(location)
+        }
         if let temp = temperatureLabel.text {
             accessibilityParts.append("Current temperature \(temp)")
         }

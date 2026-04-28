@@ -76,7 +76,9 @@
 		AE4AA244D4434097B78A125B /* DetailsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8BA9853D214D04BAA086AB /* DetailsCardView.swift */; };
 		B3C4D5E6F7A8B9C0D1E2F3A4 /* Services/BackgroundTaskManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E6F7A8B9C0D1E2 /* Services/BackgroundTaskManager.swift */; };
 		B4C106C3663847389C3A3620 /* DataSources/NOAAAlertModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766A94256EAD495AAC3A5AC9 /* DataSources/NOAAAlertModels.swift */; };
+		BB00000000000000000008 /* ForecastLaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000000000018 /* ForecastLaunchUITests.swift */; };
 		BB00000000000000000005 /* SettingsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A37DA72F75F4630090F977 /* SettingsUITests.swift */; };
+		BB00000000000000000006 /* OnboardingLaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00000000000000000007 /* OnboardingLaunchUITests.swift */; };
 		BB002002002002002002BB02 /* DataSources/WeatherCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB001001001001001001BB01 /* DataSources/WeatherCache.swift */; };
 		BB1122334455667788990011 /* Services/SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1122334455667788990011 /* Services/SubscriptionManager.swift */; };
 		BB2233445566778899001122 /* UI/Subscription/PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC2233445566778899001122 /* UI/Subscription/PaywallViewController.swift */; };
@@ -88,6 +90,12 @@
 		C4D5E6F7A8B9C0D1E2F3A4B5 /* Services/PrecipitationNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/PrecipitationNotificationService.swift */; };
 		C6F350E3885640288204C969 /* UI/Forecast/Cards/WindGustCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */; };
 		CAC95DC05F37486C91AE9DA5 /* DataSources/WeatherDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */; };
+		CE0000000000000000000001 /* AppLaunchExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000002 /* AppLaunchExperience.swift */; };
+		CE0000000000000000000003 /* AppLaunchExperienceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000004 /* AppLaunchExperienceCoordinator.swift */; };
+		CE0000000000000000000005 /* UI/Onboarding/CloudbreakUpdateIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000006 /* UI/Onboarding/CloudbreakUpdateIconView.swift */; };
+		CE0000000000000000000007 /* UI/Onboarding/OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000008 /* UI/Onboarding/OnboardingViewController.swift */; };
+		CE0000000000000000000009 /* UI/Onboarding/WhatsNewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE000000000000000000000A /* UI/Onboarding/WhatsNewViewController.swift */; };
+		CE000000000000000000000C /* AppLaunchExperienceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE000000000000000000000D /* AppLaunchExperienceTests.swift */; };
 		CC020202020202020202CC02 /* DataSources/OpenRouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC010101010101010101CC01 /* DataSources/OpenRouterService.swift */; };
 		CC040404040404040404CC04 /* UI/AI/AIWeatherChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC030303030303030303CC03 /* UI/AI/AIWeatherChatViewController.swift */; };
 		CC060606060606060606CC06 /* Scoring/ActivityScoreEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC050505050505050505CC05 /* Scoring/ActivityScoreEngine.swift */; };
@@ -241,11 +249,19 @@
 		B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/DateFormatHelper.swift; sourceTree = "<group>"; };
 		B8419FDDA87C4DCC9A676651 /* UI/Forecast/MainForecastViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/MainForecastViewController.swift; sourceTree = "<group>"; };
 		BB00000000000000000001 /* CloudshipUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CloudshipUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB00000000000000000007 /* OnboardingLaunchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingLaunchUITests.swift; sourceTree = "<group>"; };
+		BB00000000000000000018 /* ForecastLaunchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastLaunchUITests.swift; sourceTree = "<group>"; };
 		BB001001001001001001BB01 /* DataSources/WeatherCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/WeatherCache.swift; sourceTree = "<group>"; };
 		BB23CD45EF67089A12345678 /* DataSources/OpenMeteoModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/OpenMeteoModels.swift; sourceTree = "<group>"; };
 		C2D3E4F5A6B7C8D9E0F1A2B3 /* UI/Forecast/TimeMachineBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/TimeMachineBannerView.swift; sourceTree = "<group>"; };
 		C3739D4B5AF2401DB4F0949E /* UI/Forecast/Cards/AlertBannerCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/AlertBannerCardView.swift; sourceTree = "<group>"; };
 		C5B395E9DE2E4BEE99AB9E60 /* TemperatureFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TemperatureFormatter.swift; path = Shared/TemperatureFormatter.swift; sourceTree = "<group>"; };
+		CE0000000000000000000002 /* AppLaunchExperience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchExperience.swift; sourceTree = "<group>"; };
+		CE0000000000000000000004 /* AppLaunchExperienceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchExperienceCoordinator.swift; sourceTree = "<group>"; };
+		CE0000000000000000000006 /* UI/Onboarding/CloudbreakUpdateIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Onboarding/CloudbreakUpdateIconView.swift; sourceTree = "<group>"; };
+		CE0000000000000000000008 /* UI/Onboarding/OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Onboarding/OnboardingViewController.swift; sourceTree = "<group>"; };
+		CE000000000000000000000A /* UI/Onboarding/WhatsNewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Onboarding/WhatsNewViewController.swift; sourceTree = "<group>"; };
+		CE000000000000000000000D /* AppLaunchExperienceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchExperienceTests.swift; sourceTree = "<group>"; };
 		CC010101010101010101CC01 /* DataSources/OpenRouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/OpenRouterService.swift; sourceTree = "<group>"; };
 		CC030303030303030303CC03 /* UI/AI/AIWeatherChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/AI/AIWeatherChatViewController.swift; sourceTree = "<group>"; };
 		CC050505050505050505CC05 /* Scoring/ActivityScoreEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scoring/ActivityScoreEngine.swift; sourceTree = "<group>"; };
@@ -373,10 +389,22 @@
 			isa = PBXGroup;
 			children = (
 				162DC6042020FAAB00C19DCE /* AppDelegate.swift */,
+				CE0000000000000000000002 /* AppLaunchExperience.swift */,
+				CE0000000000000000000004 /* AppLaunchExperienceCoordinator.swift */,
 				A34FCE7E1E9241D089FE3F4D /* UI/MainTabBarController.swift */,
 				16C5224C214C566D007F9935 /* Cloudship.entitlements */,
 			);
 			name = App;
+			sourceTree = "<group>";
+		};
+		CE000000000000000000000B /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				CE0000000000000000000006 /* UI/Onboarding/CloudbreakUpdateIconView.swift */,
+				CE0000000000000000000008 /* UI/Onboarding/OnboardingViewController.swift */,
+				CE000000000000000000000A /* UI/Onboarding/WhatsNewViewController.swift */,
+			);
+			name = Onboarding;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000002 /* Resources */ = {
@@ -536,6 +564,7 @@
 			children = (
 				A10000000000000000000001 /* App */,
 				A10000000000000000000002 /* Resources */,
+				CE000000000000000000000B /* Onboarding */,
 				A10000000000000000000003 /* Forecast */,
 				A10000000000000000000004 /* Radar */,
 				A10000000000000000000005 /* AI */,
@@ -644,6 +673,7 @@
 		92A37DA12F75F1560090F977 /* CloudshipTests */ = {
 			isa = PBXGroup;
 			children = (
+				CE000000000000000000000D /* AppLaunchExperienceTests.swift */,
 				92A37DA32F75F1A80090F977 /* ConsensusWeatherServiceTests.swift */,
 				AA00000000000000000011 /* MapPrecipitationTotalsServiceTests.swift */,
 				92A37DA42F75F1AA0090F977 /* SettingsLogicTests.swift */,
@@ -657,6 +687,8 @@
 			isa = PBXGroup;
 			children = (
 				92A37E1E2F7C6B2B0090F977 /* UITestPlan.xctestplan */,
+				BB00000000000000000007 /* OnboardingLaunchUITests.swift */,
+				BB00000000000000000018 /* ForecastLaunchUITests.swift */,
 				92A37DA72F75F4630090F977 /* SettingsUITests.swift */,
 			);
 			path = CloudshipUITests;
@@ -910,6 +942,11 @@
 				162DC6212021048700C19DCE /* DailyViewController.swift in Sources */,
 				16695922215EAF60002BC386 /* UI/Radar/RadarViewController.swift in Sources */,
 				162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */,
+				CE0000000000000000000001 /* AppLaunchExperience.swift in Sources */,
+				CE0000000000000000000003 /* AppLaunchExperienceCoordinator.swift in Sources */,
+				CE0000000000000000000005 /* UI/Onboarding/CloudbreakUpdateIconView.swift in Sources */,
+				CE0000000000000000000007 /* UI/Onboarding/OnboardingViewController.swift in Sources */,
+				CE0000000000000000000009 /* UI/Onboarding/WhatsNewViewController.swift in Sources */,
 				1646BDAF20BF7A28006FF7F5 /* MinutelyTableViewCell.swift in Sources */,
 				161BCA7220E2D92300AE984F /* LookingAheadCollectionViewCell.swift in Sources */,
 				1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */,
@@ -988,6 +1025,7 @@
 			files = (
 				AA00000000000000000005 /* ConsensusWeatherServiceTests.swift in Sources */,
 				AA00000000000000000010 /* MapPrecipitationTotalsServiceTests.swift in Sources */,
+				CE000000000000000000000C /* AppLaunchExperienceTests.swift in Sources */,
 				AA00000000000000000006 /* SettingsLogicTests.swift in Sources */,
 				AA00000000000000000007 /* TemperatureFormatterTests.swift in Sources */,
 				AA00000000000000000008 /* WeatherModelsTests.swift in Sources */,
@@ -998,6 +1036,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB00000000000000000006 /* OnboardingLaunchUITests.swift in Sources */,
+				BB00000000000000000008 /* ForecastLaunchUITests.swift in Sources */,
 				BB00000000000000000005 /* SettingsUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

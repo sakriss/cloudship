@@ -9,6 +9,7 @@
 import UIKit
 import CoreLocation
 import MessageUI
+import UserNotifications
 
 class SettingsViewController: UITableViewController {
 
@@ -734,8 +735,11 @@ class SettingsViewController: UITableViewController {
     @objc private func rainAlertsChanged(_ sender: UISwitch) {
         UserDefaults.standard.set(sender.isOn, forKey: "RainAlertsEnabled")
         if sender.isOn {
-            DispatchQueue.global(qos: .utility).async {
-                BackgroundTaskManager.shared.scheduleNextRefresh()
+            requestNotificationAuthorizationIfNeeded { granted in
+                guard granted else { return }
+                DispatchQueue.global(qos: .utility).async {
+                    BackgroundTaskManager.shared.scheduleNextRefresh()
+                }
             }
         }
         performAfterToggleSettles { [weak self] in
@@ -771,8 +775,11 @@ class SettingsViewController: UITableViewController {
         let wasEnabled = UserDefaults.standard.bool(forKey: "MorningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "MorningBriefEnabled")
         if sender.isOn {
-            DispatchQueue.global(qos: .utility).async {
-                PrecipitationNotificationService.shared.scheduleMorningBrief()
+            requestNotificationAuthorizationIfNeeded { granted in
+                guard granted else { return }
+                DispatchQueue.global(qos: .utility).async {
+                    PrecipitationNotificationService.shared.scheduleMorningBrief()
+                }
             }
         } else {
             DispatchQueue.global(qos: .utility).async {
@@ -802,8 +809,11 @@ class SettingsViewController: UITableViewController {
         let wasEnabled = UserDefaults.standard.bool(forKey: "EveningBriefEnabled")
         UserDefaults.standard.set(sender.isOn, forKey: "EveningBriefEnabled")
         if sender.isOn {
-            DispatchQueue.global(qos: .utility).async {
-                PrecipitationNotificationService.shared.scheduleEveningBrief()
+            requestNotificationAuthorizationIfNeeded { granted in
+                guard granted else { return }
+                DispatchQueue.global(qos: .utility).async {
+                    PrecipitationNotificationService.shared.scheduleEveningBrief()
+                }
             }
         } else {
             DispatchQueue.global(qos: .utility).async {
@@ -823,6 +833,26 @@ class SettingsViewController: UITableViewController {
             }
             self.tableView.endUpdates()
             self.postSettingsChangedDebounced()
+        }
+    }
+
+    private func requestNotificationAuthorizationIfNeeded(completion: @escaping (Bool) -> Void) {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                completion(true)
+            case .notDetermined:
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    if let error = error {
+                        print("Notification auth error: \(error)")
+                    }
+                    completion(granted)
+                }
+            case .denied:
+                completion(false)
+            @unknown default:
+                completion(false)
+            }
         }
     }
 

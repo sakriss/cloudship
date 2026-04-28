@@ -67,6 +67,11 @@ class WeatherDataSourceManager: NSObject {
     }
 
     private func restoreSelectedSource() {
+        if ProcessInfo.processInfo.arguments.contains("-CloudshipUITestUseMockWeather") {
+            activeSource = UITestWeatherDataSource()
+            return
+        }
+
         let raw = UserDefaults.standard.string(forKey: "WeatherSource") ?? WeatherSourceID.noaa.rawValue
         let sourceID = WeatherSourceID(rawValue: raw)
 
@@ -160,7 +165,9 @@ class WeatherDataSourceManager: NSObject {
         do {
             // Fetch weather data and NOAA alerts in parallel
             async let weatherTask = activeSource.fetchWeather(lat: lat, lon: lon, units: units)
-            async let alertsTask  = fetchNOAAAlerts(lat: lat, lon: lon)
+            async let alertsTask: [WeatherAlert] = activeSource is UITestWeatherDataSource
+                ? []
+                : fetchNOAAAlerts(lat: lat, lon: lon)
 
             var data   = try await weatherTask
             let alerts = await alertsTask          // non-fatal — empty array on failure
@@ -396,6 +403,95 @@ class WeatherDataSourceManager: NSObject {
         NotificationCenter.default.post(
             name: WeatherDataSourceManager.weatherDataParseFailed,
             object: error.localizedDescription
+        )
+    }
+}
+
+private struct UITestWeatherDataSource: WeatherDataSource {
+    var name: String { "UITest Weather" }
+
+    func fetchWeather(lat: Double, lon: Double, units: String) async throws -> UnifiedWeatherData {
+        let now = Date()
+        let hourly = (0..<24).map { offset in
+            HourlyEntry(
+                time: Calendar.current.date(byAdding: .hour, value: offset, to: now) ?? now,
+                temp: 72.0 + Double(offset % 3),
+                feelsLike: 73.0,
+                condition: .partlyCloudy,
+                precipChance: 10,
+                precipAmount: 0,
+                windSpeed: 7,
+                windGust: 12,
+                windDirection: 225,
+                uvIndex: 4,
+                humidity: 55,
+                cloudCover: 35,
+                visibility: 10,
+                pressure: 29.92,
+                precipIntensityError: nil,
+                precipType: nil,
+                snowAccumulation: nil,
+                iceAccumulation: nil
+            )
+        }
+
+        let daily = (0..<7).map { offset in
+            DailyEntry(
+                time: Calendar.current.date(byAdding: .day, value: offset, to: now) ?? now,
+                tempMin: 58,
+                tempMax: 76,
+                feelsLikeMin: 58,
+                feelsLikeMax: 76,
+                condition: .partlyCloudy,
+                conditionNight: .mostlyClear,
+                precipChance: 10,
+                precipAmount: 0,
+                sunrise: Calendar.current.date(bySettingHour: 6, minute: 12, second: 0, of: now),
+                sunset: Calendar.current.date(bySettingHour: 20, minute: 3, second: 0, of: now),
+                moonPhase: 0.4,
+                dayDescription: "Partly sunny",
+                nightDescription: "Mostly clear",
+                windSpeed: 7,
+                windGust: 12,
+                uvIndex: 4,
+                humidity: 55,
+                cloudCover: 35,
+                visibility: 10,
+                pressure: 29.92,
+                dawnTime: nil,
+                duskTime: nil,
+                snowAccumulation: nil,
+                iceAccumulation: nil
+            )
+        }
+
+        return UnifiedWeatherData(
+            locationName: nil,
+            current: CurrentConditions(
+                temperature: 72,
+                feelsLike: 73,
+                humidity: 55,
+                windSpeed: 7,
+                windGust: 12,
+                windDirection: 225,
+                condition: .partlyCloudy,
+                uvIndex: 4,
+                visibility: 10,
+                pressure: 29.92,
+                dewPoint: 54,
+                cloudCover: 35,
+                nearestStormDistance: nil,
+                nearestStormBearing: nil,
+                precipIntensity: 0,
+                precipType: nil
+            ),
+            hourly: hourly,
+            daily: daily,
+            minutely: [],
+            alerts: [],
+            airQuality: AirQualityData(index: 24, category: .good),
+            pollen: nil,
+            consensusBreakdown: nil
         )
     }
 }

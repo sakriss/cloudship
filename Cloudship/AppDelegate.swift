@@ -8,17 +8,28 @@
 
 import UIKit
 import GoogleMobileAds
-import UserNotifications
+import CoreLocation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private var launchCoordinator: AppLaunchExperienceCoordinator?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        // Migrate legacy units key format ("units=us" → "imperial", "units=si" → "metric")
+        configureLaunchExperienceForUITestingIfNeeded()
+
+        // Programmatic window setup. Launch routing checks install/update state
+        // before defaults migration writes any first-run keys.
+        window = UIWindow(frame: UIScreen.main.bounds)
+        launchCoordinator = AppLaunchExperienceCoordinator()
+        if let window {
+            launchCoordinator?.start(in: window)
+        }
+
+        // Migrate legacy units key format ("units=us" to "imperial", "units=si" to "metric")
         if let existing = UserDefaults.standard.string(forKey: "Units") {
             if existing == "units=us" {
                 UserDefaults.standard.set("imperial", forKey: "Units")
@@ -37,25 +48,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Register background tasks for precipitation notifications
         BackgroundTaskManager.shared.registerTasks()
 
-        // Request notification permission
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Notification auth error: \(error)")
-            }
-            print("Notification permission granted: \(granted)")
+        return true
+    }
+
+    private func configureLaunchExperienceForUITestingIfNeeded() {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard arguments.contains("-UITesting") else { return }
+
+        if arguments.contains("-CloudshipUITestResetLaunchExperience") {
+            let keys = [
+                AppLaunchExperienceState.hasCompletedOnboardingKey,
+                AppLaunchExperienceState.lastSeenMarketingVersionKey,
+                AppLaunchExperienceState.lastSeenBuildKey
+            ]
+            keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+            UserDefaults.standard.set(false, forKey: AppLaunchExperienceState.hasCompletedOnboardingKey)
         }
 
-        // Programmatic window setup — no storyboard
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = MainTabBarController()
+        if arguments.contains("-CloudshipUITestUpdatedFromPreviousVersion") {
+            UserDefaults.standard.set(true, forKey: AppLaunchExperienceState.hasCompletedOnboardingKey)
+            UserDefaults.standard.set("0.0", forKey: AppLaunchExperienceState.lastSeenMarketingVersionKey)
+            UserDefaults.standard.set("0", forKey: AppLaunchExperienceState.lastSeenBuildKey)
+        }
 
-        // Restore appearance override if saved
-        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
-        let styles: [UIUserInterfaceStyle] = [.unspecified, .light, .dark, .unspecified]
-        window?.overrideUserInterfaceStyle = appearanceIdx < styles.count ? styles[appearanceIdx] : .unspecified
+        if arguments.contains("-CloudshipUITestCompletedOnboarding") {
+            UserDefaults.standard.set(true, forKey: AppLaunchExperienceState.hasCompletedOnboardingKey)
+            UserDefaults.standard.set(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+                                      forKey: AppLaunchExperienceState.lastSeenMarketingVersionKey)
+            UserDefaults.standard.set(Bundle.main.infoDictionary?["CFBundleVersion"] as? String,
+                                      forKey: AppLaunchExperienceState.lastSeenBuildKey)
+        }
 
-        window?.makeKeyAndVisible()
-        return true
+        if arguments.contains("-CloudshipUITestSeedLastForecast") {
+            let seattle = CLLocation(latitude: 47.6062, longitude: -122.3321)
+            LastForecastLocationStore.shared.save(name: "Seattle", location: seattle)
+            UserDefaults.standard.set("imperial", forKey: "Units")
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -89,4 +117,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-
