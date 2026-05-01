@@ -147,8 +147,10 @@ class WeatherDataSourceManager: NSObject {
 
         // -- Standard single-source fetch --
 
-        // Return cached data if it is fresh, same location, and same source
+        // Return cached data if it is fresh, same location, and same source.
+        // Skip cache for UITestWeatherDataSource — test data is deterministic and instantaneous.
         if !forceRefresh,
+           !(activeSource is UITestWeatherDataSource),
            let cached = WeatherCacheManager.shared.load(),
            cached.isFresh,
            cached.isValid(lat: lat, lon: lon, source: activeSource.name) {
@@ -166,7 +168,9 @@ class WeatherDataSourceManager: NSObject {
             // Fetch weather data and NOAA alerts in parallel
             async let weatherTask = activeSource.fetchWeather(lat: lat, lon: lon, units: units)
             async let alertsTask: [WeatherAlert] = activeSource is UITestWeatherDataSource
-                ? []
+                ? (ProcessInfo.processInfo.arguments.contains("-CloudshipUITestInjectAlerts")
+                   ? WeatherDataSourceManager.mockUITestAlerts()
+                   : [])
                 : fetchNOAAAlerts(lat: lat, lon: lon)
 
             var data   = try await weatherTask
@@ -404,6 +408,39 @@ class WeatherDataSourceManager: NSObject {
             name: WeatherDataSourceManager.weatherDataParseFailed,
             object: error.localizedDescription
         )
+    }
+}
+
+// MARK: - UI Test Helpers
+
+extension WeatherDataSourceManager {
+    fileprivate static func mockUITestAlerts() -> [WeatherAlert] {
+        let now = Date()
+        let cal = Calendar.current
+        return [
+            WeatherAlert(
+                event: "Heat Advisory",
+                headline: "Heat Advisory in effect until 8 PM",
+                description: "Dangerously hot conditions expected. Stay hydrated.",
+                instruction: "Drink plenty of water.",
+                severity: .moderate,
+                onset: cal.date(byAdding: .hour, value: -3, to: now),
+                expires: cal.date(byAdding: .hour, value: 5, to: now),
+                areaDesc: "King County",
+                source: "NWS"
+            ),
+            WeatherAlert(
+                event: "Wind Advisory",
+                headline: "Wind Advisory until 6 PM",
+                description: "Sustained winds 25 to 35 mph with gusts up to 50 mph.",
+                instruction: nil,
+                severity: .minor,
+                onset: cal.date(byAdding: .hour, value: -1, to: now),
+                expires: cal.date(byAdding: .hour, value: 3, to: now),
+                areaDesc: "King County",
+                source: "NWS"
+            )
+        ]
     }
 }
 
