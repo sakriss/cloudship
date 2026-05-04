@@ -672,10 +672,18 @@ class MainForecastViewController: UIViewController {
     // MARK: - Location
 
     private var locationTimeoutTask: Task<Void, Never>?
+    private var isAwaitingLocationFix = false
+    private var locationRequestShowsSpinner = false
+    private var userInitiatedLocationRequest = false
 
     private func setupLocation() {
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
         locationManager.delegate = self
+
+        if let lastGPS = LastGPSLocationStore.shared.location {
+            searchResultsVC.gpsLocation = lastGPS.location
+            searchResultsVC.gpsLocationName = lastGPS.name
+        }
 
         if let lastForecast = LastForecastLocationStore.shared.location {
             navigationItem.title = lastForecast.name
@@ -687,11 +695,26 @@ class MainForecastViewController: UIViewController {
         // assignment depending on iOS version. Handle the current status explicitly.
         let status = locationManager.authorizationStatus
         if status == .authorizedWhenInUse || status == .authorizedAlways {
-            locationManager.requestLocation()
-            startLocationTimeout()
+            requestCurrentLocation(showSpinner: currentLocation == nil, userInitiated: false)
         } else if currentLocation == nil {
             activityIndicator.stopAnimating()
         }
+    }
+
+    private func requestCurrentLocation(showSpinner: Bool, userInitiated: Bool) {
+        if let lastKnown = locationManager.location, lastKnown.horizontalAccuracy >= 0 {
+            handleResolvedCurrentLocation(lastKnown)
+            return
+        }
+
+        isAwaitingLocationFix = true
+        locationRequestShowsSpinner = showSpinner
+        userInitiatedLocationRequest = userInitiated
+        if showSpinner {
+            activityIndicator.startAnimating()
+        }
+        locationManager.requestLocation()
+        startLocationTimeout()
     }
 
     /// If no location arrives promptly, stop waiting without blocking city search.
@@ -699,11 +722,32 @@ class MainForecastViewController: UIViewController {
         locationTimeoutTask?.cancel()
         locationTimeoutTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 20_000_000_000) // 20 seconds
-            guard !Task.isCancelled, let self = self, self.currentLocation == nil else { return }
+            guard !Task.isCancelled, let self = self, self.isAwaitingLocationFix else { return }
             self.locationManager.stopUpdatingLocation()
-            self.activityIndicator.stopAnimating()
+            if self.locationRequestShowsSpinner {
+                self.activityIndicator.stopAnimating()
+            }
+            let shouldAlert = self.userInitiatedLocationRequest
+            self.finishLocationRequest()
+            if shouldAlert {
+                self.showLocationUnavailableAlert()
+            }
             print("Location lookup timed out; waiting for city search or a later location update.")
         }
+    }
+
+    private func finishLocationRequest() {
+        isAwaitingLocationFix = false
+        locationRequestShowsSpinner = false
+        userInitiatedLocationRequest = false
+    }
+
+    private func handleResolvedCurrentLocation(_ location: CLLocation) {
+        locationTimeoutTask?.cancel()
+        finishLocationRequest()
+        locationManager.stopUpdatingLocation()
+        updateGPSLocationInSearch(location)
+        fetchWeather(for: location, isGPSLocation: true)
     }
 
     private func fetchWeather(for location: CLLocation, isGPSLocation: Bool = false, displayName: String? = nil) {
@@ -725,7 +769,7 @@ class MainForecastViewController: UIViewController {
             let geo = CLGeocoder()
             if let placemarks = try? await geo.reverseGeocodeLocation(location),
                let pm = placemarks.first {
-                let name = displayName ?? pm.locality ?? pm.name ?? pm.administrativeArea ?? "My Location"
+                let name = displayName ?? Self.locationDisplayName(from: pm)
                 WeatherDataSourceManager.shared.locationName = name
                 LastForecastLocationStore.shared.save(name: name, location: location)
                 await MainActor.run {
@@ -733,6 +777,7 @@ class MainForecastViewController: UIViewController {
                     if isGPSLocation {
                         self.searchResultsVC.gpsLocationName = name
                         self.searchResultsVC.tableView.reloadData()
+                        LastGPSLocationStore.shared.save(name: name, location: location)
                     }
                 }
             } else if let displayName {
@@ -748,6 +793,46 @@ class MainForecastViewController: UIViewController {
     /// Called ONLY from CLLocationManagerDelegate — never from search selections.
     private func updateGPSLocationInSearch(_ location: CLLocation) {
         searchResultsVC.gpsLocation = location
+        searchResultsVC.tableView.reloadData()
+
+        Task { [weak self] in
+            let geo = CLGeocoder()
+            guard let placemarks = try? await geo.reverseGeocodeLocation(location),
+                  let placemark = placemarks.first else { return }
+            let name = Self.locationDisplayName(from: placemark)
+            await MainActor.run {
+                guard let self = self,
+                      self.searchResultsVC.gpsLocation?.coordinate.isNear(location.coordinate) == true else { return }
+                self.searchResultsVC.gpsLocationName = name
+                LastGPSLocationStore.shared.save(name: name, location: location)
+                self.searchResultsVC.tableView.reloadData()
+            }
+        }
+    }
+
+    private static func locationDisplayName(from placemark: CLPlacemark) -> String {
+        if let city = placemark.locality, let state = placemark.administrativeArea {
+            return "\(city), \(state)"
+        }
+        if let city = placemark.locality, let country = placemark.country {
+            return "\(city), \(country)"
+        }
+        return placemark.locality
+            ?? placemark.name
+            ?? placemark.subAdministrativeArea
+            ?? placemark.administrativeArea
+            ?? "My Location"
+    }
+
+    private func showLocationUnavailableAlert() {
+        let alert = UIAlertController(title: "Unable to Find Current Location",
+                                      message: "Your device has not returned a current location yet. Check Location Services, or set a simulator location if you are testing in Simulator.",
+                                      preferredStyle: .alert)
+        alert.accessibilityLabel = "Weather error: Unable to find current location"
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        if presentedViewController == nil {
+            present(alert, animated: true)
+        }
     }
 
     // MARK: - Notifications
@@ -1289,13 +1374,17 @@ extension MainForecastViewController: CLLocationManagerDelegate {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             // Only request if we haven't already received a location
-            if currentLocation == nil {
-                manager.requestLocation()
-                startLocationTimeout()
+            if isAwaitingLocationFix || currentLocation == nil {
+                requestCurrentLocation(showSpinner: locationRequestShowsSpinner || currentLocation == nil,
+                                       userInitiated: userInitiatedLocationRequest)
             }
         case .notDetermined:
-            activityIndicator.stopAnimating()
+            if locationRequestShowsSpinner {
+                activityIndicator.stopAnimating()
+            }
         case .denied, .restricted:
+            locationTimeoutTask?.cancel()
+            finishLocationRequest()
             activityIndicator.stopAnimating()
             let alert = UIAlertController(title: "Unable to Load Weather",
                                           message: "Location access is required to show local weather. Enable it in Settings.",
@@ -1309,12 +1398,8 @@ extension MainForecastViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let loc = locations.first else { return }
-        locationTimeoutTask?.cancel()
-        manager.stopUpdatingLocation()
-        // Update the "Current Location" search row with the real GPS fix (only from here)
-        updateGPSLocationInSearch(loc)
-        fetchWeather(for: loc, isGPSLocation: true)
+        guard let loc = locations.last else { return }
+        handleResolvedCurrentLocation(loc)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -1329,15 +1414,12 @@ extension MainForecastViewController: CLLocationManagerDelegate {
         }
 
         locationTimeoutTask?.cancel()
+        let shouldAlert = userInitiatedLocationRequest
+        finishLocationRequest()
         manager.stopUpdatingLocation()
         activityIndicator.stopAnimating()
-        let alert = UIAlertController(title: "Unable to Load Weather",
-                                      message: "Unable to determine your location. Please try searching for a city instead.",
-                                      preferredStyle: .alert)
-        alert.accessibilityLabel = "Weather error: Unable to determine your location"
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        if presentedViewController == nil {
-            present(alert, animated: true)
+        if shouldAlert {
+            showLocationUnavailableAlert()
         }
     }
 
@@ -1374,12 +1456,43 @@ extension MainForecastViewController: SearchResultsDelegate {
         }
         fetchWeather(for: location, displayName: name)
     }
+
+    func didSelectCurrentLocation(_ location: CLLocation) {
+        searchController.isActive = false
+        navigationItem.title = searchResultsVC.gpsLocationName
+        activityIndicator.startAnimating()
+        fetchWeather(for: location, isGPSLocation: true)
+    }
+
+    func didRequestCurrentLocation() {
+        searchController.isActive = false
+        let status = locationManager.authorizationStatus
+        if status == .notDetermined {
+            isAwaitingLocationFix = true
+            locationRequestShowsSpinner = true
+            userInitiatedLocationRequest = true
+            activityIndicator.startAnimating()
+            locationManager.requestWhenInUseAuthorization()
+        } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+            requestCurrentLocation(showSpinner: true, userInitiated: true)
+        } else {
+            activityIndicator.stopAnimating()
+            let alert = UIAlertController(title: "Unable to Load Weather",
+                                          message: "Location access is required to show local weather. Enable it in Settings.",
+                                          preferredStyle: .alert)
+            alert.accessibilityLabel = "Weather error: Location access denied"
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        }
+    }
 }
 
 // MARK: - Search Results VC
 
 protocol SearchResultsDelegate: AnyObject {
     func didSelectLocation(_ location: CLLocation, name: String, saveToRecents: Bool)
+    func didSelectCurrentLocation(_ location: CLLocation)
+    func didRequestCurrentLocation()
 }
 
 // MARK: - Recent search store
@@ -1395,6 +1508,14 @@ struct LastForecastLocation {
     let name: String
     let latitude: Double
     let longitude: Double
+    var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
+}
+
+struct LastGPSLocation {
+    let name: String
+    let latitude: Double
+    let longitude: Double
+    let savedAt: Date
     var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
 }
 
@@ -1417,6 +1538,31 @@ final class LastForecastLocationStore {
             "name": name,
             "lat": location.coordinate.latitude,
             "lon": location.coordinate.longitude
+        ], forKey: key)
+    }
+}
+
+final class LastGPSLocationStore {
+    static let shared = LastGPSLocationStore()
+    private init() {}
+
+    private let key = "lastGPSLocation_v1"
+
+    var location: LastGPSLocation? {
+        guard let dict = UserDefaults.standard.dictionary(forKey: key),
+              let name = dict["name"] as? String,
+              let lat = dict["lat"] as? Double,
+              let lon = dict["lon"] as? Double,
+              let savedAt = dict["savedAt"] as? Date else { return nil }
+        return LastGPSLocation(name: name, latitude: lat, longitude: lon, savedAt: savedAt)
+    }
+
+    func save(name: String, location: CLLocation) {
+        UserDefaults.standard.set([
+            "name": name,
+            "lat": location.coordinate.latitude,
+            "lon": location.coordinate.longitude,
+            "savedAt": Date()
         ], forKey: key)
     }
 }
@@ -1559,17 +1705,11 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch Section(rawValue: indexPath.section) {
         case .currentLocation:
-            guard let loc = gpsLocation else {
-                let status = locationManager?.authorizationStatus ?? CLLocationManager.authorizationStatus()
-                if status == .notDetermined {
-                    locationManager?.requestWhenInUseAuthorization()
-                } else if status == .authorizedWhenInUse || status == .authorizedAlways {
-                    locationManager?.requestLocation()
-                }
-                dismiss(animated: true)
-                return
+            if let loc = gpsLocation {
+                delegate?.didSelectCurrentLocation(loc)
+            } else {
+                delegate?.didRequestCurrentLocation()
             }
-            delegate?.didSelectLocation(loc, name: gpsLocationName, saveToRecents: false)
 
         case .recents:
             let recent = RecentSearchStore.shared.searches[indexPath.row]
@@ -1596,5 +1736,11 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
             RecentSearchStore.shared.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
+    }
+}
+
+private extension CLLocationCoordinate2D {
+    func isNear(_ other: CLLocationCoordinate2D) -> Bool {
+        abs(latitude - other.latitude) < 0.0001 && abs(longitude - other.longitude) < 0.0001
     }
 }
