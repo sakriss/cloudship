@@ -9,7 +9,6 @@
 import UIKit
 import CoreLocation
 import MapKit
-import GoogleMobileAds
 
 class MainForecastViewController: UIViewController {
 
@@ -22,7 +21,6 @@ class MainForecastViewController: UIViewController {
     /// Exposes the location currently being shown in the forecast (for the radar tab).
     var currentForecastLocation: CLLocation? { currentLocation }
     private var isShowingGPSLocation = false
-    private var bannerView: GADBannerView?
 
     // Time Machine (historical mode)
     private var timeMachineBanner: TimeMachineBannerView?
@@ -162,7 +160,6 @@ class MainForecastViewController: UIViewController {
         setupLayout()
         setupLocation()
         setupNotifications()
-        setupBannerAd()
         setupAlertCard()
         setupDailyCard()
         setupAISummaryCard()
@@ -1346,24 +1343,6 @@ class MainForecastViewController: UIViewController {
         present(banner, animated: true)
     }
 
-    // MARK: - Banner Ad
-
-    private func setupBannerAd() {
-        let banner = GADBannerView(adSize: kGADAdSizeBanner)
-        banner.adUnitID = "ca-app-pub-8795986379052808/6427921529"
-        banner.rootViewController = self
-        banner.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(banner)
-
-        NSLayoutConstraint.activate([
-            banner.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            banner.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
-
-        additionalSafeAreaInsets.bottom = CGSizeFromGADAdSize(kGADAdSizeBanner).height
-        banner.load(GADRequest())
-        self.bannerView = banner
-    }
 }
 
 // MARK: - CLLocationManagerDelegate

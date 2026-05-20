@@ -10,7 +10,7 @@ import UIKit
 import Foundation
 import CoreLocation
 
-private let tomorrowAPIKey = "KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM"
+private let tomorrowAPIKey = APIConfiguration.tomorrowIOAPIKey
 
 class WeatherController {
 
@@ -40,6 +40,8 @@ class WeatherController {
     }
     
     func fetchCurrentWeather(lat: Double, lon: Double, units: String) async throws {
+        guard !tomorrowAPIKey.isEmpty else { throw TomorrowIODataSourceError.missingAPIKey }
+
         let url = URL(string: "https://api.tomorrow.io/v4/weather/realtime")!
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         let queryItems: [URLQueryItem] = [
@@ -87,6 +89,8 @@ class WeatherController {
     }
     
     func fetchForecast(lat: Double, lon: Double, units: String) async throws {
+        guard !tomorrowAPIKey.isEmpty else { throw TomorrowIODataSourceError.missingAPIKey }
+
         let url = URL(string: "https://api.tomorrow.io/v4/weather/forecast")!
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         

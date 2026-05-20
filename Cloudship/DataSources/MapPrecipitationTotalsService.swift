@@ -221,13 +221,14 @@ final class MapPrecipitationTotalsService {
             return (date, amount)
         }
 
+        let anchor = calendar.dateInterval(of: .hour, for: now)?.start ?? now
         let windowSeconds = Double(window.rawValue) * 3600
         let range: ClosedRange<Date>
         switch direction {
         case .past:
-            range = now.addingTimeInterval(-windowSeconds)...now
+            range = anchor.addingTimeInterval(-windowSeconds)...anchor
         case .forecast:
-            range = now...now.addingTimeInterval(windowSeconds)
+            range = anchor...anchor.addingTimeInterval(windowSeconds - 1)
         }
 
         let matching = samples.filter { range.contains($0.0) }

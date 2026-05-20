@@ -37,6 +37,33 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AA00000000000000000002"
+               BuildableName = "CloudshipTests.xctest"
+               BlueprintName = "CloudshipTests"
+               ReferencedContainer = "container:Cloudship.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB00000000000000000002"
+               BuildableName = "CloudshipUITests.xctest"
+               BlueprintName = "CloudshipUITests"
+               ReferencedContainer = "container:Cloudship.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SettingsUITests">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

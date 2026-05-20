@@ -8,6 +8,26 @@
 
 import Foundation
 
+enum APIConfiguration {
+    static var tomorrowIOAPIKey: String {
+        configuredValue(for: "TomorrowIOAPIKey")
+    }
+
+    static var pirateWeatherAPIKey: String {
+        configuredValue(for: "PirateWeatherAPIKey")
+    }
+
+    static var openWeatherMapAPIKey: String {
+        configuredValue(for: "OpenWeatherMapAPIKey")
+    }
+
+    private static func configuredValue(for key: String) -> String {
+        guard let value = Bundle.main.infoDictionary?[key] as? String else { return "" }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.hasPrefix("$(") ? "" : trimmed
+    }
+}
+
 protocol WeatherDataSource {
     /// Human-readable name shown in Settings (e.g. "Tomorrow.io", "NOAA")
     var name: String { get }

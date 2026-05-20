@@ -10,7 +10,6 @@
 import StoreKit
 import Foundation
 
-@MainActor
 final class SubscriptionManager {
 
     static let shared = SubscriptionManager()

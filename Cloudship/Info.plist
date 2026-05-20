@@ -24,12 +24,12 @@
 	<string>0.5</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-8795986379052808~6028111057</string>
 	<key>AccuWeatherAPIKey</key>
 	<string>$(ACCUWEATHER_API_KEY)</string>
 	<key>GeminiAPIKey</key>
 	<string>$(GEMINI_API_KEY)</string>
+	<key>OpenWeatherMapAPIKey</key>
+	<string>$(OPENWEATHERMAP_API_KEY)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -44,6 +44,10 @@
 	<true/>
 	<key>OpenRouterAPIKey</key>
 	<string>$(OPENROUTER_API_KEY)</string>
+	<key>PirateWeatherAPIKey</key>
+	<string>$(PIRATEWEATHER_API_KEY)</string>
+	<key>TomorrowIOAPIKey</key>
+	<string>$(TOMORROWIO_API_KEY)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

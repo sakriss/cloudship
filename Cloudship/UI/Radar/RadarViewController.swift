@@ -910,7 +910,7 @@ class RadarViewController: UIViewController {
     private var geocodeTask: Task<Void, Never>?
 
     // MARK: OpenWeatherMap
-    private let owmAPIKey = "028172b81ffd68d6beb18b4ccf434ad4"
+    private let owmAPIKey = APIConfiguration.openWeatherMapAPIKey
     private let owmFrames = [RainViewerResponse.Frame(time: 0, path: "")]
 
     // MARK: Radar data
@@ -1511,12 +1511,15 @@ class RadarViewController: UIViewController {
         case .satellite:
             return "\(tileHost)\(frame.path)/\(tileSize)/{z}/{x}/{y}/0/0_0.png?refresh=\(overlayRefreshToken)"
         case .temperature:
+            guard !owmAPIKey.isEmpty else { return nil }
             return "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         case .wind:
             return nil
         case .clouds:
+            guard !owmAPIKey.isEmpty else { return nil }
             return "https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         case .pressure:
+            guard !owmAPIKey.isEmpty else { return nil }
             return "https://tile.openweathermap.org/map/pressure_new/{z}/{x}/{y}.png?appid=\(owmAPIKey)"
         }
     }

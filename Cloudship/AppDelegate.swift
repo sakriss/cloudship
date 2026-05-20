@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import GoogleMobileAds
 import CoreLocation
 
 @UIApplicationMain
@@ -40,8 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.set("imperial", forKey: "Units")
         }
 
-        GADMobileAds.sharedInstance().start(completionHandler: nil)
-
         // Start subscription manager
         SubscriptionManager.shared.start()
 
@@ -54,6 +51,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func configureLaunchExperienceForUITestingIfNeeded() {
         let arguments = ProcessInfo.processInfo.arguments
         guard arguments.contains("-UITesting") else { return }
+
+        if !arguments.contains("-CloudshipUITestPremium") {
+            UserDefaults.standard.set(false, forKey: "isPremiumCached")
+            UserDefaults.standard.set(false, forKey: "DemoModeEnabled")
+        }
+
+        if arguments.contains("-CloudshipUITestPremium") {
+            UserDefaults.standard.set(true, forKey: "isPremiumCached")
+            UserDefaults.standard.set(true, forKey: "DemoModeEnabled")
+        }
+
+        if arguments.contains("-CloudshipUITestForceFree") {
+            UserDefaults.standard.set(false, forKey: "isPremiumCached")
+            UserDefaults.standard.set(false, forKey: "DemoModeEnabled")
+        }
+
+        if arguments.contains("-CloudshipUITestUseMockWeather") {
+            UserDefaults.standard.set(false, forKey: "NearestStationEnabled")
+            UserDefaults.standard.set(false, forKey: "ConsensusModeEnabled")
+        }
 
         if arguments.contains("-CloudshipUITestResetLaunchExperience") {
             let keys = [

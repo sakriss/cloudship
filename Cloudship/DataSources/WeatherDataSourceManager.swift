@@ -193,8 +193,9 @@ class WeatherDataSourceManager: NSObject {
             if updateWidget {
                 WidgetDataWriter.shared.write(data)
                 if #available(iOS 16.1, *) {
+                    let liveActivityData = data
                     await MainActor.run {
-                        PrecipitationLiveActivityManager.shared.startOrUpdate(weather: data)
+                        PrecipitationLiveActivityManager.shared.startOrUpdate(weather: liveActivityData)
                     }
                 }
             }

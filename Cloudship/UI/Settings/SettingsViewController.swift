@@ -140,7 +140,7 @@ class SettingsViewController: UITableViewController {
     private func postSettingsChangedDebounced(delay: TimeInterval = 0.35) {
         pendingSettingsChangedWorkItem?.cancel()
         let work = DispatchWorkItem { [weak self] in
-            guard let self else { return }
+            guard self != nil else { return }
             NotificationCenter.default.post(name: Notification.Name("settingsChanged"), object: nil)
         }
         pendingSettingsChangedWorkItem = work
@@ -344,7 +344,7 @@ class SettingsViewController: UITableViewController {
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "CardTintPickerCell", for: indexPath) as! CardTintPickerCell
-                cell.onSelect = { [weak self] _ in
+                cell.onSelect = { _ in
                     // Notify forecast to re-apply tints without a full refetch
                     NotificationCenter.default.post(name: Notification.Name("cardTintChanged"), object: nil)
                 }
@@ -756,7 +756,7 @@ class SettingsViewController: UITableViewController {
         if #available(iOS 16.1, *) {
             UserDefaults.standard.set(sender.isOn, forKey: PrecipitationLiveActivityManager.enabledKey)
             if !sender.isOn {
-                DispatchQueue.global(qos: .utility).async {
+                Task { @MainActor in
                     PrecipitationLiveActivityManager.shared.end()
                 }
             }
@@ -837,6 +837,11 @@ class SettingsViewController: UITableViewController {
     }
 
     private func requestNotificationAuthorizationIfNeeded(completion: @escaping (Bool) -> Void) {
+        if ProcessInfo.processInfo.arguments.contains("-CloudshipUITestAssumeNotificationAuthorization") {
+            completion(true)
+            return
+        }
+
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
@@ -1114,7 +1119,7 @@ private class CardTintPickerCell: UITableViewCell {
             btn.addAction(action, for: .touchUpInside)
 
             // Accessibility
-            let baseLabel = tint.displayName ?? "Color"
+            let baseLabel = tint.displayName
             let selected = (tint.rawValue == CardTintStyle.saved.rawValue)
             btn.accessibilityLabel = selected ? "\(baseLabel), Selected" : baseLabel
             btn.accessibilityHint = "Tap to select card color"
@@ -1155,7 +1160,7 @@ private class CardTintPickerCell: UITableViewCell {
             }
             // Update accessibility label on selection change
             if let tint = CardTintStyle(rawValue: i) {
-                let baseLabel = tint.displayName ?? "Color"
+                let baseLabel = tint.displayName
                 btn.accessibilityLabel = isSelected ? "\(baseLabel), Selected" : baseLabel
             }
         }

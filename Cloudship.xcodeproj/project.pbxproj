@@ -27,8 +27,9 @@
 		162DC6052020FAAB00C19DCE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6042020FAAB00C19DCE /* AppDelegate.swift */; };
 		162DC6072020FAAB00C19DCE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6062020FAAB00C19DCE /* ViewController.swift */; };
 		162DC60A2020FAAB00C19DCE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162DC6082020FAAB00C19DCE /* Main.storyboard */; };
-		162DC60C2020FAAB00C19DCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 162DC60B2020FAAB00C19DCE /* Assets.xcassets */; };
-		162DC60F2020FAAB00C19DCE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */; };
+			162DC60C2020FAAB00C19DCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 162DC60B2020FAAB00C19DCE /* Assets.xcassets */; };
+			162DC60F2020FAAB00C19DCE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */; };
+			162DC620AAAA000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 162DC620AAAA000000000002 /* PrivacyInfo.xcprivacy */; };
 		162DC61F2021043A00C19DCE /* HourlyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC61E2021043A00C19DCE /* HourlyViewController.swift */; };
 		162DC6212021048700C19DCE /* DailyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162DC6202021048700C19DCE /* DailyViewController.swift */; };
 		1646BDA620BDF175006FF7F5 /* HourlyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */; };
@@ -43,7 +44,6 @@
 		26330A7B3D732B68D1720CEB /* AccuWeatherDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E374923DE9FB1E1B25F2F4F1 /* AccuWeatherDataSource.swift */; };
 		2BFFE39F022F4237A179A2EA /* UI/Forecast/Cards/DailyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82215DD8F53049A6AEED17F6 /* UI/Forecast/Cards/DailyCardView.swift */; };
 		31AD2A0030CE4ED087EFCFC9 /* UI/Forecast/Cards/MinutelyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A5DFCBB162407A9EE45CD2 /* UI/Forecast/Cards/MinutelyCardView.swift */; };
-		37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */; };
 		39524CFD2C6C487592ABCF92 /* WeatherCodeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */; };
 		39735FF173C64D0CB5AEB074 /* UI/Forecast/Cards/AirQualityCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623E1BB68FEC4BD6BF3F583C /* UI/Forecast/Cards/AirQualityCardView.swift */; };
 		4CF0A6FC02FF4ED5BE915BFA /* UI/Forecast/Cards/AlertBannerCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3739D4B5AF2401DB4F0949E /* UI/Forecast/Cards/AlertBannerCardView.swift */; };
@@ -189,7 +189,9 @@
 		162DC6092020FAAB00C19DCE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		162DC60B2020FAAB00C19DCE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		162DC60E2020FAAB00C19DCE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		162DC6102020FAAB00C19DCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+			162DC6102020FAAB00C19DCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+			162DC620AAAA000000000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+			162DC620BBBB000000000002 /* Cloudship.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Cloudship.xcconfig; sourceTree = "<group>"; };
 		162DC61E2021043A00C19DCE /* HourlyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyViewController.swift; sourceTree = "<group>"; };
 		162DC6202021048700C19DCE /* DailyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewController.swift; sourceTree = "<group>"; };
 		1646BDA520BDF175006FF7F5 /* HourlyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTableViewCell.swift; sourceTree = "<group>"; };
@@ -234,7 +236,6 @@
 		92A37E1B2F7C69970090F977 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		92A37E1E2F7C6B2B0090F977 /* UITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = UITestPlan.xctestplan; sourceTree = SOURCE_ROOT; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* UI/Shared/WeatherColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/WeatherColors.swift; sourceTree = "<group>"; };
-		A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.debug.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.debug.xcconfig"; sourceTree = "<group>"; };
 		A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/PrecipitationNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/PrecipitationNotificationService.swift; sourceTree = "<group>"; };
 		A34FCE7E1E9241D089FE3F4D /* UI/MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/MainTabBarController.swift; sourceTree = "<group>"; };
 		A7DEABC4FD344E8682753FF2 /* UI/Forecast/Cards/CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/CardView.swift; sourceTree = "<group>"; };
@@ -278,13 +279,11 @@
 		DD0101010101010101DD01 /* DataSources/AISummaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/AISummaryService.swift; sourceTree = "<group>"; };
 		DD0303030303030303DD03 /* UI/Forecast/Cards/AISummaryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/AISummaryCardView.swift; sourceTree = "<group>"; };
 		DD45EF6789AB01BC3456789A /* DataSources/OpenMeteoDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/OpenMeteoDataSource.swift; sourceTree = "<group>"; };
-		DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cloudship.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E374923DE9FB1E1B25F2F4F1 /* AccuWeatherDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccuWeatherDataSource.swift; path = DataSources/AccuWeatherDataSource.swift; sourceTree = "<group>"; };
 		E6F7A8B9C0D1E2F3A4B5C6D7 /* UI/Settings/ManageLocationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ManageLocationsViewController.swift; sourceTree = "<group>"; };
 		EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/SharedWeatherData.swift; sourceTree = "<group>"; };
 		EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/WidgetDataWriter.swift; sourceTree = "<group>"; };
 		EE0505050505050505EE05 /* UI/Forecast/WeatherAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/WeatherAnimationView.swift; sourceTree = "<group>"; };
-		EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cloudship.release.xcconfig"; path = "Target Support Files/Pods-Cloudship/Pods-Cloudship.release.xcconfig"; sourceTree = "<group>"; };
 		F1A2B3C4D5E6F7A8B9C0D1E2 /* Services/BackgroundTaskManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BackgroundTaskManager.swift; sourceTree = "<group>"; };
 		F1A5DFCBB162407A9EE45CD2 /* UI/Forecast/Cards/MinutelyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/MinutelyCardView.swift; sourceTree = "<group>"; };
 		FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/PrecipitationActivityAttributes.swift; sourceTree = "<group>"; };
@@ -313,8 +312,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37BBAD2F5CFFF2565F8B052C /* Pods_Cloudship.framework in Frameworks */,
-				1D99DB50389843F3A9FCAE90 /* Lottie in Frameworks */,
+					1D99DB50389843F3A9FCAE90 /* Lottie in Frameworks */,
 				FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -369,8 +367,7 @@
 				92A3789F2F6D95D50090F977 /* CloudshipWidget */,
 				16C5223B214C4C9D007F9935 /* Frameworks */,
 				162DC6022020FAAB00C19DCE /* Products */,
-				248F29917683ABA8929D7DD8 /* Pods */,
-				92A37D2D2F74EC660090F977 /* Recovered References */,
+					92A37D2D2F74EC660090F977 /* Recovered References */,
 				92A37DA12F75F1560090F977 /* CloudshipTests */,
 				92A37DA22F75F1570090F977 /* CloudshipUITests */,
 			);
@@ -413,10 +410,12 @@
 			isa = PBXGroup;
 			children = (
 				162DC6082020FAAB00C19DCE /* Main.storyboard */,
-				162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
-				162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
-				162DC6102020FAAB00C19DCE /* Info.plist */,
-			);
+					162DC60B2020FAAB00C19DCE /* Assets.xcassets */,
+					162DC60D2020FAAB00C19DCE /* LaunchScreen.storyboard */,
+					162DC6102020FAAB00C19DCE /* Info.plist */,
+					162DC620AAAA000000000002 /* PrivacyInfo.xcprivacy */,
+					162DC620BBBB000000000002 /* Cloudship.xcconfig */,
+				);
 			name = Resources;
 			sourceTree = "<group>";
 		};
@@ -637,8 +636,7 @@
 			children = (
 				92A37E1B2F7C69970090F977 /* XCTest.framework */,
 				16C5223C214C4C9D007F9935 /* NotificationCenter.framework */,
-				DFE26352977A0BF1ABA3B69F /* Pods_Cloudship.framework */,
-				92A3789B2F6D95D50090F977 /* WidgetKit.framework */,
+					92A3789B2F6D95D50090F977 /* WidgetKit.framework */,
 				92A3789D2F6D95D50090F977 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
@@ -653,15 +651,6 @@
 				16C52244214C4C9D007F9935 /* Info.plist */,
 			);
 			path = TodayExtension;
-			sourceTree = "<group>";
-		};
-		248F29917683ABA8929D7DD8 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */,
-				EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		92A37D2D2F74EC660090F977 /* Recovered References */ = {
@@ -712,13 +701,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 162DC6132020FAAB00C19DCE /* Build configuration list for PBXNativeTarget "Cloudship" */;
 			buildPhases = (
-				E040A744487574F147EC7BAC /* [CP] Check Pods Manifest.lock */,
-				162DC5FD2020FAAB00C19DCE /* Sources */,
+					162DC5FD2020FAAB00C19DCE /* Sources */,
 				162DC5FE2020FAAB00C19DCE /* Frameworks */,
 				162DC5FF2020FAAB00C19DCE /* Resources */,
 				16C5224B214C4C9D007F9935 /* Embed App Extensions */,
-				B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */,
-			);
+				);
 			buildRules = (
 			);
 			dependencies = (
@@ -851,8 +838,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16F5BD832100010600A93A03 /* Settings.bundle in Resources */,
-				167E38222151F799000ADA23 /* MainInterface.storyboard in Resources */,
+					16F5BD832100010600A93A03 /* Settings.bundle in Resources */,
+					162DC620AAAA000000000001 /* PrivacyInfo.xcprivacy in Resources */,
+					167E38222151F799000ADA23 /* MainInterface.storyboard in Resources */,
 				162DC60F2020FAAB00C19DCE /* LaunchScreen.storyboard in Resources */,
 				162DC60C2020FAAB00C19DCE /* Assets.xcassets in Resources */,
 				162DC60A2020FAAB00C19DCE /* Main.storyboard in Resources */,
@@ -869,48 +857,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		B9F8D2D0802506F4DD341E15 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Cloudship/Pods-Cloudship-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
-				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cloudship/Pods-Cloudship-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E040A744487574F147EC7BAC /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Cloudship-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1204,10 +1150,10 @@
 			};
 			name = Release;
 		};
-		162DC6142020FAAB00C19DCE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */;
-			buildSettings = {
+				162DC6142020FAAB00C19DCE /* Debug */ = {
+					isa = XCBuildConfiguration;
+					baseConfigurationReference = 162DC620BBBB000000000002 /* Cloudship.xcconfig */;
+					buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cloudship/Cloudship.entitlements;
@@ -1221,75 +1167,17 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ld_classic",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"sqlite3\"",
-					"-l\"z\"",
-					"-framework",
-					"\"AVFoundation\"",
-					"-framework",
-					"\"AudioToolbox\"",
-					"-framework",
-					"\"CFNetwork\"",
-					"-framework",
-					"\"CoreGraphics\"",
-					"-framework",
-					"\"CoreMedia\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"CoreVideo\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"GoogleAppMeasurement\"",
-					"-framework",
-					"\"GoogleMobileAds\"",
-					"-framework",
-					"\"GoogleUtilities\"",
-					"-framework",
-					"\"MapKit\"",
-					"-framework",
-					"\"MediaPlayer\"",
-					"-framework",
-					"\"MessageUI\"",
-					"-framework",
-					"\"MobileCoreServices\"",
-					"-framework",
-					"\"QuartzCore\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"StoreKit\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"nanopb\"",
-					"-weak_framework",
-					"\"AdSupport\"",
-					"-weak_framework",
-					"\"JavaScriptCore\"",
-					"-weak_framework",
-					"\"SafariServices\"",
-					"-weak_framework",
-					"\"WebKit\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+					PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
+					PRODUCT_NAME = "$(TARGET_NAME)";
+					SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		162DC6152020FAAB00C19DCE /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */;
-			buildSettings = {
+				162DC6152020FAAB00C19DCE /* Release */ = {
+					isa = XCBuildConfiguration;
+					baseConfigurationReference = 162DC620BBBB000000000002 /* Cloudship.xcconfig */;
+					buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Cloudship/Cloudship.entitlements;
@@ -1303,67 +1191,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ld_classic",
-					"-ObjC",
-					"-l\"c++\"",
-					"-l\"sqlite3\"",
-					"-l\"z\"",
-					"-framework",
-					"\"AVFoundation\"",
-					"-framework",
-					"\"AudioToolbox\"",
-					"-framework",
-					"\"CFNetwork\"",
-					"-framework",
-					"\"CoreGraphics\"",
-					"-framework",
-					"\"CoreMedia\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"CoreVideo\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"GoogleAppMeasurement\"",
-					"-framework",
-					"\"GoogleMobileAds\"",
-					"-framework",
-					"\"GoogleUtilities\"",
-					"-framework",
-					"\"MapKit\"",
-					"-framework",
-					"\"MediaPlayer\"",
-					"-framework",
-					"\"MessageUI\"",
-					"-framework",
-					"\"MobileCoreServices\"",
-					"-framework",
-					"\"QuartzCore\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"StoreKit\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"nanopb\"",
-					"-weak_framework",
-					"\"AdSupport\"",
-					"-weak_framework",
-					"\"JavaScriptCore\"",
-					"-weak_framework",
-					"\"SafariServices\"",
-					"-weak_framework",
-					"\"WebKit\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+					PRODUCT_BUNDLE_IDENTIFIER = "com.happygiraffe.Cloudship-test";
+					PRODUCT_NAME = "$(TARGET_NAME)";
+					SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1389,7 +1219,7 @@
 				INFOPLIST_FILE = CloudshipWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CloudshipWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Scott Kriss. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+					IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1433,7 +1263,7 @@
 				INFOPLIST_FILE = CloudshipWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CloudshipWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Scott Kriss. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+					IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1454,10 +1284,9 @@
 			};
 			name = Release;
 		};
-		AA0000000000000000000B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1BB0DE49D3208CC84861E0F /* Pods-Cloudship.debug.xcconfig */;
-			buildSettings = {
+			AA0000000000000000000B /* Debug */ = {
+				isa = XCBuildConfiguration;
+				buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1485,10 +1314,9 @@
 			};
 			name = Debug;
 		};
-		AA0000000000000000000C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = EEF98949222745BD4081A74D /* Pods-Cloudship.release.xcconfig */;
-			buildSettings = {
+			AA0000000000000000000C /* Release */ = {
+				isa = XCBuildConfiguration;
+				buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_OBJC_WEAK = YES;

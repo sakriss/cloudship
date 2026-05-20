@@ -12,9 +12,11 @@ class TomorrowIODataSource: WeatherDataSource {
 
     let name = "Tomorrow.io"
 
-    private let apiKey = "KQXY4gdDsX3eiTsTJx8oG6UELO1S6zyM"
+    private let apiKey = APIConfiguration.tomorrowIOAPIKey
 
     func fetchWeather(lat: Double, lon: Double, units: String) async throws -> UnifiedWeatherData {
+        guard !apiKey.isEmpty else { throw TomorrowIODataSourceError.missingAPIKey }
+
         async let realtime = fetchRealtime(lat: lat, lon: lon, units: units)
         async let forecast = fetchForecast(lat: lat, lon: lon, units: units)
 
@@ -187,5 +189,16 @@ class TomorrowIODataSource: WeatherDataSource {
             airQuality: airQuality,
             pollen: pollen
         )
+    }
+}
+
+enum TomorrowIODataSourceError: LocalizedError {
+    case missingAPIKey
+
+    var errorDescription: String? {
+        switch self {
+        case .missingAPIKey:
+            return "Tomorrow.io API key is not configured."
+        }
     }
 }

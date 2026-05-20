@@ -17,6 +17,8 @@ class PirateWeatherDataSource: WeatherDataSource {
     // MARK: - WeatherDataSource
 
     func fetchWeather(lat: Double, lon: Double, units: String) async throws -> UnifiedWeatherData {
+        guard !apiKey.isEmpty else { throw PirateWeatherError.missingAPIKey }
+
         let imperial = units == "imperial"
         let pwUnits = imperial ? "us" : "si"
 
@@ -53,7 +55,7 @@ class PirateWeatherDataSource: WeatherDataSource {
 
     // MARK: - API Key
 
-    private let apiKey = "nCmW8159sdpOatt0Sm7a1r3tcflAgDCR"
+    private let apiKey = APIConfiguration.pirateWeatherAPIKey
 
     // MARK: - Build unified model
 
@@ -228,6 +230,7 @@ class PirateWeatherDataSource: WeatherDataSource {
 // MARK: - Errors
 
 enum PirateWeatherError: LocalizedError {
+    case missingAPIKey
     case invalidURL
     case unauthorized
     case rateLimited
@@ -235,6 +238,7 @@ enum PirateWeatherError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
+        case .missingAPIKey: return "Pirate Weather API key is not configured."
         case .invalidURL:    return "Invalid Pirate Weather URL."
         case .unauthorized:  return "Pirate Weather API key is invalid."
         case .rateLimited:   return "Pirate Weather monthly API limit reached."
