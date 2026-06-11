@@ -106,7 +106,14 @@ final class PrecipitationLiveActivityManager {
         let precipType = Self.precipTypeString(weather.current.condition)
         let intensity = weather.current.precipIntensity ?? 0
         let chance = weather.hourly.first.flatMap { $0.precipChance }.map { Int($0) } ?? 0
-        let symbol = Self.sfSymbol(for: weather.current.condition)
+        let todayDaily = weather.daily.first { Calendar.current.isDateInToday($0.time) }
+            ?? weather.daily.first
+        let isNight = WeatherCodeMapper.isNight(
+            at: Date(),
+            sunrise: todayDaily?.sunrise,
+            sunset: todayDaily?.sunset
+        )
+        let symbol = Self.sfSymbol(for: weather.current.condition, isNight: isNight)
         let transition = Self.transitionMinutes(minutely: weather.minutely, isPrecipitating: isPrecip)
 
         return PrecipitationActivityAttributes.ContentState(
@@ -144,11 +151,11 @@ final class PrecipitationLiveActivityManager {
         }
     }
 
-    private static func sfSymbol(for condition: WeatherCondition) -> String {
+    private static func sfSymbol(for condition: WeatherCondition, isNight: Bool) -> String {
         switch condition {
-        case .clear:        return "sun.max.fill"
-        case .mostlyClear:  return "sun.min.fill"
-        case .partlyCloudy: return "cloud.sun.fill"
+        case .clear:        return isNight ? "moon.stars.fill" : "sun.max.fill"
+        case .mostlyClear:  return isNight ? "moon.fill" : "sun.min.fill"
+        case .partlyCloudy: return isNight ? "cloud.moon.fill" : "cloud.sun.fill"
         case .mostlyCloudy: return "cloud.fill"
         case .cloudy:       return "smoke.fill"
         case .fog, .lightFog:   return "cloud.fog.fill"

@@ -29,22 +29,31 @@ class CardView: UIView {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
-        let iv = UIImageView(image: UIImage(systemName: "line.3.horizontal"))
-        iv.tintColor = CardView.textColor(for: .tertiary)
-        iv.contentMode = .scaleAspectFit
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(iv)
+        let bars = (0..<3).map { _ -> UIView in
+            let bar = UIView()
+            bar.backgroundColor = CardView.textColor(for: .tertiary)
+            bar.layer.cornerRadius = 1.5
+            bar.tag = 901
+            bar.translatesAutoresizingMaskIntoConstraints = false
+            bar.heightAnchor.constraint(equalToConstant: 3).isActive = true
+            return bar
+        }
+        let stack = UIStackView(arrangedSubviews: bars)
+        stack.axis = .vertical
+        stack.spacing = 3
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(stack)
         NSLayoutConstraint.activate([
-            iv.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            iv.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            iv.widthAnchor.constraint(equalToConstant: 18),
-            iv.heightAnchor.constraint(equalToConstant: 14)
+            stack.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            stack.widthAnchor.constraint(equalToConstant: 28)
         ])
         return container
     }()
 
     /// Set to false to hide the reorder handle (e.g. header, alert banner).
-    var showsReorderHandle: Bool = true {
+    var showsReorderHandle: Bool = false {
         didSet { reorderHandle.isHidden = !showsReorderHandle }
     }
 
@@ -61,7 +70,9 @@ class CardView: UIView {
     }
 
     private func commonInit() {
-        backgroundColor = .secondarySystemBackground
+        backgroundColor = UIAccessibility.isReduceTransparencyEnabled
+            ? .systemBackground
+            : .secondarySystemBackground
 
         layer.cornerRadius = 18
         layer.cornerCurve = .continuous
@@ -69,17 +80,17 @@ class CardView: UIView {
 
         // Shadow
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.10
+        layer.shadowOpacity = UIAccessibility.isReduceTransparencyEnabled ? 0 : 0.08
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 10
 
-        // Reorder handle — top-right, 44×44 touch target
+        // Reorder handle — top-right, with an intentionally generous touch target.
         addSubview(reorderHandle)
         NSLayoutConstraint.activate([
             reorderHandle.topAnchor.constraint(equalTo: topAnchor),
             reorderHandle.trailingAnchor.constraint(equalTo: trailingAnchor),
-            reorderHandle.widthAnchor.constraint(equalToConstant: 44),
-            reorderHandle.heightAnchor.constraint(equalToConstant: 44)
+            reorderHandle.widthAnchor.constraint(equalToConstant: 52),
+            reorderHandle.heightAnchor.constraint(equalToConstant: 52)
         ])
         updateChromeColors()
     }
@@ -88,7 +99,9 @@ class CardView: UIView {
 
     /// Apply the user's chosen card tint. Call after configuring card content.
     func applyTint(_ style: CardTintStyle) {
-        backgroundColor = style.cardBackgroundColor
+        backgroundColor = UIAccessibility.isReduceTransparencyEnabled
+            ? .systemBackground
+            : style.cardBackgroundColor
     }
 
     /// Apply warm parchment/sepia styling for Time Machine historical mode.
@@ -105,7 +118,12 @@ class CardView: UIView {
     }
 
     func updateChromeColors() {
-        (reorderHandle.subviews.first as? UIImageView)?.tintColor = Self.textColor(for: .tertiary)
+        reorderHandle.subviews
+            .flatMap(\.subviews)
+            .filter { $0.tag == 901 }
+            .forEach { $0.backgroundColor = Self.textColor(for: .tertiary) }
+        layer.borderWidth = UIAccessibility.isDarkerSystemColorsEnabled ? 1 : 0
+        layer.borderColor = UIColor.separator.cgColor
     }
 
     static func textColor(for role: TextRole) -> UIColor {

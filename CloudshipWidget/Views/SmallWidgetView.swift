@@ -23,9 +23,17 @@ struct SmallWidgetView: View {
                 Spacer()
 
                 // Condition icon
-                Image(systemName: WidgetConditionIcon.symbolName(for: data.conditionRaw))
-                    .font(.title2)
-                    .foregroundColor(WidgetConditionIcon.color(for: data.conditionRaw))
+                Image(WidgetConditionIcon.assetName(
+                    for: data.conditionRaw,
+                    isNight: WidgetConditionIcon.isNight(
+                        at: entry.date,
+                        sunrise: data.sunrise,
+                        sunset: data.sunset
+                    )
+                ))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 34, height: 34)
 
                 // Temperature
                 Text(tempString(data.temperature, metric: data.isMetric))
@@ -44,9 +52,10 @@ struct SmallWidgetView: View {
             .containerBackground(.fill.tertiary, for: .widget)
         } else {
             VStack {
-                Image(systemName: "cloud.fill")
-                    .font(.title)
-                    .foregroundColor(.secondary)
+                Image("cloudy")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 38, height: 38)
                 Text("Open Cloudship")
                     .font(.caption)
                     .foregroundColor(.secondary)

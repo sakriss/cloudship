@@ -985,9 +985,9 @@ class RadarViewController: UIViewController {
         return stack
     }()
     private lazy var playbackRow: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [prevButton, playPauseButton, nextButton, UIView(), settingsButton])
+        let stack = UIStackView(arrangedSubviews: [playPauseButton, UIView(), settingsButton])
         stack.axis = .horizontal
-        stack.spacing = 20
+        stack.spacing = 12
         stack.alignment = .center
         return stack
     }()
@@ -1350,6 +1350,10 @@ class RadarViewController: UIViewController {
         b.tintColor = .label
         b.translatesAutoresizingMaskIntoConstraints = false
         b.addTarget(self, action: action, for: .touchUpInside)
+        NSLayoutConstraint.activate([
+            b.widthAnchor.constraint(greaterThanOrEqualToConstant: 44),
+            b.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
+        ])
         return b
     }
 
@@ -1401,8 +1405,6 @@ class RadarViewController: UIViewController {
         timeRow.isHidden = !showPlayback
         frameSlider.isHidden = !showPlayback
         playPauseButton.isHidden = !showPlayback
-        prevButton.isHidden = !showPlayback
-        nextButton.isHidden = !showPlayback
         playbackRow.isHidden = interactionMode != .radar
         if !showPlayback {
             liveBadge.isHidden = true

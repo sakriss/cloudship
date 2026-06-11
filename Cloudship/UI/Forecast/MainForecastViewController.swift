@@ -111,6 +111,7 @@ class MainForecastViewController: UIViewController {
     private let animationView      = WeatherAnimationView()
     private let weatherGradient    = WeatherGradientView()
     private var currentStatusBarStyle: UIStatusBarStyle = .default
+    private var isCustomizingForecast = false
 
     override var preferredStatusBarStyle: UIStatusBarStyle { currentStatusBarStyle }
 
@@ -139,17 +140,6 @@ class MainForecastViewController: UIViewController {
     // Search
     private var searchController: UISearchController!
     private var searchResultsVC: SearchResultsViewController!
-
-    private lazy var inlineSearchBar: UISearchBar = {
-        let sb = UISearchBar()
-        sb.placeholder = "Search for a city"
-        sb.searchBarStyle = .minimal
-        sb.delegate = self
-        sb.translatesAutoresizingMaskIntoConstraints = false
-        sb.accessibilityLabel = "Search City"
-        sb.accessibilityHint = "Tap to search for a city"
-        return sb
-    }()
 
     // MARK: - Lifecycle
 
@@ -197,27 +187,71 @@ class MainForecastViewController: UIViewController {
         definesPresentationContext = true
         // Search bar lives in scroll content — not the nav bar
 
-        // Time Machine calendar button (left)
-        let calendarButton = UIBarButtonItem(
-            image: UIImage(systemName: "calendar"),
-            style: .plain,
-            target: self,
-            action: #selector(openTimeMachine)
-        )
-        calendarButton.accessibilityLabel = "Time Machine"
-        calendarButton.accessibilityHint = "Tap to choose a past date for historical weather"
-        navigationItem.leftBarButtonItem = calendarButton
+        navigationItem.leftBarButtonItem = makeForecastMenuButton()
 
-        // AI chat button (right)
         let aiButton = UIBarButtonItem(
             image: UIImage(systemName: "sparkles"),
             style: .plain,
             target: self,
             action: #selector(openAIChat)
         )
-        aiButton.accessibilityLabel = "AI Chat"
-        aiButton.accessibilityHint = "Ask about your weather with AI assistance"
-        navigationItem.rightBarButtonItem = aiButton
+        aiButton.accessibilityLabel = "Weather Assistant"
+        aiButton.accessibilityHint = "Ask a question about this forecast"
+
+        let searchButton = UIBarButtonItem(
+            image: UIImage(systemName: "magnifyingglass"),
+            style: .plain,
+            target: self,
+            action: #selector(openSearch)
+        )
+        searchButton.accessibilityLabel = "Search Cities"
+        searchButton.accessibilityHint = "Find a city or use your current location"
+        navigationItem.rightBarButtonItems = [aiButton, searchButton]
+    }
+
+    private func makeForecastMenuButton() -> UIBarButtonItem {
+        let historyAction = UIAction(
+            title: "Historical Weather",
+            image: UIImage(systemName: "calendar")
+        ) { [weak self] _ in
+            self?.openTimeMachine()
+        }
+        let customizeAction = UIAction(
+            title: isCustomizingForecast ? "Done Editing Layout" : "Customize Card Layout",
+            image: UIImage(systemName: isCustomizingForecast ? "checkmark" : "slider.horizontal.3")
+        ) { [weak self] _ in
+            self?.toggleForecastCustomization()
+        }
+        let item = UIBarButtonItem(
+            image: UIImage(systemName: isCustomizingForecast ? "checkmark.circle.fill" : "ellipsis.circle"),
+            menu: UIMenu(title: "Forecast Options", children: [historyAction, customizeAction])
+        )
+        item.accessibilityLabel = isCustomizingForecast ? "Finish editing card layout" : "Forecast options"
+        return item
+    }
+
+    @objc private func openSearch() {
+        present(searchController, animated: true) { [weak self] in
+            self?.searchController.searchBar.becomeFirstResponder()
+        }
+    }
+
+    @objc private func toggleForecastCustomization() {
+        isCustomizingForecast.toggle()
+        reorderableCards.forEach { card in
+            card.showsReorderHandle = isCustomizingForecast
+            card.reorderHandle.accessibilityElementsHidden = !isCustomizingForecast
+        }
+        navigationItem.leftBarButtonItem = makeForecastMenuButton()
+
+        let feedback = UIImpactFeedbackGenerator(style: .light)
+        feedback.impactOccurred()
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: isCustomizingForecast
+                ? "Customize Card Layout enabled. Drag the handles to reorder cards."
+                : "Card layout saved."
+        )
     }
 
     @objc private func openAIChat() {
@@ -401,9 +435,9 @@ class MainForecastViewController: UIViewController {
 
     // MARK: - Card Reordering Setup
 
-    private static let cardOrderKey = "cardOrder_v2"
+    private static let cardOrderKey = "cardOrder_v3"
 
-    private static let defaultCardIDs = ["aiSummary", "hourly", "daily", "minutely", "details", "windGust", "airQuality", "pollen", "activityScores"]
+    private static let defaultCardIDs = ["hourly", "daily", "minutely", "activityScores", "aiSummary", "details", "windGust", "airQuality", "pollen"]
 
     private func setupReorderableCards() {
         // Map ID → card
@@ -440,8 +474,9 @@ class MainForecastViewController: UIViewController {
         headerCard.showsReorderHandle = false
         alertBannerCard.showsReorderHandle = false
 
-        // Attach pan gesture to each reorderable card's handle
+        // Handles stay hidden until the explicit Customize Card Layout mode is active.
         for card in reorderableCards {
+            card.showsReorderHandle = false
             let pan = UIPanGestureRecognizer(target: self, action: #selector(handleCardDrag(_:)))
             card.reorderHandle.addGestureRecognizer(pan)
             // Accessibility for reorder handle
@@ -466,12 +501,12 @@ class MainForecastViewController: UIViewController {
             weatherGradient.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        // Check if weather-reactive theme is enabled
-        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
-        weatherGradient.isHidden = (appearanceIdx != 3)  // 3 = Auto (Weather-Reactive)
+        // The forecast always uses an atmospheric condition-aware backdrop.
+        weatherGradient.isHidden = false
 
         // Animation view sits behind content but above gradient
         animationView.translatesAutoresizingMaskIntoConstraints = false
+        animationView.isHidden = true
         view.insertSubview(animationView, aboveSubview: weatherGradient)
         NSLayoutConstraint.activate([
             animationView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -485,19 +520,14 @@ class MainForecastViewController: UIViewController {
         scrollView.addSubview(stackView)
         scrollView.refreshControl = refreshControl
 
-        // Inline search bar scrolls with content — disappears naturally when scrolling down
-        stackView.addArrangedSubview(inlineSearchBar)
-        inlineSearchBar.isAccessibilityElement = true
-        inlineSearchBar.accessibilityTraits = .header
-
-        // Source label sits above the header card (not a CardView, so added separately)
+        // Confidence disclosure sits above the hero without competing with it.
         stackView.addArrangedSubview(sourceLabel)
         sourceLabel.isAccessibilityElement = true
         if let label = sourceLabel.viewWithTag(99) as? UILabel {
-            sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
+            sourceLabel.accessibilityLabel = label.text
         }
         sourceLabel.accessibilityTraits = .button
-        sourceLabel.accessibilityHint = "Double tap to switch weather sources"
+        sourceLabel.accessibilityHint = "Double tap for forecast source and agreement details"
         sourceLabel.isUserInteractionEnabled = true
         sourceLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapSourceLabel)))
 
@@ -655,9 +685,10 @@ class MainForecastViewController: UIViewController {
 
     private func rebuildStack() {
         let allOrdered: [CardView] = [headerCard, alertBannerCard] + reorderableCards
+        let baseIndex = (stackView.arrangedSubviews.firstIndex(of: sourceLabel) ?? -1) + 1
         for (i, card) in allOrdered.enumerated() {
             stackView.removeArrangedSubview(card)
-            stackView.insertArrangedSubview(card, at: i)
+            stackView.insertArrangedSubview(card, at: baseIndex + i)
         }
     }
 
@@ -1044,13 +1075,6 @@ class MainForecastViewController: UIViewController {
     }
 
     private func applyWeatherTheme(for condition: WeatherCondition) {
-        let appearanceIdx = UserDefaults.standard.integer(forKey: "AppearanceIndex")
-        guard appearanceIdx == 3 else {
-            weatherGradient.isHidden = true
-            resetBarAppearance()
-            return
-        }
-
         let hour = Calendar.current.component(.hour, from: Date())
         let isNight = hour < 6 || hour >= 20
         let theme = WeatherTheme.theme(for: condition, isNight: isNight)
@@ -1134,28 +1158,29 @@ class MainForecastViewController: UIViewController {
 
         if isConsensus,
            let breakdown = WeatherDataSourceManager.shared.lastData?.consensusBreakdown {
-            label.text = "Consensus (\(breakdown.sourcesUsed) sources)"
+            let nonOutliers = breakdown.readings.filter { !$0.isOutlier }.count
+            let agreement = nonOutliers == breakdown.readings.count ? "High agreement" : "Mixed agreement"
+            label.text = "\(agreement) · \(breakdown.sourcesUsed) forecasts compared"
         } else if isNearestStation {
             let sourceID = defaults.string(forKey: "NearestStationLastSourceID")
             let km = defaults.double(forKey: "NearestStationLastDistanceKm")
             if sourceID == WeatherSourceID.noaa.rawValue, km > 0 {
                 if TemperatureFormatter.isMetric {
-                    label.text = String(format: "NOAA · %.1f km", km)
+                    label.text = String(format: "Closest station · %.1f km away", km)
                 } else {
-                    label.text = String(format: "NOAA · %.1f mi", km * 0.621371)
+                    label.text = String(format: "Closest station · %.1f mi away", km * 0.621371)
                 }
             } else {
-                label.text = WeatherDataSourceManager.shared.activeSource.name
+                label.text = "Forecast confidence · Single trusted source"
             }
         } else {
-            label.text = WeatherDataSourceManager.shared.activeSource.name
+            label.text = "Forecast confidence · Single trusted source"
         }
 
-        // Accessibility update for sourceLabel
-        sourceLabel.accessibilityLabel = "Data Source: \(label.text ?? "")"
+        sourceLabel.accessibilityLabel = label.text
         sourceLabel.accessibilityHint = isConsensus
-            ? "Double tap to switch weather sources or view consensus breakdown"
-            : "Double tap to switch weather sources"
+            ? "Double tap to view forecast agreement or change the comparison method"
+            : "Double tap to view or change the forecast source"
     }
 
     @objc private func didTapSourceLabel() {
@@ -1279,9 +1304,6 @@ class MainForecastViewController: UIViewController {
 
         // AI daily brief — async fetch with cache
         fetchAISummary(for: data)
-
-        // Weather background animation
-        animationView.transition(to: data.current.condition)
 
         // Historical mode: show banner, hide irrelevant cards
         let mgr = WeatherDataSourceManager.shared

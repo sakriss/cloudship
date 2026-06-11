@@ -22,10 +22,13 @@ final class OnboardingLaunchUITests: XCTestCase {
             "-CloudshipUITestResetLaunchExperience"
         ])
 
-        XCTAssertTrue(app.staticTexts["Cloudship"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.staticTexts["Know what to do today"].waitForExistence(timeout: 8))
         XCTAssertTrue(app.otherElements["cloudbreakUpdateIcon"].exists)
 
         app.buttons["Get Started"].tap()
+        XCTAssertTrue(app.staticTexts["More confidence, less guesswork"].waitForExistence(timeout: 3))
+
+        app.buttons["Continue"].tap()
         XCTAssertTrue(app.staticTexts["Forecasts where you are"].waitForExistence(timeout: 3))
 
         app.buttons["Skip"].tap()

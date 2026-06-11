@@ -13,11 +13,11 @@ import UIKit
 enum HourlyMetric: String, CaseIterable {
     case temp         = "Temp"
     case feelsLike    = "Feels Like"
-    case precipChance = "Precip %"
-    case precipAmount = "Precip Amt"
+    case precipChance = "Rain"
+    case precipAmount = "Rainfall"
     case windSpeed    = "Wind"
     case windGust     = "Gusts"
-    case uvIndex      = "UV Index"
+    case uvIndex      = "UV"
     case humidity     = "Humidity"
     case cloudCover   = "Cloud Cover"
     case visibility   = "Visibility"
@@ -261,7 +261,7 @@ private class HourlyItemCell: UICollectionViewCell {
         hourLabel.textColor = CardView.textColor(for: .secondary)
         hourLabel.text = DateFormatHelper.hourLabel(from: entry.time)
         iconView.image = UIImage(named: WeatherCodeMapper.iconName(for: entry.condition,
-                                                                    isNight: WeatherCodeMapper.isNighttime()))
+                                                                    isNight: WeatherCodeMapper.isNight(at: entry.time)))
 
         // Primary value label
         if let v = metric.value(from: entry) {
@@ -275,10 +275,12 @@ private class HourlyItemCell: UICollectionViewCell {
         // Always show precip % underneath when not already showing it
         if metric != .precipChance, let chance = entry.precipChance, chance > 0 {
             precipLabel.text = "\(Int(chance.rounded()))%"
-            precipLabel.isHidden = false
+            precipLabel.alpha = 1
         } else {
-            precipLabel.text = nil
-            precipLabel.isHidden = true
+            // Keep the row in the stack so every hourly column shares the same
+            // vertical alignment, even when there is no precipitation value.
+            precipLabel.text = "0%"
+            precipLabel.alpha = 0
         }
 
         // VoiceOver
@@ -288,7 +290,9 @@ private class HourlyItemCell: UICollectionViewCell {
         let condition = WeatherCodeMapper.description(for: entry.condition)
         if !condition.isEmpty { parts.append(condition) }
         if let val = valueLabel.text, val != "—" { parts.append("\(metric.rawValue): \(val)") }
-        if let precip = precipLabel.text, !precipLabel.isHidden { parts.append("Precipitation: \(precip)") }
+        if precipLabel.alpha > 0, let precip = precipLabel.text {
+            parts.append("Precipitation: \(precip)")
+        }
         accessibilityLabel = parts.joined(separator: ", ")
     }
 }
@@ -343,12 +347,26 @@ class HourlyCardView: CardView {
     private var entries: [HourlyEntry] = []
     private var activeMetric: HourlyMetric = .temp
     private var pillButtons: [MetricPillButton] = []
+    private let primaryMetrics: [HourlyMetric] = [.temp, .precipChance, .windSpeed, .uvIndex]
 
     private var curveView = HourlyCurveView()
     private var collectionView: UICollectionView!
     private var pillScrollView: UIScrollView!
     private var pillStack: UIStackView!
     private var titleLabel: UILabel!
+    private lazy var moreButton: UIButton = {
+        var configuration = UIButton.Configuration.gray()
+        configuration.title = "More"
+        configuration.image = UIImage(systemName: "chevron.down")
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 4
+        configuration.cornerStyle = .capsule
+        configuration.baseForegroundColor = CardView.textColor(for: .secondary)
+        let button = UIButton(configuration: configuration)
+        button.showsMenuAsPrimaryAction = true
+        button.accessibilityHint = "Choose another hourly metric"
+        return button
+    }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -360,8 +378,10 @@ class HourlyCardView: CardView {
         setupLayout()
     }
 
-    private static let itemWidth: CGFloat = 64
     private static let curveHeight: CGFloat = 54
+    private var itemWidth: CGFloat {
+        traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? 96 : 64
+    }
 
     private func setupLayout() {
         let p = CardView.padding
@@ -380,17 +400,18 @@ class HourlyCardView: CardView {
 
         for metric in HourlyMetric.allCases {
             let btn = MetricPillButton(metric: metric)
-            btn.isHidden = true
+            btn.isHidden = !primaryMetrics.contains(metric)
             btn.addTarget(self, action: #selector(pillTapped(_:)), for: .touchUpInside)
             pillStack.addArrangedSubview(btn)
             pillButtons.append(btn)
         }
+        pillStack.addArrangedSubview(moreButton)
 
         // Collection view — taller to contain the scrolling curve below cells
         let totalCellHeight: CGFloat = 100
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: Self.itemWidth, height: totalCellHeight)
+        layout.itemSize = CGSize(width: itemWidth, height: totalCellHeight)
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.sectionInset = UIEdgeInsets(top: 0, left: p, bottom: 0, right: p)
@@ -438,22 +459,22 @@ class HourlyCardView: CardView {
         applyTextPalette()
         entries = Array(hourly.prefix(24))
 
-        // Reveal only pills that have data; select first available
+        // Keep the first row focused on the four metrics people check most.
         var firstWithData: HourlyMetric?
         for btn in pillButtons {
             let has = btn.metric.hasData(in: entries)
-            btn.isHidden = !has
+            btn.isHidden = !has || !primaryMetrics.contains(btn.metric)
             if has && firstWithData == nil {
                 firstWithData = btn.metric
             }
         }
-
         // Keep current selection if still valid, else reset to first available
         if !activeMetric.hasData(in: entries) {
             activeMetric = firstWithData ?? .temp
         }
 
         updateSelection()
+        configureMoreMenu()
         collectionView.reloadData()
         updateCurve()
     }
@@ -476,6 +497,29 @@ class HourlyCardView: CardView {
             btn.isSelected = btn.metric == activeMetric
             btn.updateAppearance()
         }
+        let isSecondaryMetric = !primaryMetrics.contains(activeMetric)
+        moreButton.configuration?.title = isSecondaryMetric ? activeMetric.rawValue : "More"
+        moreButton.configuration?.baseForegroundColor = isSecondaryMetric
+            ? activeMetric.accentColor
+            : CardView.textColor(for: .secondary)
+        moreButton.accessibilityLabel = isSecondaryMetric
+            ? "\(activeMetric.rawValue), selected. More hourly metrics"
+            : "More hourly metrics"
+    }
+
+    private func configureMoreMenu() {
+        let secondaryMetrics = HourlyMetric.allCases.filter {
+            !primaryMetrics.contains($0) && $0.hasData(in: entries)
+        }
+        moreButton.isHidden = secondaryMetrics.isEmpty
+        moreButton.menu = UIMenu(children: secondaryMetrics.map { metric in
+            UIAction(
+                title: metric.rawValue,
+                state: metric == activeMetric ? .on : .off
+            ) { [weak self] _ in
+                self?.selectMetric(metric)
+            }
+        })
     }
 
     private func updateCurve() {
@@ -483,24 +527,30 @@ class HourlyCardView: CardView {
         let vals = entries.map { activeMetric.value(from: $0) }
         curveView.values = vals
         curveView.color = activeMetric.accentColor
-        curveView.itemWidth = Self.itemWidth
+        curveView.itemWidth = itemWidth
 
         // Position curve below the cells, spanning the full scrollable content width.
         // x = sectionInset.left so column 0 in the curve aligns with cell 0 in the collection.
         let p = CardView.padding
-        let curveWidth = CGFloat(entries.count) * Self.itemWidth
+        let curveWidth = CGFloat(entries.count) * itemWidth
         curveView.frame = CGRect(
             x: p,
             y: 100 + 4,
             width: max(curveWidth, 0),
             height: Self.curveHeight - 4
         )
+        curveView.itemWidth = itemWidth
     }
 
     @objc private func pillTapped(_ sender: MetricPillButton) {
-        guard activeMetric != sender.metric else { return }
-        activeMetric = sender.metric
+        selectMetric(sender.metric)
+    }
+
+    private func selectMetric(_ metric: HourlyMetric) {
+        guard activeMetric != metric else { return }
+        activeMetric = metric
         updateSelection()
+        configureMoreMenu()
         collectionView.reloadData()
         UIView.transition(with: curveView, duration: 0.25, options: .transitionCrossDissolve) {
             self.updateCurve()
@@ -511,6 +561,15 @@ class HourlyCardView: CardView {
     private func applyTextPalette() {
         titleLabel?.textColor = CardView.textColor(for: .secondary)
         pillButtons.forEach { $0.updateAppearance() }
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory,
+              let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        layout.itemSize.width = itemWidth
+        layout.invalidateLayout()
+        updateCurve()
     }
 }
 

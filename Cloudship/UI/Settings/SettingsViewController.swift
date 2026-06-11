@@ -67,21 +67,17 @@ class SettingsViewController: UITableViewController {
         return sw
     }()
 
-    private lazy var sourceControl: UISegmentedControl = {
-        let sc = UISegmentedControl(items: ["NOAA", "O-Meteo", "Pirate", "Apple", "Tmrw", "Accu"])
-        sc.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 11)], for: .normal)
-        let active = WeatherDataSourceManager.shared.activeSource
-        if active is NOAADataSource                { sc.selectedSegmentIndex = 0 }
-        else if active is OpenMeteoDataSource      { sc.selectedSegmentIndex = 1 }
-        else if active is PirateWeatherDataSource  { sc.selectedSegmentIndex = 2 }
-        else if active is AppleWeatherDataSource   { sc.selectedSegmentIndex = 3 }
-        else if active is TomorrowIODataSource     { sc.selectedSegmentIndex = 4 }
-        else if active is AccuWeatherDataSource    { sc.selectedSegmentIndex = 5 }
-        else                                        { sc.selectedSegmentIndex = 0 }
-        sc.addTarget(self, action: #selector(sourceChanged(_:)), for: .valueChanged)
-        sc.accessibilityLabel = "Weather Source"
-        sc.accessibilityHint = "Select the weather data source"
-        return sc
+    private lazy var sourceButton: UIButton = {
+        var configuration = UIButton.Configuration.gray()
+        configuration.cornerStyle = .large
+        configuration.image = UIImage(systemName: "chevron.up.chevron.down")
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        let button = UIButton(configuration: configuration)
+        button.showsMenuAsPrimaryAction = true
+        button.accessibilityLabel = "Forecast Provider"
+        button.accessibilityHint = "Choose which forecast provider Cloudship uses"
+        return button
     }()
 
     private lazy var nearestStationSwitch: UISwitch = {
@@ -247,6 +243,13 @@ class SettingsViewController: UITableViewController {
         updateSourceControlState()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
+        tableView.contentInset.bottom = tabBarHeight + 16
+        tableView.verticalScrollIndicatorInsets.bottom = tabBarHeight + 16
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -271,7 +274,7 @@ class SettingsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let title: String?
         switch Section(rawValue: section)! {
-        case .dataSource:     title = "Data Source"
+        case .dataSource:     title = "Forecast Confidence"
         case .units:          title = "Units"
         case .appearance:     title = "Appearance"
         case .notifications:  title = "Notifications"
@@ -283,7 +286,7 @@ class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if Section(rawValue: section) == .dataSource {
-            return "NOAA: US-only. Open-Meteo, Pirate Weather, Apple Weather: global.\nTomorrow.io and AccuWeather require Premium.\nNearest Station and Consensus Mode override the source selector above."
+            return "Choose one provider, use the closest active station, or compare forecasts together. Provider details remain available without crowding the everyday forecast."
         }
         return nil
     }
@@ -295,9 +298,9 @@ class SettingsViewController: UITableViewController {
             switch indexPath.row {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_source", for: indexPath) as! ControlCell
-                cell.configure(label: "Weather Source", control: sourceControl)
-                sourceControl.accessibilityLabel = "Weather Source"
-                sourceControl.accessibilityHint = "Select the weather data source"
+                cell.configure(label: "Forecast Provider", control: sourceButton)
+                sourceButton.accessibilityLabel = "Forecast Provider"
+                sourceButton.accessibilityHint = "Choose which forecast provider Cloudship uses"
                 return cell
 
             case 1:
@@ -317,7 +320,7 @@ class SettingsViewController: UITableViewController {
                 )
                 title.append(star)
                 config.attributedText = title
-                config.secondaryText = "Weighted average of all sources"
+                config.secondaryText = "Compare available forecasts and reduce single-source surprises"
                 config.secondaryTextProperties.color = .secondaryLabel
                 config.secondaryTextProperties.font = .systemFont(ofSize: 12)
                 cell.contentConfiguration = config
@@ -547,24 +550,13 @@ class SettingsViewController: UITableViewController {
 
     // MARK: - Actions
 
-    @objc private func sourceChanged(_ sender: UISegmentedControl) {
-        let premiumIndices: Set<Int> = [4, 5]  // Tomorrow.io, AccuWeather
-        if premiumIndices.contains(sender.selectedSegmentIndex)
-            && !SubscriptionManager.shared.isPremiumCached {
-            // Revert to current selection
-            let active = WeatherDataSourceManager.shared.activeSource
-            if active is NOAADataSource                { sender.selectedSegmentIndex = 0 }
-            else if active is OpenMeteoDataSource      { sender.selectedSegmentIndex = 1 }
-            else if active is PirateWeatherDataSource  { sender.selectedSegmentIndex = 2 }
-            else if active is AppleWeatherDataSource   { sender.selectedSegmentIndex = 3 }
-            else if active is TomorrowIODataSource     { sender.selectedSegmentIndex = 4 }
-            else if active is AccuWeatherDataSource    { sender.selectedSegmentIndex = 5 }
-            else                                        { sender.selectedSegmentIndex = 0 }
+    private func selectSource(at index: Int) {
+        if [4, 5].contains(index) && !SubscriptionManager.shared.isPremiumCached {
             presentPaywall()
             return
         }
 
-        switch sender.selectedSegmentIndex {
+        switch index {
         case 0:  WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         case 1:  WeatherDataSourceManager.shared.activeSource = OpenMeteoDataSource()
         case 2:  WeatherDataSourceManager.shared.activeSource = PirateWeatherDataSource()
@@ -573,6 +565,9 @@ class SettingsViewController: UITableViewController {
         case 5:  WeatherDataSourceManager.shared.activeSource = AccuWeatherDataSource()
         default: WeatherDataSourceManager.shared.activeSource = NOAADataSource()
         }
+        updateSourceControlState()
+        let feedback = UISelectionFeedbackGenerator()
+        feedback.selectionChanged()
         postSettingsChangedDebounced()
     }
 
@@ -670,13 +665,24 @@ class SettingsViewController: UITableViewController {
         return 0
     }
 
-    /// Dims/enables the source segmented control based on whether an override mode is active.
+    /// Updates the provider menu and disables it when an automatic comparison mode is active.
     private func updateSourceControlState() {
-        sourceControl.selectedSegmentIndex = selectedSourceIndex()
+        let sourceNames = ["NOAA", "Open-Meteo", "Pirate Weather", "Apple Weather", "Tomorrow.io", "AccuWeather"]
+        let selected = selectedSourceIndex()
+        sourceButton.configuration?.title = sourceNames[selected]
+        sourceButton.menu = UIMenu(children: sourceNames.enumerated().map { index, name in
+            let premiumSuffix = [4, 5].contains(index) ? " · Premium" : ""
+            return UIAction(
+                title: name + premiumSuffix,
+                state: index == selected ? .on : .off
+            ) { [weak self] _ in
+                self?.selectSource(at: index)
+            }
+        })
         let overrideActive = UserDefaults.standard.bool(forKey: WeatherDataSourceManager.nearestStationEnabledKey)
                           || UserDefaults.standard.bool(forKey: WeatherDataSourceManager.consensusModeEnabledKey)
-        sourceControl.isEnabled = !overrideActive
-        sourceControl.alpha = overrideActive ? 0.40 : 1.0
+        sourceButton.isEnabled = !overrideActive
+        sourceButton.alpha = overrideActive ? 0.45 : 1.0
     }
 
     #if DEBUG

@@ -61,6 +61,8 @@ struct CloudshipTimelineProvider: TimelineProvider {
             hiTemp: 72,
             loTemp: 58,
             isMetric: false,
+            sunrise: cal.date(bySettingHour: 6, minute: 30, second: 0, of: now),
+            sunset: cal.date(bySettingHour: 19, minute: 45, second: 0, of: now),
             hourlyForecast: (0..<5).map { i in
                 SharedHourlyEntry(
                     time: cal.date(byAdding: .hour, value: i, to: now)!,

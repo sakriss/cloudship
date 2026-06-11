@@ -41,6 +41,8 @@ final class WidgetDataWriter {
             hiTemp:         todayDaily?.tempMax ?? 0,
             loTemp:         todayDaily?.tempMin ?? 0,
             isMetric:       isMetric,
+            sunrise:        todayDaily?.sunrise,
+            sunset:         todayDaily?.sunset,
             hourlyForecast: data.hourly.prefix(5).compactMap { entry -> SharedHourlyEntry? in
                 guard let temp = entry.temp else { return nil }
                 return SharedHourlyEntry(

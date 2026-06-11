@@ -29,9 +29,17 @@ struct LargeWidgetView: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: 4) {
-                        Image(systemName: WidgetConditionIcon.symbolName(for: data.conditionRaw))
-                            .font(.title)
-                            .foregroundColor(WidgetConditionIcon.color(for: data.conditionRaw))
+                        Image(WidgetConditionIcon.assetName(
+                            for: data.conditionRaw,
+                            isNight: WidgetConditionIcon.isNight(
+                                at: entry.date,
+                                sunrise: data.sunrise,
+                                sunset: data.sunset
+                            )
+                        ))
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 42, height: 42)
 
                         HStack(spacing: 6) {
                             Label(shortTemp(data.hiTemp, metric: data.isMetric), systemImage: "arrow.up")
@@ -55,9 +63,17 @@ struct LargeWidgetView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
 
-                            Image(systemName: WidgetConditionIcon.symbolName(for: hour.conditionRaw))
-                                .font(.caption)
-                                .foregroundColor(WidgetConditionIcon.color(for: hour.conditionRaw))
+                            Image(WidgetConditionIcon.assetName(
+                                for: hour.conditionRaw,
+                                isNight: WidgetConditionIcon.isNight(
+                                    at: hour.time,
+                                    sunrise: data.sunrise,
+                                    sunset: data.sunset
+                                )
+                            ))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
 
                             Text(shortTemp(hour.temp, metric: data.isMetric))
                                 .font(.caption)
@@ -78,9 +94,9 @@ struct LargeWidgetView: View {
                                 .font(.caption)
                                 .frame(width: 40, alignment: .leading)
 
-                            Image(systemName: WidgetConditionIcon.symbolName(for: day.conditionRaw))
-                                .font(.caption)
-                                .foregroundColor(WidgetConditionIcon.color(for: day.conditionRaw))
+                            Image(WidgetConditionIcon.assetName(for: day.conditionRaw))
+                                .resizable()
+                                .scaledToFit()
                                 .frame(width: 20)
 
                             Spacer()
@@ -127,9 +143,10 @@ struct LargeWidgetView: View {
             .containerBackground(.fill.tertiary, for: .widget)
         } else {
             VStack {
-                Image(systemName: "cloud.fill")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
+                Image("cloudy")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 44, height: 44)
                 Text("Open Cloudship to load weather")
                     .font(.caption)
                     .foregroundColor(.secondary)

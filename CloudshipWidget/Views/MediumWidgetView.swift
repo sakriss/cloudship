@@ -23,9 +23,17 @@ struct MediumWidgetView: View {
 
                     Spacer()
 
-                    Image(systemName: WidgetConditionIcon.symbolName(for: data.conditionRaw))
-                        .font(.title2)
-                        .foregroundColor(WidgetConditionIcon.color(for: data.conditionRaw))
+                    Image(WidgetConditionIcon.assetName(
+                        for: data.conditionRaw,
+                        isNight: WidgetConditionIcon.isNight(
+                            at: entry.date,
+                            sunrise: data.sunrise,
+                            sunset: data.sunset
+                        )
+                    ))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 34, height: 34)
 
                     Text(tempString(data.temperature, metric: data.isMetric))
                         .font(.system(size: 36, weight: .thin))
@@ -57,9 +65,17 @@ struct MediumWidgetView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
 
-                            Image(systemName: WidgetConditionIcon.symbolName(for: hour.conditionRaw))
-                                .font(.caption)
-                                .foregroundColor(WidgetConditionIcon.color(for: hour.conditionRaw))
+                            Image(WidgetConditionIcon.assetName(
+                                for: hour.conditionRaw,
+                                isNight: WidgetConditionIcon.isNight(
+                                    at: hour.time,
+                                    sunrise: data.sunrise,
+                                    sunset: data.sunset
+                                )
+                            ))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
 
                             Text(shortTemp(hour.temp, metric: data.isMetric))
                                 .font(.caption)
@@ -74,9 +90,10 @@ struct MediumWidgetView: View {
             .containerBackground(.fill.tertiary, for: .widget)
         } else {
             HStack {
-                Image(systemName: "cloud.fill")
-                    .font(.title)
-                    .foregroundColor(.secondary)
+                Image("cloudy")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 38, height: 38)
                 Text("Open Cloudship to load weather")
                     .font(.caption)
                     .foregroundColor(.secondary)

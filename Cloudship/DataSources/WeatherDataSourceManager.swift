@@ -405,9 +405,16 @@ class WeatherDataSourceManager: NSObject {
     @MainActor
     private func postFailure(error: Error) {
         print("Weather fetch failed: \(error)")
+        let message: String
+        if let urlError = error as? URLError,
+           [.notConnectedToInternet, .networkConnectionLost, .timedOut].contains(urlError.code) {
+            message = "Cloudship couldn't reach the forecast service. Check your connection and try again."
+        } else {
+            message = "Cloudship couldn't update this forecast. Please try again in a moment."
+        }
         NotificationCenter.default.post(
             name: WeatherDataSourceManager.weatherDataParseFailed,
-            object: error.localizedDescription
+            object: message
         )
     }
 }
@@ -449,15 +456,24 @@ private struct UITestWeatherDataSource: WeatherDataSource {
     var name: String { "UITest Weather" }
 
     func fetchWeather(lat: Double, lon: Double, units: String) async throws -> UnifiedWeatherData {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-CloudshipUITestSlowWeather") {
+            try await Task.sleep(nanoseconds: 8_000_000_000)
+        }
+        if arguments.contains("-CloudshipUITestForceWeatherError") {
+            throw URLError(.notConnectedToInternet)
+        }
+
+        let isPrecipitationScenario = arguments.contains("-CloudshipUITestPrecipitation")
         let now = Date()
         let hourly = (0..<24).map { offset in
             HourlyEntry(
                 time: Calendar.current.date(byAdding: .hour, value: offset, to: now) ?? now,
                 temp: 72.0 + Double(offset % 3),
                 feelsLike: 73.0,
-                condition: .partlyCloudy,
-                precipChance: 10,
-                precipAmount: 0,
+                condition: isPrecipitationScenario && offset >= 1 ? .rain : .partlyCloudy,
+                precipChance: isPrecipitationScenario && offset >= 1 ? 85 : 10,
+                precipAmount: isPrecipitationScenario && offset >= 1 ? 0.12 : 0,
                 windSpeed: 7,
                 windGust: 12,
                 windDirection: 225,
@@ -467,7 +483,7 @@ private struct UITestWeatherDataSource: WeatherDataSource {
                 visibility: 10,
                 pressure: 29.92,
                 precipIntensityError: nil,
-                precipType: nil,
+                precipType: isPrecipitationScenario && offset >= 1 ? "rain" : nil,
                 snowAccumulation: nil,
                 iceAccumulation: nil
             )
@@ -480,10 +496,10 @@ private struct UITestWeatherDataSource: WeatherDataSource {
                 tempMax: 76,
                 feelsLikeMin: 58,
                 feelsLikeMax: 76,
-                condition: .partlyCloudy,
+                condition: isPrecipitationScenario && offset == 0 ? .rain : .partlyCloudy,
                 conditionNight: .mostlyClear,
-                precipChance: 10,
-                precipAmount: 0,
+                precipChance: isPrecipitationScenario && offset == 0 ? 85 : 10,
+                precipAmount: isPrecipitationScenario && offset == 0 ? 0.25 : 0,
                 sunrise: Calendar.current.date(bySettingHour: 6, minute: 12, second: 0, of: now),
                 sunset: Calendar.current.date(bySettingHour: 20, minute: 3, second: 0, of: now),
                 moonPhase: 0.4,
@@ -512,7 +528,7 @@ private struct UITestWeatherDataSource: WeatherDataSource {
                 windSpeed: 7,
                 windGust: 12,
                 windDirection: 225,
-                condition: .partlyCloudy,
+                condition: isPrecipitationScenario ? .rain : .partlyCloudy,
                 uvIndex: 4,
                 visibility: 10,
                 pressure: 29.92,
@@ -520,8 +536,8 @@ private struct UITestWeatherDataSource: WeatherDataSource {
                 cloudCover: 35,
                 nearestStormDistance: nil,
                 nearestStormBearing: nil,
-                precipIntensity: 0,
-                precipType: nil
+                precipIntensity: isPrecipitationScenario ? 0.15 : 0,
+                precipType: isPrecipitationScenario ? "rain" : nil
             ),
             hourly: hourly,
             daily: daily,

@@ -16,6 +16,8 @@ struct SharedWeatherData: Codable {
     let hiTemp: Double
     let loTemp: Double
     let isMetric: Bool
+    let sunrise: Date?
+    let sunset: Date?
     let hourlyForecast: [SharedHourlyEntry]
     let dailyForecast: [SharedDailyEntry]
     let lastUpdated: Date

@@ -77,7 +77,7 @@ class AISummaryCardView: CardView {
 
     private func setupLayout() {
         let p = CardView.padding
-        let titleLabel = makeTitleLabel(text: "DAILY BRIEF")
+        let titleLabel = makeTitleLabel(text: "WEATHER ASSISTANT")
         addSubview(sparkleIcon)
         addSubview(titleLabel)
         addSubview(summaryLabel)

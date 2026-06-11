@@ -106,14 +106,16 @@ enum WeatherCodeMapper {
             return "cloudy"
         case .fog, .lightFog:
             return "fog"
-        case .drizzle, .rain, .heavyRain:
+        case .drizzle:
+            return "drizzle"
+        case .rain, .heavyRain:
             return "rain"
         case .lightSnow, .snow, .heavySnow:
             return "snow"
         case .sleet:
             return "sleet"
         case .thunderstorm:
-            return "rain"       // fallback; add thunder asset later
+            return "thunderstorm"
         case .windy:
             return "wind"
         case .unknown:
@@ -129,10 +131,26 @@ enum WeatherCodeMapper {
 
     // MARK: - Night detection helper
 
-    /// Returns true if the current local hour is between 8 PM and 6 AM.
-    static func isNighttime() -> Bool {
-        let hour = Calendar.current.component(.hour, from: Date())
+    /// Uses solar times when they describe the requested date, then falls back
+    /// to a predictable clock-based boundary for sources without sun data.
+    static func isNight(
+        at date: Date = Date(),
+        sunrise: Date? = nil,
+        sunset: Date? = nil,
+        calendar: Calendar = .current
+    ) -> Bool {
+        if let sunrise, let sunset,
+           calendar.isDate(date, inSameDayAs: sunrise),
+           calendar.isDate(date, inSameDayAs: sunset) {
+            return date < sunrise || date >= sunset
+        }
+
+        let hour = calendar.component(.hour, from: date)
         return hour >= 20 || hour < 6
+    }
+
+    static func isNighttime() -> Bool {
+        isNight()
     }
 
     // MARK: - Dark Sky / Pirate Weather icon string → WeatherCondition

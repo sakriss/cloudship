@@ -26,6 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         launchCoordinator = AppLaunchExperienceCoordinator()
         if let window {
             launchCoordinator?.start(in: window)
+            if ProcessInfo.processInfo.arguments.contains("-CloudshipUITestAccessibilityText") {
+                window.traitOverrides.preferredContentSizeCategory = .accessibilityLarge
+            }
         }
 
         // Migrate legacy units key format ("units=us" to "imperial", "units=si" to "metric")

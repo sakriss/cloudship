@@ -198,6 +198,46 @@ final class WeatherConditionTests: XCTestCase {
     func testUnknownIconDefaultsToCloudy() {
         XCTAssertEqual(WeatherCodeMapper.iconName(for: .unknown), "cloudy")
     }
+
+    func testClearIconUsesMoonAtNight() {
+        XCTAssertEqual(WeatherCodeMapper.iconName(for: .clear, isNight: true), "clearnight")
+        XCTAssertEqual(WeatherCodeMapper.iconName(for: .partlyCloudy, isNight: true), "cloudynight")
+    }
+
+    func testNightDetectionUsesForecastHour() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let morning = calendar.date(from: DateComponents(
+            year: 2026, month: 6, day: 11, hour: 10
+        ))!
+        let night = calendar.date(from: DateComponents(
+            year: 2026, month: 6, day: 11, hour: 22
+        ))!
+
+        XCTAssertFalse(WeatherCodeMapper.isNight(at: morning, calendar: calendar))
+        XCTAssertTrue(WeatherCodeMapper.isNight(at: night, calendar: calendar))
+    }
+
+    func testNightDetectionUsesSunriseAndSunset() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let sunrise = calendar.date(from: DateComponents(
+            year: 2026, month: 6, day: 11, hour: 7
+        ))!
+        let sunset = calendar.date(from: DateComponents(
+            year: 2026, month: 6, day: 11, hour: 17
+        ))!
+        let afterSunset = calendar.date(from: DateComponents(
+            year: 2026, month: 6, day: 11, hour: 18
+        ))!
+
+        XCTAssertTrue(WeatherCodeMapper.isNight(
+            at: afterSunset,
+            sunrise: sunrise,
+            sunset: sunset,
+            calendar: calendar
+        ))
+    }
 }
 
 // MARK: - PollenLevel Tests

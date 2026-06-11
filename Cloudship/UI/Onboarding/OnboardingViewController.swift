@@ -13,13 +13,15 @@ final class OnboardingViewController: UIViewController {
 
     private enum Step: Int, CaseIterable {
         case welcome
+        case confidence
         case location
         case notifications
         case preferences
 
         var title: String {
             switch self {
-            case .welcome: return "Cloudship"
+            case .welcome: return "Know what to do today"
+            case .confidence: return "More confidence, less guesswork"
             case .location: return "Forecasts where you are"
             case .notifications: return "Know when rain changes"
             case .preferences: return "Make it yours"
@@ -29,11 +31,13 @@ final class OnboardingViewController: UIViewController {
         var message: String {
             switch self {
             case .welcome:
-                return "A brighter way to read the sky, from quick daily checks to deeper forecast details."
+                return "Cloudship turns the forecast into one clear daily call, then keeps the deeper details close when you need them."
+            case .confidence:
+                return "Compare forecasts, watch rain changes, and see which activities fit the day. Cloudship is built for decisions, not data overload."
             case .location:
-                return "Use your location for local conditions, hourly forecasts, radar handoff, and nearby weather alerts."
+                return "Allow location to make the daily call, radar, and nearby alerts accurate for where you actually are."
             case .notifications:
-                return "Cloudship can let you know when precipitation is starting, stopping, or worth watching."
+                return "Enable notifications for useful changes, such as rain starting or stopping. Cloudship will not send routine noise."
             case .preferences:
                 return "Choose your default temperature units. You can change this later in Settings."
             }
@@ -42,6 +46,7 @@ final class OnboardingViewController: UIViewController {
         var buttonTitle: String {
             switch self {
             case .welcome: return "Get Started"
+            case .confidence: return "Continue"
             case .location: return "Allow Location"
             case .notifications: return "Enable Notifications"
             case .preferences: return "Start Forecasting"
@@ -160,7 +165,7 @@ final class OnboardingViewController: UIViewController {
 
     @objc private func primaryTapped() {
         switch currentStep {
-        case .welcome:
+        case .welcome, .confidence:
             advance()
         case .location:
             locationManager.requestWhenInUseAuthorization()
@@ -192,8 +197,14 @@ final class OnboardingViewController: UIViewController {
             finish()
             return
         }
-        UIView.transition(with: view, duration: 0.24, options: [.transitionCrossDissolve, .allowUserInteraction]) {
-            self.currentStep = nextStep
+        let feedback = UISelectionFeedbackGenerator()
+        feedback.selectionChanged()
+        if UIAccessibility.isReduceMotionEnabled {
+            currentStep = nextStep
+        } else {
+            UIView.transition(with: view, duration: 0.24, options: [.transitionCrossDissolve, .allowUserInteraction]) {
+                self.currentStep = nextStep
+            }
         }
     }
 
