@@ -57,6 +57,22 @@ enum DateFormatHelper {
             ?? iso8601Full.date(from: string)
     }
 
+    /// Parse the date portion of an ISO 8601 value as a calendar day.
+    /// Daily forecast timestamps identify a day rather than an instant in time.
+    static func calendarDate(
+        fromISO8601 string: String?,
+        timeZone: TimeZone = .current
+    ) -> Date? {
+        guard let string, string.count >= 10 else { return nil }
+
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.calendar = Calendar(identifier: .gregorian)
+        f.timeZone = timeZone
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: String(string.prefix(10)))
+    }
+
     /// Format a Date as an hour string, e.g. "2 PM", "11 AM". Uses device timezone.
     static func hourString(from date: Date) -> String {
         let f = DateFormatter()

@@ -157,8 +157,8 @@ class HeaderCardView: CardView {
 
         addSubview(stack)
         NSLayoutConstraint.activate([
-            conditionIcon.widthAnchor.constraint(equalToConstant: 68),
-            conditionIcon.heightAnchor.constraint(equalToConstant: 68),
+            conditionIcon.widthAnchor.constraint(equalToConstant: 88),
+            conditionIcon.heightAnchor.constraint(equalToConstant: 88),
             divider.heightAnchor.constraint(equalToConstant: 1 / UIScreen.main.scale),
             stack.topAnchor.constraint(equalTo: topAnchor, constant: p),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: p),

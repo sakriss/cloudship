@@ -9,6 +9,26 @@
 import XCTest
 @testable import Cloudship
 
+final class DateFormatHelperTests: XCTestCase {
+
+    func testCalendarDatePreservesDailyForecastDateAcrossTimeZones() throws {
+        let timeZone = try XCTUnwrap(TimeZone(identifier: "America/Los_Angeles"))
+        let date = try XCTUnwrap(
+            DateFormatHelper.calendarDate(
+                fromISO8601: "2026-06-11T00:00:00Z",
+                timeZone: timeZone
+            )
+        )
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+
+        XCTAssertEqual(
+            calendar.dateComponents([.year, .month, .day], from: date),
+            DateComponents(year: 2026, month: 6, day: 11)
+        )
+    }
+}
+
 // MARK: - AQI Category Tests
 
 final class AQICategoryTests: XCTestCase {

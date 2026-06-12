@@ -125,7 +125,7 @@ class TomorrowIODataSource: WeatherDataSource {
         }
 
         let daily: [DailyEntry] = (forecast.timelines?.daily ?? []).prefix(7).compactMap { entry in
-            guard let time = DateFormatHelper.date(from: entry.time) else { return nil }
+            guard let time = DateFormatHelper.calendarDate(fromISO8601: entry.time) else { return nil }
             let v = entry.values
             let cond      = WeatherCodeMapper.condition(fromTomorrowDailyValues: v)
             let condNight = WeatherCodeMapper.nightCondition(fromTomorrowDailyValues: v)
