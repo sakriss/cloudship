@@ -399,7 +399,7 @@ private class RadarLegendPillView: UIView {
     private let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
     private let titleLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .semibold)
+        l.font = .appFont(size: 11, weight: .semibold)
         l.textColor = .label
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -614,7 +614,7 @@ private final class RadarTotalsCardView: UIVisualEffectView {
         layer.masksToBounds = true
         isHidden = true
 
-        titleLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        titleLabel.font = .appFont(size: 12, weight: .semibold)
         titleLabel.textColor = .secondaryLabel
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -624,7 +624,7 @@ private final class RadarTotalsCardView: UIVisualEffectView {
         valueLabel.textAlignment = .center
         valueLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        subtitleLabel.font = .systemFont(ofSize: 11, weight: .medium)
+        subtitleLabel.font = .appFont(size: 11, weight: .medium)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 2
@@ -758,7 +758,7 @@ private class RadarSettingsViewController: UIViewController {
         let v = UIView(); v.translatesAutoresizingMaskIntoConstraints = false
         let label = UILabel()
         label.text = title.uppercased()
-        label.font = .systemFont(ofSize: 11, weight: .semibold)
+        label.font = .appFont(size: 11, weight: .semibold)
         label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         sub.translatesAutoresizingMaskIntoConstraints = false
@@ -833,7 +833,7 @@ private class RadarSettingsViewController: UIViewController {
     private func makeChip(_ title: String, tag: Int, action: Selector) -> UIButton {
         let btn = UIButton(type: .system)
         btn.setTitle(title, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
+        btn.titleLabel?.font = .appFont(size: 13, weight: .medium)
         btn.layer.cornerRadius = 14; btn.layer.borderWidth = 1
         btn.contentEdgeInsets = UIEdgeInsets(top: 6, left: 14, bottom: 6, right: 14)
         btn.tag = tag
@@ -1007,7 +1007,7 @@ class RadarViewController: UIViewController {
             let icon = UIImage(systemName: layer.icon, withConfiguration: config)
             btn.setImage(icon, for: .normal)
             btn.setTitle("  " + layer.rawValue, for: .normal)
-            btn.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
+            btn.titleLabel?.font = .appFont(size: 12, weight: .medium)
             btn.layer.cornerRadius = 14; btn.layer.borderWidth = 1
             btn.contentEdgeInsets = UIEdgeInsets(top: 6, left: 10, bottom: 6, right: 14)
             btn.addTarget(self, action: #selector(layerTapped(_:)), for: .touchUpInside)
@@ -1018,7 +1018,7 @@ class RadarViewController: UIViewController {
     private let timeLabel: UILabel = {
         let l = UILabel()
         l.text = "Loading…"
-        l.font = .systemFont(ofSize: 13, weight: .semibold)
+        l.font = .appFont(size: 13, weight: .semibold)
         l.textColor = .label
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -1028,7 +1028,7 @@ class RadarViewController: UIViewController {
     private let liveBadge: UILabel = {
         let l = UILabel()
         l.text = " LIVE "
-        l.font = .systemFont(ofSize: 10, weight: .bold)
+        l.font = .appFont(size: 10, weight: .bold)
         l.textColor = .white
         l.backgroundColor = UIColor(red: 0.85, green: 0.18, blue: 0.18, alpha: 1)
         l.layer.cornerRadius = 4; l.layer.masksToBounds = true
@@ -1286,7 +1286,7 @@ class RadarViewController: UIViewController {
             let button = UIButton(type: .system)
             button.tag = index
             button.setTitle(window.title, for: .normal)
-            button.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
+            button.titleLabel?.font = .appFont(size: 13, weight: .medium)
             button.layer.cornerRadius = 14
             button.layer.borderWidth = 1
             button.contentEdgeInsets = UIEdgeInsets(top: 7, left: 10, bottom: 7, right: 10)

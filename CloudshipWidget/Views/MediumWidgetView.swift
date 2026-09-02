@@ -17,7 +17,7 @@ struct MediumWidgetView: View {
                 // Left: current conditions
                 VStack(alignment: .leading, spacing: 4) {
                     Text(data.locationName)
-                        .font(.caption2)
+                        .font(.app(.caption2))
                         .foregroundColor(.secondary)
                         .lineLimit(1)
 
@@ -36,14 +36,14 @@ struct MediumWidgetView: View {
                         .frame(width: 34, height: 34)
 
                     Text(tempString(data.temperature, metric: data.isMetric))
-                        .font(.system(size: 36, weight: .thin))
+                        .font(.app(size: 36, weight: .thin))
                         .minimumScaleFactor(0.6)
 
                     HStack(spacing: 6) {
                         Label(tempString(data.hiTemp, metric: data.isMetric), systemImage: "arrow.up")
                         Label(tempString(data.loTemp, metric: data.isMetric), systemImage: "arrow.down")
                     }
-                    .font(.caption2)
+                    .font(.app(.caption2))
                     .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -60,7 +60,7 @@ struct MediumWidgetView: View {
                         let hour = data.hourlyForecast[i]
                         VStack(spacing: 6) {
                             Text(hourLabel(hour.time))
-                                .font(.system(size: 10))
+                                .font(.app(size: 10))
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
@@ -78,7 +78,7 @@ struct MediumWidgetView: View {
                                 .frame(width: 24, height: 24)
 
                             Text(shortTemp(hour.temp, metric: data.isMetric))
-                                .font(.caption)
+                                .font(.app(.caption))
                                 .fontWeight(.medium)
                         }
                         .frame(maxWidth: .infinity)
@@ -95,7 +95,7 @@ struct MediumWidgetView: View {
                     .scaledToFit()
                     .frame(width: 38, height: 38)
                 Text("Open Cloudship to load weather")
-                    .font(.caption)
+                    .font(.app(.caption))
                     .foregroundColor(.secondary)
             }
             .containerBackground(.fill.tertiary, for: .widget)

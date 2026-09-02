@@ -101,17 +101,18 @@ class MinutelyCardView: CardView {
     private var titleLabel: UILabel!
     private let summaryLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
-        l.numberOfLines = 1
+        l.numberOfLines = 2
+        l.lineBreakMode = .byWordWrapping
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
     private let emptyLabel: UILabel = {
         let l = UILabel()
         l.text = "No precipitation expected"
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .center
@@ -122,7 +123,7 @@ class MinutelyCardView: CardView {
     private let nowLabel: UILabel = {
         let l = UILabel()
         l.text = "Now"
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -132,7 +133,7 @@ class MinutelyCardView: CardView {
     private let endLabel: UILabel = {
         let l = UILabel()
         l.text = "+60 min"
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .right
@@ -143,7 +144,7 @@ class MinutelyCardView: CardView {
     private let label15: UILabel = {
         let l = UILabel()
         l.text = "+15"
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
@@ -154,7 +155,7 @@ class MinutelyCardView: CardView {
     private let label30: UILabel = {
         let l = UILabel()
         l.text = "+30"
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
@@ -165,7 +166,7 @@ class MinutelyCardView: CardView {
     private let label45: UILabel = {
         let l = UILabel()
         l.text = "+45"
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
@@ -176,10 +177,12 @@ class MinutelyCardView: CardView {
     private let noSourceLabel: UILabel = {
         let l = UILabel()
         l.text = "Minutely data not available for this source"
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .center
+        l.numberOfLines = 2
+        l.lineBreakMode = .byWordWrapping
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()

@@ -88,7 +88,7 @@ class PollenCardView: CardView {
 
         let iconLabel = UILabel()
         iconLabel.text = icon
-        iconLabel.font = .preferredFont(forTextStyle: .title3)
+        iconLabel.font = .appFont(forTextStyle: .title3)
         iconLabel.adjustsFontForContentSizeCategory = true
         iconLabel.translatesAutoresizingMaskIntoConstraints = false
 
@@ -100,14 +100,14 @@ class PollenCardView: CardView {
 
         let nameLabel = UILabel()
         nameLabel.text = name
-        nameLabel.font = .preferredFont(forTextStyle: .body)
+        nameLabel.font = .appFont(forTextStyle: .body)
         nameLabel.adjustsFontForContentSizeCategory = true
         nameLabel.textColor = .label
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let levelLabel = UILabel()
         levelLabel.text = level.label
-        levelLabel.font = .preferredFont(forTextStyle: .body)
+        levelLabel.font = .appFont(forTextStyle: .body)
         levelLabel.adjustsFontForContentSizeCategory = true
         levelLabel.textColor = levelColor(level)
         levelLabel.textAlignment = .right

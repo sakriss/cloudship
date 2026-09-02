@@ -113,9 +113,12 @@ private class DailyRowView: UIView {
 
     private let dayLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
+        l.adjustsFontSizeToFitWidth = true
+        l.minimumScaleFactor = 0.85
+        l.lineBreakMode = .byClipping
         l.setContentHuggingPriority(.required, for: .horizontal)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -130,7 +133,7 @@ private class DailyRowView: UIView {
 
     private let precipLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
         l.textAlignment = .right
@@ -143,7 +146,7 @@ private class DailyRowView: UIView {
 
     private let snowLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .systemCyan
         l.textAlignment = .right
@@ -157,7 +160,7 @@ private class DailyRowView: UIView {
 
     private let minTempLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.textAlignment = .right
@@ -169,7 +172,7 @@ private class DailyRowView: UIView {
 
     private let maxTempLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.textAlignment = .right
@@ -183,7 +186,7 @@ private class DailyRowView: UIView {
     /// Shown instead of rangeBar + maxTempLabel when a metric has no daily data from this source.
     private let noDataLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .tertiaryLabel
         l.textAlignment = .right
@@ -209,7 +212,7 @@ private class DailyRowView: UIView {
 
             dayLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: CardView.padding),
             dayLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            dayLabel.widthAnchor.constraint(equalToConstant: 48),
+            dayLabel.widthAnchor.constraint(equalToConstant: 58),
 
             iconView.leadingAnchor.constraint(equalTo: dayLabel.trailingAnchor, constant: 4),
             iconView.centerYAnchor.constraint(equalTo: centerYAnchor),

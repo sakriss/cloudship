@@ -154,7 +154,7 @@ class CardView: UIView {
     func makeTitleLabel(text: String) -> UILabel {
         let label = UILabel()
         label.text = text.uppercased()
-        label.font = .preferredFont(forTextStyle: .caption1)
+        label.font = .appFont(forTextStyle: .caption1)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = Self.textColor(for: .secondary)
         label.translatesAutoresizingMaskIntoConstraints = false

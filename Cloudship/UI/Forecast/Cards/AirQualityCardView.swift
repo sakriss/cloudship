@@ -13,7 +13,7 @@ class AirQualityCardView: CardView {
 
     private let indexLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .largeTitle)
+        l.font = .appFont(forTextStyle: .largeTitle)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +22,7 @@ class AirQualityCardView: CardView {
 
     private let categoryLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .headline)
+        l.font = .appFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -30,7 +30,7 @@ class AirQualityCardView: CardView {
 
     private let descriptionLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .secondaryLabel
         l.numberOfLines = 2

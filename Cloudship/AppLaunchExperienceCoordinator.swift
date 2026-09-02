@@ -35,6 +35,7 @@ final class AppLaunchExperienceCoordinator {
         window.rootViewController = onboarding
         applySavedAppearance(to: window)
         window.makeKeyAndVisible()
+        AppTypography.apply(to: window)
     }
 
     private func showMainApp(in window: UIWindow, notes: ReleaseNotes?) {
@@ -42,6 +43,7 @@ final class AppLaunchExperienceCoordinator {
         window.rootViewController = tabBarController
         applySavedAppearance(to: window)
         window.makeKeyAndVisible()
+        AppTypography.apply(to: window)
 
         guard let notes else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self, weak tabBarController] in

@@ -10,6 +10,7 @@ import UIKit
 import CoreLocation
 import MessageUI
 import UserNotifications
+import WidgetKit
 
 class SettingsViewController: UITableViewController {
 
@@ -117,6 +118,20 @@ class SettingsViewController: UITableViewController {
         return sc
     }()
 
+    private lazy var fontButton: UIButton = {
+        var configuration = UIButton.Configuration.gray()
+        configuration.cornerStyle = .large
+        configuration.image = UIImage(systemName: "chevron.up.chevron.down")
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 8
+        let button = UIButton(configuration: configuration)
+        button.showsMenuAsPrimaryAction = true
+        button.accessibilityLabel = "Font"
+        button.accessibilityHint = "Choose the font used throughout Cloudship"
+        updateFontButton(button)
+        return button
+    }()
+
     // MARK: - Reload debouncing
 
     private var pendingReloadWorkItem: DispatchWorkItem?
@@ -197,7 +212,7 @@ class SettingsViewController: UITableViewController {
         config.text = "Nearest Active Station"
         config.secondaryText = nearestStationSubtitle
         config.secondaryTextProperties.color = .secondaryLabel
-        config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+        config.secondaryTextProperties.font = .appFont(size: 12)
         cell.contentConfiguration = config
         cell.accessoryView = nearestStationSwitch
         cell.selectionStyle = .none
@@ -222,6 +237,7 @@ class SettingsViewController: UITableViewController {
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_source")
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_units")
         tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_appearance")
+        tableView.register(ControlCell.self, forCellReuseIdentifier: "ControlCell_font")
         tableView.register(CardTintPickerCell.self, forCellReuseIdentifier: "CardTintPickerCell")
 
         NotificationCenter.default.addObserver(self,
@@ -264,7 +280,7 @@ class SettingsViewController: UITableViewController {
         switch Section(rawValue: section)! {
         case .dataSource:     return 3   // source picker + nearest station + consensus mode
         case .units:          return 1
-        case .appearance:     return 2
+        case .appearance:     return 3
         case .notifications:  return notificationRowCount
         case .subscription:   return 1
         case .about:          return 5
@@ -289,6 +305,38 @@ class SettingsViewController: UITableViewController {
             return "Choose one provider, use the closest active station, or compare forecasts together. Provider details remain available without crowding the everyday forecast."
         }
         return nil
+    }
+
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let title = self.tableView(tableView, titleForHeaderInSection: section) else { return nil }
+        let header = UITableViewHeaderFooterView(reuseIdentifier: nil)
+        var configuration = UIListContentConfiguration.groupedHeader()
+        configuration.text = title
+        configuration.textProperties.font = .appFont(forTextStyle: .title3, weight: .semibold)
+        configuration.textProperties.color = .secondaryLabel
+        configuration.textProperties.numberOfLines = 1
+        header.contentConfiguration = configuration
+        return header
+    }
+
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let title = self.tableView(tableView, titleForFooterInSection: section) else { return nil }
+        let footer = UITableViewHeaderFooterView(reuseIdentifier: nil)
+        var configuration = UIListContentConfiguration.groupedFooter()
+        configuration.text = title
+        configuration.textProperties.font = .appFont(forTextStyle: .footnote)
+        configuration.textProperties.color = .secondaryLabel
+        configuration.textProperties.numberOfLines = 0
+        footer.contentConfiguration = configuration
+        return footer
+    }
+
+    override func tableView(_ tableView: UITableView,
+                            willDisplay cell: UITableViewCell,
+                            forRowAt indexPath: IndexPath) {
+        AppTypography.apply(to: cell)
+        cell.contentView.setNeedsLayout()
+        cell.contentView.layoutIfNeeded()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -316,13 +364,14 @@ class SettingsViewController: UITableViewController {
                 let star  = NSAttributedString(
                     string: "\u{2605}",
                     attributes: [.foregroundColor: UIColor.systemYellow,
-                                 .font: UIFont.systemFont(ofSize: 14)]
+                                 .font: UIFont.appFont(size: 14)]
                 )
                 title.append(star)
                 config.attributedText = title
+                config.textProperties.font = .appFont(forTextStyle: .body)
                 config.secondaryText = "Compare available forecasts and reduce single-source surprises"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = consensusModeSwitch
                 cell.selectionStyle = .none
@@ -345,6 +394,11 @@ class SettingsViewController: UITableViewController {
                 appearanceControl.accessibilityLabel = "Theme"
                 appearanceControl.accessibilityHint = "Change the app's appearance"
                 return cell
+            } else if indexPath.row == 1 {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "ControlCell_font", for: indexPath) as! ControlCell
+                updateFontButton(fontButton)
+                cell.configure(label: "Font", control: fontButton)
+                return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "CardTintPickerCell", for: indexPath) as! CardTintPickerCell
                 cell.onSelect = { _ in
@@ -366,7 +420,7 @@ class SettingsViewController: UITableViewController {
                 config.text = "Rain Alerts"
                 config.secondaryText = "Get notified when rain is starting or stopping"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = rainAlertsSwitch
                 cell.accessoryView?.accessibilityLabel = "Rain Alerts"
@@ -376,7 +430,7 @@ class SettingsViewController: UITableViewController {
                 config.text = "Manage Locations"
                 config.secondaryText = "Set up rain alerts for specific locations"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
@@ -385,7 +439,7 @@ class SettingsViewController: UITableViewController {
                 config.text = "Precipitation Live Activity"
                 config.secondaryText = "Real-time rain tracking in Dynamic Island"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 if #available(iOS 16.1, *) {
                     cell.accessoryView = liveActivitySwitch
@@ -396,7 +450,7 @@ class SettingsViewController: UITableViewController {
                     unavailConfig.text = "Precipitation Live Activity"
                     unavailConfig.secondaryText = "Requires iOS 16.1+"
                     unavailConfig.secondaryTextProperties.color = .tertiaryLabel
-                    unavailConfig.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                    unavailConfig.secondaryTextProperties.font = .appFont(size: 12)
                     cell.contentConfiguration = unavailConfig
                 }
 
@@ -404,7 +458,7 @@ class SettingsViewController: UITableViewController {
                 config.text = "Morning Brief"
                 config.secondaryText = "Daily weather summary"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = morningBriefSwitch
                 cell.accessoryView?.accessibilityLabel = "Morning Brief"
@@ -415,7 +469,7 @@ class SettingsViewController: UITableViewController {
                 let hour = UserDefaults.standard.object(forKey: "MorningBriefHour") as? Int ?? 7
                 config.secondaryText = formattedHour(hour)
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
@@ -424,7 +478,7 @@ class SettingsViewController: UITableViewController {
                 config.text = "Evening Brief"
                 config.secondaryText = "Tonight and tomorrow outlook"
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryView = eveningBriefSwitch
                 cell.accessoryView?.accessibilityLabel = "Evening Brief"
@@ -435,7 +489,7 @@ class SettingsViewController: UITableViewController {
                 let hour = UserDefaults.standard.object(forKey: "EveningBriefHour") as? Int ?? 20
                 config.secondaryText = formattedHour(hour)
                 config.secondaryTextProperties.color = .secondaryLabel
-                config.secondaryTextProperties.font = .systemFont(ofSize: 12)
+                config.secondaryTextProperties.font = .appFont(size: 12)
                 cell.contentConfiguration = config
                 cell.accessoryType = .disclosureIndicator
                 cell.selectionStyle = .default
@@ -927,6 +981,32 @@ class SettingsViewController: UITableViewController {
         postSettingsChangedDebounced()
     }
 
+    private func updateFontButton(_ button: UIButton) {
+        let selected = AppFontStyle.saved
+        button.configuration?.title = selected.displayName
+        button.menu = UIMenu(
+            title: "Font",
+            children: AppFontStyle.allCases.map { style in
+                UIAction(
+                    title: style.displayName,
+                    state: style == selected ? .on : .off
+                ) { [weak self, weak button] _ in
+                    AppFontStyle.save(style)
+                    if let button {
+                        self?.updateFontButton(button)
+                    }
+                    NotificationCenter.default.post(
+                        name: AppFontStyle.changedNotification,
+                        object: style
+                    )
+                    WidgetCenter.shared.reloadAllTimelines()
+                    self?.tableView.reloadData()
+                    UIAccessibility.post(notification: .layoutChanged, argument: button)
+                }
+            }
+        )
+    }
+
     private func triggerRefetch() {
         postSettingsChangedDebounced()
     }
@@ -1084,7 +1164,7 @@ private class CardTintPickerCell: UITableViewCell {
     private let nameLabel: UILabel = {
         let l = UILabel()
         l.text = "Card Color"
-        l.font = .systemFont(ofSize: 16)
+        l.font = .appFont(size: 16)
         l.translatesAutoresizingMaskIntoConstraints = false
         l.isAccessibilityElement = true
         l.accessibilityTraits = .header
@@ -1195,7 +1275,7 @@ private class LegalTextViewController: UIViewController {
 
         let textView = UITextView()
         textView.text = legalText
-        textView.font = .systemFont(ofSize: 14)
+        textView.font = .appFont(size: 14)
         textView.textColor = .label
         textView.isEditable = false
         textView.isSelectable = true
@@ -1220,7 +1300,7 @@ private class ControlCell: UITableViewCell {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 16)
+        l.font = .appFont(size: 16)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()

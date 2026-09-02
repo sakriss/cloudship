@@ -16,7 +16,7 @@ struct SmallWidgetView: View {
             VStack(alignment: .leading, spacing: 4) {
                 // Location
                 Text(data.locationName)
-                    .font(.caption2)
+                    .font(.app(.caption2))
                     .foregroundColor(.secondary)
                     .lineLimit(1)
 
@@ -37,7 +37,7 @@ struct SmallWidgetView: View {
 
                 // Temperature
                 Text(tempString(data.temperature, metric: data.isMetric))
-                    .font(.system(size: 42, weight: .thin))
+                    .font(.app(size: 42, weight: .thin))
                     .minimumScaleFactor(0.6)
 
                 // Hi / Lo
@@ -45,7 +45,7 @@ struct SmallWidgetView: View {
                     Label(tempString(data.hiTemp, metric: data.isMetric), systemImage: "arrow.up")
                     Label(tempString(data.loTemp, metric: data.isMetric), systemImage: "arrow.down")
                 }
-                .font(.caption)
+                .font(.app(.caption))
                 .foregroundColor(.secondary)
             }
             .padding()
@@ -57,7 +57,7 @@ struct SmallWidgetView: View {
                     .scaledToFit()
                     .frame(width: 38, height: 38)
                 Text("Open Cloudship")
-                    .font(.caption)
+                    .font(.app(.caption))
                     .foregroundColor(.secondary)
             }
             .containerBackground(.fill.tertiary, for: .widget)

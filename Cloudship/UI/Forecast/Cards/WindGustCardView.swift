@@ -158,7 +158,7 @@ class WindGustCardView: CardView {
     private var titleLabel: UILabel!
     private let maxLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -166,7 +166,7 @@ class WindGustCardView: CardView {
     }()
     private let minLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -182,7 +182,7 @@ class WindGustCardView: CardView {
     private static func makeTickLabel(_ text: String) -> UILabel {
         let l = UILabel()
         l.text = text
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false

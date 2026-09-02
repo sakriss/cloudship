@@ -34,6 +34,12 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         return true
     }
 
+    func tabBarController(_ tabBarController: UITabBarController,
+                          didSelect viewController: UIViewController) {
+        AppTypography.apply(to: viewController.view)
+        AppTypography.apply(to: tabBarController.tabBar)
+    }
+
     // MARK: - Tab setup
 
     private func setupTabs() {
@@ -77,6 +83,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         // Use the default system appearance — adapts to light/dark automatically
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
+        AppTypography.applyFont(to: appearance)
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance

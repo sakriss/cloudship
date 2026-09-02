@@ -33,7 +33,7 @@ class AIWeatherChatViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let l = UILabel()
         l.text = "Ask about your weather"
-        l.font = .systemFont(ofSize: 17, weight: .semibold)
+        l.font = .appFont(size: 17, weight: .semibold)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -88,7 +88,7 @@ class AIWeatherChatViewController: UIViewController {
     private lazy var textField: UITextField = {
         let tf = UITextField()
         tf.placeholder = "Ask anything..."
-        tf.font = .systemFont(ofSize: 15)
+        tf.font = .appFont(size: 15)
         tf.backgroundColor = .tertiarySystemBackground
         tf.layer.cornerRadius = 18
         tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
@@ -232,7 +232,7 @@ class AIWeatherChatViewController: UIViewController {
         for suggestion in suggestions {
             let btn = UIButton(type: .system)
             btn.setTitle("\(suggestion.emoji) \(suggestion.text)", for: .normal)
-            btn.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
+            btn.titleLabel?.font = .appFont(size: 13, weight: .medium)
             btn.backgroundColor = .secondarySystemBackground
             btn.tintColor = .label
             btn.layer.cornerRadius = 14
@@ -367,7 +367,7 @@ class AIWeatherChatViewController: UIViewController {
 
         let dots = UILabel()
         dots.text = "···"
-        dots.font = .systemFont(ofSize: 22, weight: .bold)
+        dots.font = .appFont(size: 22, weight: .bold)
         dots.textColor = .tertiaryLabel
         dots.translatesAutoresizingMaskIntoConstraints = false
 
@@ -411,7 +411,7 @@ class AIWeatherChatViewController: UIViewController {
 
         let label = UILabel()
         label.text = text
-        label.font = .systemFont(ofSize: 15)
+        label.font = .appFont(size: 15)
         label.textColor = isUser ? .white : .label
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false

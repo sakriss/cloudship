@@ -14,7 +14,7 @@ class HeaderCardView: CardView {
 
     private let locationLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .left
@@ -25,7 +25,7 @@ class HeaderCardView: CardView {
 
     private let temperatureLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .largeTitle)
+        l.font = .appFont(forTextStyle: .largeTitle)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .left
@@ -37,7 +37,7 @@ class HeaderCardView: CardView {
 
     private let conditionLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .headline)
+        l.font = .appFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .left
@@ -49,7 +49,7 @@ class HeaderCardView: CardView {
 
     private let feelsLikeLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .left
@@ -59,7 +59,7 @@ class HeaderCardView: CardView {
 
     private let hiLoLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .left
@@ -71,7 +71,7 @@ class HeaderCardView: CardView {
 
     private let stormProximityLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -89,7 +89,7 @@ class HeaderCardView: CardView {
     private let callTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "TODAY'S CALL"
-        label.font = .preferredFont(forTextStyle: .caption1)
+        label.font = .appFont(forTextStyle: .caption1)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = CardView.textColor(for: .secondary)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -98,7 +98,7 @@ class HeaderCardView: CardView {
 
     private let todayCallLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .headline)
+        label.font = .appFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = CardView.textColor(for: .primary)
         label.numberOfLines = 0
@@ -194,17 +194,17 @@ class HeaderCardView: CardView {
 
             if absDiff >= 5 {
                 // Prominent display when feels-like differs significantly
-                feelsLikeLabel.font = .preferredFont(forTextStyle: .headline)
+                feelsLikeLabel.font = .appFont(forTextStyle: .headline)
                 feelsLikeLabel.textColor = diff > 0
                     ? UIColor.systemOrange   // feels hotter
                     : UIColor.systemCyan     // feels colder
             } else {
-                feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
+                feelsLikeLabel.font = .appFont(forTextStyle: .body)
                 feelsLikeLabel.textColor = CardView.textColor(for: .secondary)
             }
         } else if let fl = c.feelsLike {
             feelsLikeLabel.text = "Feels like \(TemperatureFormatter.format(fl))"
-            feelsLikeLabel.font = .preferredFont(forTextStyle: .body)
+            feelsLikeLabel.font = .appFont(forTextStyle: .body)
             feelsLikeLabel.textColor = CardView.textColor(for: .secondary)
         } else {
             feelsLikeLabel.text = nil

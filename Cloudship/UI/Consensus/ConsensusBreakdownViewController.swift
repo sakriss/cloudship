@@ -32,7 +32,7 @@ final class ConsensusBreakdownViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let l = UILabel()
         l.text = "Consensus Forecast"
-        l.font = .systemFont(ofSize: 17, weight: .semibold)
+        l.font = .appFont(size: 17, weight: .semibold)
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -41,7 +41,7 @@ final class ConsensusBreakdownViewController: UIViewController {
     private lazy var subtitleLabel: UILabel = {
         let l = UILabel()
         l.text = "Averaging \(breakdown.sourcesUsed) source\(breakdown.sourcesUsed == 1 ? "" : "s")"
-        l.font = .systemFont(ofSize: 13)
+        l.font = .appFont(size: 13)
         l.textColor = .secondaryLabel
         l.textAlignment = .center
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -62,7 +62,7 @@ final class ConsensusBreakdownViewController: UIViewController {
     private lazy var footerLabel: UILabel = {
         let l = UILabel()
         l.text = "Multiple sources reduce the impact of single-provider errors. Outlier sources (\u{26A0}) are down-weighted automatically."
-        l.font = .systemFont(ofSize: 12)
+        l.font = .appFont(size: 12)
         l.textColor = .tertiaryLabel
         l.numberOfLines = 0
         l.textAlignment = .center
@@ -159,12 +159,12 @@ private final class SourceReadingCell: UITableViewCell {
     private func buildLayout() {
         [sourceNameLabel, outlierBadge, tempLabel, precipLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.font = .systemFont(ofSize: 14)
+            $0.font = .appFont(size: 14)
         }
 
         outlierBadge.text = "⚠"
         outlierBadge.textColor = .systemOrange
-        outlierBadge.font = .systemFont(ofSize: 13)
+        outlierBadge.font = .appFont(size: 13)
 
         tempLabel.textAlignment   = .right
         precipLabel.textAlignment = .right
@@ -232,7 +232,7 @@ private final class SummaryRowCell: UITableViewCell {
     private func buildLayout() {
         [nameLabel, tempLabel, precipLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.font = .systemFont(ofSize: 14, weight: .semibold)
+            $0.font = .appFont(size: 14, weight: .semibold)
         }
 
         nameLabel.text     = "Consensus"

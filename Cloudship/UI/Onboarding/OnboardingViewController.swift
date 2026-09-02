@@ -93,12 +93,12 @@ final class OnboardingViewController: UIViewController {
 
         iconView.translatesAutoresizingMaskIntoConstraints = false
 
-        titleLabel.font = .systemFont(ofSize: 34, weight: .bold)
+        titleLabel.font = .appFont(size: 34, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.numberOfLines = 0
 
-        messageLabel.font = .preferredFont(forTextStyle: .body)
+        messageLabel.font = .appFont(forTextStyle: .body)
         messageLabel.textColor = .secondaryLabel
         messageLabel.textAlignment = .center
         messageLabel.numberOfLines = 0
@@ -112,7 +112,7 @@ final class OnboardingViewController: UIViewController {
 
         primaryButton.configuration = .filled()
         primaryButton.configuration?.cornerStyle = .large
-        primaryButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        primaryButton.titleLabel?.font = .appFont(size: 17, weight: .semibold)
         primaryButton.addTarget(self, action: #selector(primaryTapped), for: .touchUpInside)
 
         secondaryButton.configuration = .plain()

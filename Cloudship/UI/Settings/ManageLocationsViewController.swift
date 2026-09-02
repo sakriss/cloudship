@@ -128,7 +128,7 @@ private class LocationCell: UITableViewCell {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 16, weight: .medium)
+        l.font = .appFont(size: 16, weight: .medium)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -136,7 +136,7 @@ private class LocationCell: UITableViewCell {
     private let rainAlertLabel: UILabel = {
         let l = UILabel()
         l.text = "Rain Alerts"
-        l.font = .systemFont(ofSize: 13)
+        l.font = .appFont(size: 13)
         l.textColor = .secondaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l

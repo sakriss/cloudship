@@ -12,7 +12,7 @@ class DailyBriefCardView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "DAILY BRIEF"
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.font = UIFont.appFont(forTextStyle: .headline)
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

@@ -53,18 +53,18 @@ struct PrecipitationLiveActivityWidget: Widget {
     private func compactLeading(state: PrecipitationActivityAttributes.ContentState) -> some View {
         Image(systemName: state.conditionSymbol)
             .foregroundStyle(precipColor(state))
-            .font(.system(size: 14, weight: .semibold))
+            .font(.app(size: 14, weight: .semibold))
     }
 
     @ViewBuilder
     private func compactTrailing(state: PrecipitationActivityAttributes.ContentState) -> some View {
         if state.isPrecipitating, let mins = state.transitionMinutes {
             Text("\(mins)m")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.app(size: 13, weight: .semibold))
                 .foregroundStyle(precipColor(state))
         } else {
             Text(state.temperatureString)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.app(size: 13, weight: .semibold))
                 .foregroundStyle(.primary)
         }
     }
@@ -75,7 +75,7 @@ struct PrecipitationLiveActivityWidget: Widget {
     private func minimal(state: PrecipitationActivityAttributes.ContentState) -> some View {
         Image(systemName: state.conditionSymbol)
             .foregroundStyle(precipColor(state))
-            .font(.system(size: 12, weight: .semibold))
+            .font(.app(size: 12, weight: .semibold))
     }
 
     // MARK: - Expanded regions
@@ -85,10 +85,10 @@ struct PrecipitationLiveActivityWidget: Widget {
         VStack(alignment: .leading, spacing: 2) {
             Image(systemName: state.conditionSymbol)
                 .foregroundStyle(precipColor(state))
-                .font(.system(size: 24))
+                .font(.app(size: 24))
             if state.isPrecipitating, !state.precipType.isEmpty {
                 Text(state.precipType.capitalized)
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.app(size: 10, weight: .medium))
                     .foregroundStyle(.secondary)
             }
         }
@@ -99,9 +99,9 @@ struct PrecipitationLiveActivityWidget: Widget {
     private func expandedTrailing(state: PrecipitationActivityAttributes.ContentState) -> some View {
         VStack(alignment: .trailing, spacing: 2) {
             Text(state.temperatureString)
-                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .font(.app(size: 20, weight: .semibold))
             Text("\(state.precipChance)%")
-                .font(.system(size: 11, weight: .medium))
+                .font(.app(size: 11, weight: .medium))
                 .foregroundStyle(.secondary)
         }
         .padding(.trailing, 4)
@@ -110,7 +110,7 @@ struct PrecipitationLiveActivityWidget: Widget {
     @ViewBuilder
     private func expandedCenter(location: String) -> some View {
         Text(location)
-            .font(.system(size: 10, weight: .medium))
+            .font(.app(size: 10, weight: .medium))
             .foregroundStyle(.secondary)
             .lineLimit(1)
     }
@@ -119,7 +119,7 @@ struct PrecipitationLiveActivityWidget: Widget {
     private func expandedBottom(state: PrecipitationActivityAttributes.ContentState) -> some View {
         HStack {
             Text(state.summary)
-                .font(.system(size: 13, weight: .medium))
+                .font(.app(size: 13, weight: .medium))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
             Spacer()
@@ -148,7 +148,7 @@ struct PrecipitationLiveActivityWidget: Widget {
         HStack(spacing: 2) {
             ForEach(0..<3, id: \.self) { i in
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 8))
+                    .font(.app(size: 8))
                     .foregroundStyle(i < filled ? Color.blue : Color.gray.opacity(0.3))
             }
         }
@@ -166,28 +166,28 @@ struct PrecipLockScreenView: View {
         HStack(spacing: 16) {
             VStack(spacing: 4) {
                 Image(systemName: state.conditionSymbol)
-                    .font(.system(size: 36))
+                    .font(.app(size: 36))
                     .foregroundStyle(precipForeground)
                 Text(state.temperatureString)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.app(size: 15, weight: .semibold))
             }
             .frame(width: 72)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(locationName)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.app(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 Text(state.summary)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.app(size: 15, weight: .semibold))
                     .lineLimit(2)
                 HStack(spacing: 8) {
                     Label("\(state.precipChance)%", systemImage: "drop.fill")
-                        .font(.system(size: 12))
+                        .font(.app(size: 12))
                         .foregroundStyle(.secondary)
                     if state.isPrecipitating, !state.precipType.isEmpty {
                         Text(state.precipType.capitalized)
-                            .font(.system(size: 12))
+                            .font(.app(size: 12))
                             .foregroundStyle(.secondary)
                     }
                 }

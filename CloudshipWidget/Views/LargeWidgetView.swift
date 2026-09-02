@@ -18,12 +18,12 @@ struct LargeWidgetView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(data.locationName)
-                            .font(.caption)
+                            .font(.app(.caption))
                             .foregroundColor(.secondary)
                             .lineLimit(1)
 
                         Text(tempString(data.temperature, metric: data.isMetric))
-                            .font(.system(size: 40, weight: .thin))
+                            .font(.app(size: 40, weight: .thin))
                     }
 
                     Spacer()
@@ -45,7 +45,7 @@ struct LargeWidgetView: View {
                             Label(shortTemp(data.hiTemp, metric: data.isMetric), systemImage: "arrow.up")
                             Label(shortTemp(data.loTemp, metric: data.isMetric), systemImage: "arrow.down")
                         }
-                        .font(.caption2)
+                        .font(.app(.caption2))
                         .foregroundColor(.secondary)
                     }
                 }
@@ -58,7 +58,7 @@ struct LargeWidgetView: View {
                         let hour = data.hourlyForecast[i]
                         VStack(spacing: 4) {
                             Text(hourLabel(hour.time))
-                                .font(.system(size: 10))
+                                .font(.app(size: 10))
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
@@ -76,7 +76,7 @@ struct LargeWidgetView: View {
                                 .frame(width: 24, height: 24)
 
                             Text(shortTemp(hour.temp, metric: data.isMetric))
-                                .font(.caption)
+                                .font(.app(.caption))
                                 .fontWeight(.medium)
                         }
                         .frame(maxWidth: .infinity)
@@ -91,7 +91,7 @@ struct LargeWidgetView: View {
                         let day = data.dailyForecast[i]
                         HStack {
                             Text(dayLabel(day.time))
-                                .font(.caption)
+                                .font(.app(.caption))
                                 .frame(width: 40, alignment: .leading)
 
                             Image(WidgetConditionIcon.assetName(for: day.conditionRaw))
@@ -102,7 +102,7 @@ struct LargeWidgetView: View {
                             Spacer()
 
                             Text(shortTemp(day.tempMin, metric: data.isMetric))
-                                .font(.caption)
+                                .font(.app(.caption))
                                 .foregroundColor(.secondary)
                                 .frame(width: 30, alignment: .trailing)
 
@@ -133,7 +133,7 @@ struct LargeWidgetView: View {
                             .frame(height: 4)
 
                             Text(shortTemp(day.tempMax, metric: data.isMetric))
-                                .font(.caption)
+                                .font(.app(.caption))
                                 .frame(width: 30, alignment: .trailing)
                         }
                     }
@@ -148,7 +148,7 @@ struct LargeWidgetView: View {
                     .scaledToFit()
                     .frame(width: 44, height: 44)
                 Text("Open Cloudship to load weather")
-                    .font(.caption)
+                    .font(.app(.caption))
                     .foregroundColor(.secondary)
             }
             .containerBackground(.fill.tertiary, for: .widget)

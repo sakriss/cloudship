@@ -14,7 +14,7 @@ class TimeMachineBannerView: UIView {
 
     private let dateLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 14, weight: .semibold)
+        l.font = .appFont(size: 14, weight: .semibold)
         l.textColor = UIColor(red: 0.55, green: 0.35, blue: 0.0, alpha: 1)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -31,7 +31,7 @@ class TimeMachineBannerView: UIView {
     private lazy var backButton: UIButton = {
         let b = UIButton(type: .system)
         b.setTitle("Back to Today", for: .normal)
-        b.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        b.titleLabel?.font = .appFont(size: 13, weight: .semibold)
         b.tintColor = UIColor(red: 0.55, green: 0.35, blue: 0.0, alpha: 1)
         b.translatesAutoresizingMaskIntoConstraints = false
         b.addTarget(self, action: #selector(backTapped), for: .touchUpInside)

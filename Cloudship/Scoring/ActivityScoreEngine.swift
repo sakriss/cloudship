@@ -48,6 +48,11 @@ struct ActivityScore {
     }
 }
 
+private struct PrecipitationImpact {
+    let score: Double
+    let cap: Int?
+}
+
 // MARK: - Engine
 
 final class ActivityScoreEngine {
@@ -100,11 +105,11 @@ final class ActivityScoreEngine {
         factors.append(("Poor air quality", aqiScore))
 
         // Precipitation
-        let precipScore = precipitationScore(condition: c.condition, hourly: data.hourly, hoursAhead: 2)
-        factors.append(("Rain expected", precipScore))
+        let precip = precipitationImpact(activity: .running, condition: c.condition, hourly: data.hourly, hoursAhead: 2)
+        factors.append(("Rain expected", precip.score))
 
         let weights: [Double] = [0.30, 0.20, 0.20, 0.15, 0.15]
-        return buildScore(activity: .running, factors: factors, weights: weights)
+        return buildScore(activity: .running, factors: factors, weights: weights, scoreCap: precip.cap)
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -130,8 +135,8 @@ final class ActivityScoreEngine {
         factors.append(("Temperature", tempScore))
 
         // Rain — hard penalty for active rain
-        let precipScore = precipitationScore(condition: c.condition, hourly: data.hourly, hoursAhead: 2)
-        factors.append(("Rain", precipScore))
+        let precip = precipitationImpact(activity: .cycling, condition: c.condition, hourly: data.hourly, hoursAhead: 2)
+        factors.append(("Rain", precip.score))
 
         // Visibility (ideal >5mi/8km, bad <0.5mi/0.8km)
         let visGood = isMetric ? 8.0 : 5.0
@@ -145,7 +150,7 @@ final class ActivityScoreEngine {
         factors.append(("Poor air quality", aqiScore))
 
         let weights: [Double] = [0.30, 0.20, 0.20, 0.15, 0.15]
-        return buildScore(activity: .cycling, factors: factors, weights: weights)
+        return buildScore(activity: .cycling, factors: factors, weights: weights, scoreCap: precip.cap)
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -184,8 +189,8 @@ final class ActivityScoreEngine {
         factors.append(("Poor air quality", aqiScore))
 
         // Precipitation
-        let precipScore = precipitationScore(condition: c.condition, hourly: data.hourly, hoursAhead: 1)
-        factors.append(("Rain", precipScore))
+        let precip = precipitationImpact(activity: .dogWalking, condition: c.condition, hourly: data.hourly, hoursAhead: 1)
+        factors.append(("Rain", precip.score))
 
         // Wind (dogs are less bothered, but still a factor)
         let windGood = isMetric ? 24.0 : 15.0
@@ -194,7 +199,7 @@ final class ActivityScoreEngine {
         factors.append(("Too windy", windScore))
 
         let weights: [Double] = [0.30, 0.25, 0.25, 0.20]
-        return buildScore(activity: .dogWalking, factors: factors, weights: weights)
+        return buildScore(activity: .dogWalking, factors: factors, weights: weights, scoreCap: precip.cap)
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -206,8 +211,8 @@ final class ActivityScoreEngine {
         var factors: [(String, Double)] = []
 
         // Rain in next 3 hours
-        let precipScore = precipitationScore(condition: c.condition, hourly: data.hourly, hoursAhead: 3)
-        factors.append(("Rain expected", precipScore))
+        let precip = precipitationImpact(activity: .outdoorDining, condition: c.condition, hourly: data.hourly, hoursAhead: 3)
+        factors.append(("Rain expected", precip.score))
 
         // Temperature (ideal 60-85°F / 16-29°C)
         let idealLo = isMetric ? 16.0 : 60.0
@@ -228,7 +233,7 @@ final class ActivityScoreEngine {
         factors.append(("High UV", uvScore))
 
         let weights: [Double] = [0.30, 0.25, 0.25, 0.20]
-        return buildScore(activity: .outdoorDining, factors: factors, weights: weights)
+        return buildScore(activity: .outdoorDining, factors: factors, weights: weights, scoreCap: precip.cap)
     }
 
     // MARK: - Scoring helpers
@@ -252,30 +257,50 @@ final class ActivityScoreEngine {
         return (badAbove - v) / (badAbove - goodBelow) * 100
     }
 
-    /// Check current condition + upcoming hourly precip chance.
-    private static func precipitationScore(condition: WeatherCondition, hourly: [HourlyEntry], hoursAhead: Int) -> Double {
-        // Active precipitation is a big penalty
-        let activePrecip: Set<WeatherCondition> = [.rain, .heavyRain, .drizzle, .snow, .heavySnow, .lightSnow, .sleet, .thunderstorm]
+    /// Check current condition + upcoming hourly precip chance, including a cap
+    /// for active or sustained precipitation so wet days do not look "great".
+    private static func precipitationImpact(
+        activity: Activity,
+        condition: WeatherCondition,
+        hourly: [HourlyEntry],
+        hoursAhead: Int
+    ) -> PrecipitationImpact {
         if activePrecip.contains(condition) {
-            return condition == .drizzle ? 20 : 0
+            return PrecipitationImpact(
+                score: condition == .drizzle ? 20 : 0,
+                cap: activePrecipitationCap(for: activity, condition: condition)
+            )
         }
 
-        // Check upcoming precip chance
         let upcoming = hourly.prefix(hoursAhead)
-        let maxChance = upcoming.compactMap(\.precipChance).max() ?? 0
-        if maxChance > 0.7 { return 15 }   // very likely rain soon
-        if maxChance > 0.5 { return 40 }   // decent chance
-        if maxChance > 0.3 { return 65 }   // possible but not likely
-        return 100                          // clear skies ahead
+        let maxChance = upcoming.compactMap { normalizedPrecipChance($0.precipChance) }.max() ?? 0
+        let sustainedCap = sustainedPrecipitationCap(for: activity, hourly: hourly)
+
+        if maxChance > 70 {
+            return PrecipitationImpact(score: 15, cap: minCap(sustainedCap, likelyRainCap(for: activity)))
+        }
+        if maxChance > 50 {
+            return PrecipitationImpact(score: 40, cap: sustainedCap)
+        }
+        if maxChance > 30 {
+            return PrecipitationImpact(score: 65, cap: sustainedCap)
+        }
+        return PrecipitationImpact(score: 100, cap: sustainedCap)
     }
 
     /// Build final score from weighted factors and identify the limiting one.
-    private static func buildScore(activity: Activity, factors: [(String, Double)], weights: [Double]) -> ActivityScore {
+    private static func buildScore(
+        activity: Activity,
+        factors: [(String, Double)],
+        weights: [Double],
+        scoreCap: Int? = nil
+    ) -> ActivityScore {
         var weighted = 0.0
         for (i, factor) in factors.enumerated() {
             weighted += factor.1 * weights[i]
         }
-        let finalScore = Int(weighted.rounded())
+        let uncappedScore = Int(weighted.rounded())
+        let finalScore = min(uncappedScore, scoreCap ?? 100)
 
         // Find the worst factor as the limiting one
         let worst = factors.min(by: { $0.1 < $1.1 })
@@ -294,5 +319,77 @@ final class ActivityScoreEngine {
         }
 
         return ActivityScore(activity: activity, score: finalScore, rating: rating, limitingFactor: limitingFactor)
+    }
+
+    private static let activePrecip: Set<WeatherCondition> = [
+        .rain, .heavyRain, .drizzle, .snow, .heavySnow, .lightSnow, .sleet, .thunderstorm
+    ]
+
+    private static func normalizedPrecipChance(_ chance: Double?) -> Double? {
+        guard let chance else { return nil }
+        return chance <= 1 ? chance * 100 : chance
+    }
+
+    private static func activePrecipitationCap(for activity: Activity, condition: WeatherCondition) -> Int {
+        switch condition {
+        case .heavyRain, .heavySnow, .thunderstorm:
+            switch activity {
+            case .running:       return 35
+            case .cycling:       return 25
+            case .dogWalking:    return 35
+            case .outdoorDining: return 25
+            }
+        case .drizzle:
+            switch activity {
+            case .running:       return 70
+            case .cycling:       return 55
+            case .dogWalking:    return 65
+            case .outdoorDining: return 55
+            }
+        default:
+            switch activity {
+            case .running:       return 65
+            case .cycling:       return 55
+            case .dogWalking:    return 60
+            case .outdoorDining: return 45
+            }
+        }
+    }
+
+    private static func likelyRainCap(for activity: Activity) -> Int {
+        switch activity {
+        case .running:       return 70
+        case .cycling:       return 60
+        case .dogWalking:    return 65
+        case .outdoorDining: return 55
+        }
+    }
+
+    private static func sustainedPrecipitationCap(for activity: Activity, hourly: [HourlyEntry]) -> Int? {
+        let dayWindow = Array(hourly.prefix(12))
+        guard dayWindow.count >= 6 else { return nil }
+
+        let wetHours = dayWindow.filter { entry in
+            activePrecip.contains(entry.condition)
+                || (normalizedPrecipChance(entry.precipChance) ?? 0) >= 60
+                || (entry.precipAmount ?? 0) > 0
+        }.count
+
+        guard wetHours >= 6 else { return nil }
+        switch activity {
+        case .running:       return 60
+        case .cycling:       return 50
+        case .dogWalking:    return 55
+        case .outdoorDining: return 40
+        }
+    }
+
+    private static func minCap(_ lhs: Int?, _ rhs: Int?) -> Int? {
+        switch (lhs, rhs) {
+        case let (l?, r?): return min(l, r)
+        case let (l?, nil): return l
+        case let (nil, r?): return r
+        case (nil, nil): return nil
+        }
     }
 }

@@ -113,7 +113,7 @@ private class ActivityRowView: UIView {
 
     private let emojiLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .title3)
+        l.font = .appFont(forTextStyle: .title3)
         l.adjustsFontForContentSizeCategory = true
         l.translatesAutoresizingMaskIntoConstraints = false
         l.setContentHuggingPriority(.required, for: .horizontal)
@@ -123,7 +123,7 @@ private class ActivityRowView: UIView {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .primary)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -135,7 +135,7 @@ private class ActivityRowView: UIView {
 
     private let scoreLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .headline)
+        l.font = .appFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .right
@@ -147,7 +147,7 @@ private class ActivityRowView: UIView {
 
     private let ratingLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textAlignment = .right
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -158,7 +158,7 @@ private class ActivityRowView: UIView {
 
     private let factorLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .tertiary)
         l.translatesAutoresizingMaskIntoConstraints = false

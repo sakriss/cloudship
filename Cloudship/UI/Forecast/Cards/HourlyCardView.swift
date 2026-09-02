@@ -199,7 +199,7 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let hourLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.textAlignment = .center
@@ -216,7 +216,7 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let valueLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .primary)
         l.textAlignment = .center
@@ -228,7 +228,7 @@ private class HourlyItemCell: UICollectionViewCell {
 
     private let precipLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
         l.textAlignment = .center
@@ -307,7 +307,7 @@ private class MetricPillButton: UIButton {
         self.metric = metric
         super.init(frame: .zero)
         setTitle(metric.rawValue, for: .normal)
-        titleLabel?.font = .preferredFont(forTextStyle: .caption1)
+        titleLabel?.font = .appFont(forTextStyle: .caption1)
         titleLabel?.adjustsFontForContentSizeCategory = true
         layer.cornerRadius = 14
         layer.borderWidth = 1
@@ -362,6 +362,11 @@ class HourlyCardView: CardView {
         configuration.imagePadding = 4
         configuration.cornerStyle = .capsule
         configuration.baseForegroundColor = CardView.textColor(for: .secondary)
+        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
+            var attributes = attributes
+            attributes.font = .appFont(size: 13, weight: .medium)
+            return attributes
+        }
         let button = UIButton(configuration: configuration)
         button.showsMenuAsPrimaryAction = true
         button.accessibilityHint = "Choose another hourly metric"

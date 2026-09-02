@@ -90,6 +90,7 @@
 		C1E203800DBD4DDDA82FA0AC /* UI/MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34FCE7E1E9241D089FE3F4D /* UI/MainTabBarController.swift */; };
 		C4D5E6F7A8B9C0D1E2F3A4B5 /* Services/PrecipitationNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D5E6F7A8B9C0D1E2F3 /* Services/PrecipitationNotificationService.swift */; };
 		C6F350E3885640288204C969 /* UI/Forecast/Cards/WindGustCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */; };
+		C6F350E3885640288204C970 /* UI/Forecast/Cards/TideCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434F4C497BC1429B8CCA805D /* UI/Forecast/Cards/TideCardView.swift */; };
 		CAC95DC05F37486C91AE9DA5 /* DataSources/WeatherDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */; };
 		CE0000000000000000000001 /* AppLaunchExperience.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000002 /* AppLaunchExperience.swift */; };
 		CE0000000000000000000003 /* AppLaunchExperienceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000000000000000000004 /* AppLaunchExperienceCoordinator.swift */; };
@@ -124,6 +125,10 @@
 		FB598DCB43574CB7B794C358 /* UI/Forecast/Cards/HourlyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2936012EBFF64B6798B8AF71 /* UI/Forecast/Cards/HourlyCardView.swift */; };
 		FC0202020202020202FC02 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FC0303030303030303FC03 /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC0101010101010101FC01 /* ActivityKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		F0A100000000000000000001 /* Shared/AppFontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A100000000000000000005 /* Shared/AppFontStyle.swift */; };
+		F0A100000000000000000002 /* Shared/AppFontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A100000000000000000005 /* Shared/AppFontStyle.swift */; };
+		F0A100000000000000000003 /* UI/Shared/AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A100000000000000000006 /* UI/Shared/AppTypography.swift */; };
+		F0A100000000000000000004 /* AppFontStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A100000000000000000007 /* AppFontStyleTests.swift */; };
 		FF2E1D0C9B8A7F6E5D4C3B2A /* DataSources/PirateWeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1B2C3D4E5F6A7B8C9D0E1F /* DataSources/PirateWeatherModels.swift */; };
 /* End PBXBuildFile section */
 
@@ -212,6 +217,7 @@
 		349D9A52185E40BB96946278 /* UI/Forecast/Cards/PollenCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/PollenCardView.swift; sourceTree = "<group>"; };
 		3C8BA9853D214D04BAA086AB /* DetailsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DetailsCardView.swift; path = UI/Forecast/Cards/DetailsCardView.swift; sourceTree = "<group>"; };
 		434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/WindGustCardView.swift; sourceTree = "<group>"; };
+		434F4C497BC1429B8CCA805D /* UI/Forecast/Cards/TideCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/TideCardView.swift; sourceTree = "<group>"; };
 		5036433DBE614771979DE8B6 /* DataSources/UnifiedWeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/UnifiedWeatherModels.swift; sourceTree = "<group>"; };
 		5DEAD06BEC734AD881E3BD9F /* DataSources/PrecipitationAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/PrecipitationAnalyzer.swift; sourceTree = "<group>"; };
 		623E1BB68FEC4BD6BF3F583C /* UI/Forecast/Cards/AirQualityCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Forecast/Cards/AirQualityCardView.swift; sourceTree = "<group>"; };
@@ -291,6 +297,9 @@
 		FC0101010101010101FC01 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherCodeMapper.swift; path = Shared/WeatherCodeMapper.swift; sourceTree = "<group>"; };
 		FCF7A8C295D5464B958C65A8 /* DataSources/WeatherDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSources/WeatherDataSource.swift; sourceTree = "<group>"; };
+		F0A100000000000000000005 /* Shared/AppFontStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/AppFontStyle.swift; sourceTree = "<group>"; };
+		F0A100000000000000000006 /* UI/Shared/AppTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Shared/AppTypography.swift; sourceTree = "<group>"; };
+		F0A100000000000000000007 /* AppFontStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFontStyleTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -435,6 +444,7 @@
 				F1A5DFCBB162407A9EE45CD2 /* UI/Forecast/Cards/MinutelyCardView.swift */,
 				3C8BA9853D214D04BAA086AB /* DetailsCardView.swift */,
 				434F4C497BC1429B8CCA805C /* UI/Forecast/Cards/WindGustCardView.swift */,
+				434F4C497BC1429B8CCA805D /* UI/Forecast/Cards/TideCardView.swift */,
 				623E1BB68FEC4BD6BF3F583C /* UI/Forecast/Cards/AirQualityCardView.swift */,
 				349D9A52185E40BB96946278 /* UI/Forecast/Cards/PollenCardView.swift */,
 				CC070707070707070707CC07 /* UI/Forecast/Cards/ActivityScoresCardView.swift */,
@@ -504,11 +514,13 @@
 			isa = PBXGroup;
 			children = (
 				B2BC1A9E2EB54D5C9EA68589 /* Shared/DateFormatHelper.swift */,
+				F0A100000000000000000005 /* Shared/AppFontStyle.swift */,
 				C5B395E9DE2E4BEE99AB9E60 /* TemperatureFormatter.swift */,
 				FC45F78F15B14D7A9EE91D51 /* WeatherCodeMapper.swift */,
 				EE0101010101010101EE01 /* Shared/SharedWeatherData.swift */,
 				FA0101010101010101FA01 /* Shared/PrecipitationActivityAttributes.swift */,
 				EE0303030303030303EE03 /* Shared/WidgetDataWriter.swift */,
+				F0A100000000000000000006 /* UI/Shared/AppTypography.swift */,
 				A1B2C3D4E5F6A7B8C9D0E1F2 /* UI/Shared/WeatherColors.swift */,
 				D7E8F9A0B1C2D3E4F5A6B7C8 /* UI/Shared/WeatherTheme.swift */,
 				D8E9F0A1B2C3D4E5F6A7B8C9 /* UI/Shared/CardTintStyle.swift */,
@@ -665,6 +677,7 @@
 			isa = PBXGroup;
 			children = (
 				CE000000000000000000000D /* AppLaunchExperienceTests.swift */,
+				F0A100000000000000000007 /* AppFontStyleTests.swift */,
 				92A37DA32F75F1A80090F977 /* ConsensusWeatherServiceTests.swift */,
 				AA00000000000000000011 /* MapPrecipitationTotalsServiceTests.swift */,
 				92A37DA42F75F1AA0090F977 /* SettingsLogicTests.swift */,
@@ -914,6 +927,7 @@
 				6A0011223344556677889900 /* DataSources/MapPrecipitationTotalsService.swift in Sources */,
 				39524CFD2C6C487592ABCF92 /* WeatherCodeMapper.swift in Sources */,
 				683F03A96DDF4861BBF6208F /* TemperatureFormatter.swift in Sources */,
+				F0A100000000000000000001 /* Shared/AppFontStyle.swift in Sources */,
 				975C3C61B2584CF8B0AC3C70 /* Shared/DateFormatHelper.swift in Sources */,
 				C1E203800DBD4DDDA82FA0AC /* UI/MainTabBarController.swift in Sources */,
 				AE458E43367B4E75B22A3328 /* UI/Forecast/MainForecastViewController.swift in Sources */,
@@ -933,6 +947,7 @@
 				DD0202020202020202DD02 /* DataSources/AISummaryService.swift in Sources */,
 				DD0404040404040404DD04 /* UI/Forecast/Cards/AISummaryCardView.swift in Sources */,
 				C6F350E3885640288204C969 /* UI/Forecast/Cards/WindGustCardView.swift in Sources */,
+				C6F350E3885640288204C970 /* UI/Forecast/Cards/TideCardView.swift in Sources */,
 				4CF0A6FC02FF4ED5BE915BFA /* UI/Forecast/Cards/AlertBannerCardView.swift in Sources */,
 				EE0606060606060606EE06 /* UI/Forecast/WeatherAnimationView.swift in Sources */,
 				57D141E4370348318F1DF8BB /* UI/Alert/AlertDetailViewController.swift in Sources */,
@@ -940,6 +955,7 @@
 				EE0202020202020202EE02 /* Shared/SharedWeatherData.swift in Sources */,
 				FA0202020202020202FA02 /* Shared/PrecipitationActivityAttributes.swift in Sources */,
 				EE0404040404040404EE04 /* Shared/WidgetDataWriter.swift in Sources */,
+				F0A100000000000000000003 /* UI/Shared/AppTypography.swift in Sources */,
 				F2E1D0C9B8A7F6E5D4C3B2A1 /* UI/Shared/WeatherColors.swift in Sources */,
 				E8F9A0B1C2D3E4F5A6B7C8D9 /* UI/Shared/WeatherTheme.swift in Sources */,
 				E9F0A1B2C3D4E5F6A7B8C9DA /* UI/Shared/CardTintStyle.swift in Sources */,
@@ -964,6 +980,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92A378BF2F6D98240090F977 /* Shared/SharedWeatherData.swift in Sources */,
+				F0A100000000000000000002 /* Shared/AppFontStyle.swift in Sources */,
 				FA0303030303030303FA03 /* Shared/PrecipitationActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -975,6 +992,7 @@
 				AA00000000000000000005 /* ConsensusWeatherServiceTests.swift in Sources */,
 				AA00000000000000000010 /* MapPrecipitationTotalsServiceTests.swift in Sources */,
 				CE000000000000000000000C /* AppLaunchExperienceTests.swift in Sources */,
+				F0A100000000000000000004 /* AppFontStyleTests.swift in Sources */,
 				AA00000000000000000006 /* SettingsLogicTests.swift in Sources */,
 				AA00000000000000000007 /* TemperatureFormatterTests.swift in Sources */,
 				AA00000000000000000008 /* WeatherModelsTests.swift in Sources */,

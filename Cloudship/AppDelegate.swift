@@ -19,6 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         configureLaunchExperienceForUITestingIfNeeded()
+        AppFontStyle.mirrorToAppGroup(.saved)
+        AppTypography.configureNavigationAppearance()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(appFontStyleChanged),
+                                               name: AppFontStyle.changedNotification,
+                                               object: nil)
 
         // Programmatic window setup. Launch routing checks install/update state
         // before defaults migration writes any first-run keys.
@@ -49,6 +55,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         BackgroundTaskManager.shared.registerTasks()
 
         return true
+    }
+
+    @objc private func appFontStyleChanged() {
+        AppTypography.configureNavigationAppearance()
+        AppTypography.applyToVisibleWindows()
     }
 
     private func configureLaunchExperienceForUITestingIfNeeded() {

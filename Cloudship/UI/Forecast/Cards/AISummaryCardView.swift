@@ -39,7 +39,7 @@ class AISummaryCardView: CardView {
     /// numberOfLines = 0 means it grows to fit any amount of text, pulling the card bottom down.
     private let summaryLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .body)
+        l.font = .appFont(forTextStyle: .body)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .label
         l.numberOfLines = 0

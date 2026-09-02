@@ -41,13 +41,13 @@ final class WhatsNewViewController: UIViewController, UIAdaptivePresentationCont
 
         let titleLabel = UILabel()
         titleLabel.text = notes.title
-        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
+        titleLabel.font = .appFont(size: 28, weight: .bold)
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = notes.subtitle
-        subtitleLabel.font = .preferredFont(forTextStyle: .body)
+        subtitleLabel.font = .appFont(forTextStyle: .body)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
@@ -62,7 +62,7 @@ final class WhatsNewViewController: UIViewController, UIAdaptivePresentationCont
         continueButton.configuration = .filled()
         continueButton.configuration?.cornerStyle = .large
         continueButton.configuration?.title = "Continue"
-        continueButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        continueButton.titleLabel?.font = .appFont(size: 17, weight: .semibold)
         continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [
@@ -104,7 +104,7 @@ final class WhatsNewViewController: UIViewController, UIAdaptivePresentationCont
 
         let label = UILabel()
         label.text = text
-        label.font = .preferredFont(forTextStyle: .body)
+        label.font = .appFont(forTextStyle: .body)
         label.numberOfLines = 0
 
         let row = UIStackView(arrangedSubviews: [icon, label])

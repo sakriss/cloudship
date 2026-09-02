@@ -185,7 +185,7 @@ class DailyDetailViewController: UIViewController {
             label.text = df.string(from: entry.time)
         }
 
-        label.font = .systemFont(ofSize: 15, weight: .bold)
+        label.font = .appFont(size: 15, weight: .bold)
         label.textColor = index == selectedIndex
             ? UIColor(red: 0.27, green: 0.65, blue: 0.89, alpha: 1)
             : .secondaryLabel
@@ -257,12 +257,12 @@ class DailyDetailViewController: UIViewController {
 
         let nameLabel = UILabel()
         nameLabel.text = label
-        nameLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        nameLabel.font = .appFont(size: 15, weight: .semibold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let descLabel = UILabel()
         descLabel.text = description
-        descLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        descLabel.font = .appFont(size: 14, weight: .regular)
         descLabel.textColor = .secondaryLabel
         descLabel.numberOfLines = 0
         descLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -395,13 +395,13 @@ class DailyDetailViewController: UIViewController {
 
         let nameLabel = UILabel()
         nameLabel.text = name.uppercased()
-        nameLabel.font = .systemFont(ofSize: 10, weight: .semibold)
+        nameLabel.font = .appFont(size: 10, weight: .semibold)
         nameLabel.textColor = .secondaryLabel
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let valueLabel = UILabel()
         valueLabel.text = value
-        valueLabel.font = .systemFont(ofSize: 18, weight: .medium)
+        valueLabel.font = .appFont(size: 18, weight: .medium)
         valueLabel.adjustsFontSizeToFitWidth = true
         valueLabel.minimumScaleFactor = 0.7
         valueLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -530,7 +530,7 @@ private class DailyHourlyStripView: UIScrollView {
 
         let timeLabel = UILabel()
         timeLabel.text = df.string(from: entry.time).lowercased()
-        timeLabel.font = .systemFont(ofSize: 10, weight: .regular)
+        timeLabel.font = .appFont(size: 10, weight: .regular)
         timeLabel.textColor = .secondaryLabel
         timeLabel.textAlignment = .center
         timeLabel.translatesAutoresizingMaskIntoConstraints = false

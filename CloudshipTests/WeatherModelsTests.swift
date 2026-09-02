@@ -270,3 +270,104 @@ final class PollenLevelTests: XCTestCase {
         }
     }
 }
+
+// MARK: - Activity Score Tests
+
+final class ActivityScoreEngineTests: XCTestCase {
+
+    func testActiveRainCapsOtherwiseGoodActivityScores() throws {
+        let scores = ActivityScoreEngine.scores(from: makeWeatherData(currentCondition: .rain))
+
+        XCTAssertEqual(try score(for: .running, in: scores).score, 65)
+        XCTAssertEqual(try score(for: .cycling, in: scores).score, 55)
+        XCTAssertEqual(try score(for: .dogWalking, in: scores).score, 60)
+        XCTAssertEqual(try score(for: .outdoorDining, in: scores).score, 45)
+    }
+
+    func testSustainedRainCapsOtherwiseGoodActivityScores() throws {
+        let rainyHours = Self.makeHourlyEntries(condition: .rain, precipChance: 80, precipAmount: 0.1)
+        let scores = ActivityScoreEngine.scores(from: makeWeatherData(currentCondition: .clear, hourly: rainyHours))
+
+        XCTAssertEqual(try score(for: .running, in: scores).score, 60)
+        XCTAssertEqual(try score(for: .cycling, in: scores).score, 50)
+        XCTAssertEqual(try score(for: .dogWalking, in: scores).score, 55)
+        XCTAssertEqual(try score(for: .outdoorDining, in: scores).score, 40)
+    }
+
+    func testFractionalPrecipChanceStillScoresAsPercent() throws {
+        let likelyRain = Self.makeHourlyEntries(condition: .clear, precipChance: 0.8, precipAmount: 0)
+        let scores = ActivityScoreEngine.scores(from: makeWeatherData(currentCondition: .clear, hourly: likelyRain))
+
+        XCTAssertEqual(try score(for: .running, in: scores).score, 60)
+        XCTAssertEqual(try score(for: .cycling, in: scores).score, 50)
+        XCTAssertEqual(try score(for: .dogWalking, in: scores).score, 55)
+        XCTAssertEqual(try score(for: .outdoorDining, in: scores).score, 40)
+    }
+
+    private func score(for activity: Activity, in scores: [ActivityScore]) throws -> ActivityScore {
+        try XCTUnwrap(scores.first { $0.activity == activity })
+    }
+
+    private func makeWeatherData(
+        currentCondition: WeatherCondition,
+        hourly: [HourlyEntry] = makeHourlyEntries(condition: .clear, precipChance: 0, precipAmount: 0)
+    ) -> UnifiedWeatherData {
+        UnifiedWeatherData(
+            locationName: "Test",
+            current: CurrentConditions(
+                temperature: 60,
+                feelsLike: 60,
+                humidity: 45,
+                windSpeed: 3,
+                windGust: nil,
+                windDirection: nil,
+                condition: currentCondition,
+                uvIndex: 2,
+                visibility: 10,
+                pressure: nil,
+                dewPoint: nil,
+                cloudCover: nil,
+                nearestStormDistance: nil,
+                nearestStormBearing: nil,
+                precipIntensity: nil,
+                precipType: nil
+            ),
+            hourly: hourly,
+            daily: [],
+            minutely: [],
+            alerts: [],
+            airQuality: AirQualityData(index: 25, category: .good),
+            pollen: nil,
+            consensusBreakdown: nil
+        )
+    }
+
+    private static func makeHourlyEntries(
+        condition: WeatherCondition,
+        precipChance: Double,
+        precipAmount: Double
+    ) -> [HourlyEntry] {
+        (0..<12).map { hour in
+            HourlyEntry(
+                time: Date(timeIntervalSince1970: Double(hour * 3600)),
+                temp: 60,
+                feelsLike: 60,
+                condition: condition,
+                precipChance: precipChance,
+                precipAmount: precipAmount,
+                windSpeed: 3,
+                windGust: nil,
+                windDirection: nil,
+                uvIndex: 2,
+                humidity: 45,
+                cloudCover: nil,
+                visibility: 10,
+                pressure: nil,
+                precipIntensityError: nil,
+                precipType: nil,
+                snowAccumulation: nil,
+                iceAccumulation: nil
+            )
+        }
+    }
+}

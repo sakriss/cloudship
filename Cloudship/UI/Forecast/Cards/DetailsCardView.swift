@@ -22,7 +22,7 @@ private class DetailTileView: UIView {
 
     private let valueLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .headline)
+        l.font = .appFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .primary)
         l.adjustsFontSizeToFitWidth = true
@@ -33,7 +33,7 @@ private class DetailTileView: UIView {
 
     private let nameLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = CardView.textColor(for: .secondary)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -195,7 +195,7 @@ private class SunArcView: UIView {
         let sunsetStr = timeString(from: sunset)
 
         let attrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.preferredFont(forTextStyle: .caption2),
+            .font: UIFont.appFont(forTextStyle: .caption2),
             .foregroundColor: CardView.textColor(for: .secondary)
         ]
         let riseSize = sunriseStr.size(withAttributes: attrs)
@@ -207,7 +207,7 @@ private class SunArcView: UIView {
 
         // Dawn/dusk labels (Pirate Weather)
         let dawnDuskAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont.preferredFont(forTextStyle: .caption2),
+            .font: UIFont.appFont(forTextStyle: .caption2),
             .foregroundColor: CardView.textColor(for: .tertiary)
         ]
         if let dawn = dawn {

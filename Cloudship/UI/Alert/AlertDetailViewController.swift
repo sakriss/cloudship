@@ -89,7 +89,7 @@ private class AlertHeaderCell: UITableViewCell {
 
     private let severityBadge: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .bold)
+        l.font = .appFont(size: 11, weight: .bold)
         l.textAlignment = .center
         l.layer.cornerRadius = 8
         l.layer.masksToBounds = true
@@ -99,7 +99,7 @@ private class AlertHeaderCell: UITableViewCell {
 
     private let eventLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 17, weight: .semibold)
+        l.font = .appFont(size: 17, weight: .semibold)
         l.numberOfLines = 0
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -107,7 +107,7 @@ private class AlertHeaderCell: UITableViewCell {
 
     private let sourceLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .regular)
+        l.font = .appFont(size: 12, weight: .regular)
         l.textColor = .secondaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -115,7 +115,7 @@ private class AlertHeaderCell: UITableViewCell {
 
     private let onsetLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .regular)
+        l.font = .appFont(size: 13, weight: .regular)
         l.textColor = .secondaryLabel
         l.numberOfLines = 2
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -124,7 +124,7 @@ private class AlertHeaderCell: UITableViewCell {
 
     private let areaLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .regular)
+        l.font = .appFont(size: 13, weight: .regular)
         l.textColor = .secondaryLabel
         l.numberOfLines = 0
         l.lineBreakMode = .byWordWrapping
@@ -214,7 +214,7 @@ private class AlertTextCell: UITableViewCell {
 
     private let sectionLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 11, weight: .semibold)
+        l.font = .appFont(size: 11, weight: .semibold)
         l.textColor = .tertiaryLabel
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
@@ -222,7 +222,7 @@ private class AlertTextCell: UITableViewCell {
 
     private let bodyLabel: UILabel = {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 14, weight: .regular)
+        l.font = .appFont(size: 14, weight: .regular)
         l.textColor = .label
         l.numberOfLines = 0
         l.translatesAutoresizingMaskIntoConstraints = false

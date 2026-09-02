@@ -40,7 +40,7 @@ class PaywallViewController: UIViewController {
     private let titleLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = "Cloudship Premium"
-        lbl.font = .systemFont(ofSize: 28, weight: .bold)
+        lbl.font = .appFont(size: 28, weight: .bold)
         lbl.textAlignment = .center
         return lbl
     }()
@@ -48,7 +48,7 @@ class PaywallViewController: UIViewController {
     private let subtitleLabel: UILabel = {
         let lbl = UILabel()
         lbl.text = "Unlock the full weather experience"
-        lbl.font = .systemFont(ofSize: 16)
+        lbl.font = .appFont(size: 16)
         lbl.textColor = .secondaryLabel
         lbl.textAlignment = .center
         return lbl
@@ -60,7 +60,7 @@ class PaywallViewController: UIViewController {
     private let restoreButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitle("Restore Purchases", for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 14)
+        btn.titleLabel?.font = .appFont(size: 14)
         btn.setTitleColor(.secondaryLabel, for: .normal)
         return btn
     }()
@@ -291,7 +291,7 @@ class PaywallViewController: UIViewController {
 
         let label = UILabel()
         label.text = text
-        label.font = .systemFont(ofSize: 16)
+        label.font = .appFont(size: 16)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
 

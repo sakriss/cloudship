@@ -61,7 +61,7 @@ class MainForecastViewController: UIViewController {
         icon.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = .appFont(size: 12, weight: .medium)
         label.textColor = .label
         label.translatesAutoresizingMaskIntoConstraints = false
         label.tag = 99  // used to find and update later
@@ -104,6 +104,7 @@ class MainForecastViewController: UIViewController {
     private let dailyCard       = DailyCardView()
     private let detailsCard     = DetailsCardView()
     private let windGustCard    = WindGustCardView()
+    private let tideCard        = TideCardView()
     private let airQualityCard  = AirQualityCardView()
     private let pollenCard      = PollenCardView()
     private let activityScoresCard = ActivityScoresCardView()
@@ -112,6 +113,7 @@ class MainForecastViewController: UIViewController {
     private let weatherGradient    = WeatherGradientView()
     private var currentStatusBarStyle: UIStatusBarStyle = .default
     private var isCustomizingForecast = false
+    private var tideTask: Task<Void, Never>?
 
     override var preferredStatusBarStyle: UIStatusBarStyle { currentStatusBarStyle }
 
@@ -166,6 +168,7 @@ class MainForecastViewController: UIViewController {
     }
 
     deinit {
+        tideTask?.cancel()
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -232,6 +235,9 @@ class MainForecastViewController: UIViewController {
 
     @objc private func openSearch() {
         present(searchController, animated: true) { [weak self] in
+            if let searchController = self?.searchController {
+                AppTypography.apply(to: searchController.view)
+            }
             self?.searchController.searchBar.becomeFirstResponder()
         }
     }
@@ -393,7 +399,7 @@ class MainForecastViewController: UIViewController {
 
     private var allForecastCards: [CardView] {
         [headerCard, alertBannerCard, minutelyCard, hourlyCard, dailyCard,
-         detailsCard, windGustCard, airQualityCard, pollenCard, activityScoresCard, aiSummaryCard]
+         detailsCard, windGustCard, tideCard, airQualityCard, pollenCard, activityScoresCard, aiSummaryCard]
     }
 
     private func applyTimeMachineTheme() {
@@ -418,6 +424,7 @@ class MainForecastViewController: UIViewController {
         aiSummaryCard.isHidden = false
         airQualityCard.isHidden = false
         pollenCard.isHidden = false
+        tideCard.isHidden = false
         activityScoresCard.isHidden = false
         alertBannerCard.isHidden = false
 
@@ -437,7 +444,7 @@ class MainForecastViewController: UIViewController {
 
     private static let cardOrderKey = "cardOrder_v3"
 
-    private static let defaultCardIDs = ["hourly", "daily", "minutely", "activityScores", "aiSummary", "details", "windGust", "airQuality", "pollen"]
+    private static let defaultCardIDs = ["hourly", "daily", "minutely", "activityScores", "aiSummary", "details", "windGust", "tide", "airQuality", "pollen"]
 
     private func setupReorderableCards() {
         // Map ID → card
@@ -447,6 +454,7 @@ class MainForecastViewController: UIViewController {
             "daily":      dailyCard,
             "details":    detailsCard,
             "windGust":   windGustCard,
+            "tide":       tideCard,
             "airQuality":     airQualityCard,
             "pollen":         pollenCard,
             "activityScores": activityScoresCard,
@@ -461,11 +469,20 @@ class MainForecastViewController: UIViewController {
             ?? Self.defaultCardIDs
 
         var ordered: [CardView] = savedIDs.compactMap { idToCard[$0] }
-        // Append cards not present in saved order (e.g. newly added cards)
-        let seen = Set(ordered.map { $0.cardID })
+        // Insert cards not present in saved order (e.g. newly added cards) near
+        // their default neighbors without otherwise resetting the user's order.
+        var seen = Set(ordered.map { $0.cardID })
         for id in Self.defaultCardIDs {
             if !seen.contains(id), let card = idToCard[id] {
-                ordered.append(card)
+                let defaultIndex = Self.defaultCardIDs.firstIndex(of: id) ?? Self.defaultCardIDs.count
+                let previousDefaultIDs = Self.defaultCardIDs.prefix(defaultIndex).reversed()
+                if let anchorID = previousDefaultIDs.first(where: { seen.contains($0) }),
+                   let anchorIndex = ordered.firstIndex(where: { $0.cardID == anchorID }) {
+                    ordered.insert(card, at: min(anchorIndex + 1, ordered.count))
+                } else {
+                    ordered.append(card)
+                }
+                seen.insert(id)
             }
         }
         reorderableCards = ordered
@@ -562,6 +579,9 @@ class MainForecastViewController: UIViewController {
 
         windGustCard.isAccessibilityElement = true
         windGustCard.accessibilityLabel = "Wind gust information"
+
+        tideCard.isAccessibilityElement = true
+        tideCard.accessibilityLabel = "Tide information"
 
         airQualityCard.isAccessibilityElement = true
         airQualityCard.accessibilityLabel = "Air quality information"
@@ -1103,6 +1123,7 @@ class MainForecastViewController: UIViewController {
         buttonAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
         navAppearance.buttonAppearance = buttonAppearance
         navAppearance.backButtonAppearance = buttonAppearance
+        AppTypography.applyFont(to: navAppearance)
 
         navigationController?.navigationBar.standardAppearance = navAppearance
         navigationController?.navigationBar.scrollEdgeAppearance = navAppearance
@@ -1122,6 +1143,7 @@ class MainForecastViewController: UIViewController {
         tabAppearance.stackedLayoutAppearance = itemAppearance
         tabAppearance.inlineLayoutAppearance = itemAppearance
         tabAppearance.compactInlineLayoutAppearance = itemAppearance
+        AppTypography.applyFont(to: tabAppearance)
 
         tabBarController?.tabBar.standardAppearance = tabAppearance
         tabBarController?.tabBar.scrollEdgeAppearance = tabAppearance
@@ -1136,6 +1158,7 @@ class MainForecastViewController: UIViewController {
     private func resetBarAppearance() {
         let navAppearance = UINavigationBarAppearance()
         navAppearance.configureWithDefaultBackground()
+        AppTypography.applyFont(to: navAppearance)
         navigationController?.navigationBar.standardAppearance = navAppearance
         navigationController?.navigationBar.scrollEdgeAppearance = navAppearance
         navigationController?.navigationBar.compactAppearance = navAppearance
@@ -1143,6 +1166,7 @@ class MainForecastViewController: UIViewController {
 
         let tabAppearance = UITabBarAppearance()
         tabAppearance.configureWithDefaultBackground()
+        AppTypography.applyFont(to: tabAppearance)
         tabBarController?.tabBar.standardAppearance = tabAppearance
         tabBarController?.tabBar.scrollEdgeAppearance = tabAppearance
 
@@ -1282,6 +1306,7 @@ class MainForecastViewController: UIViewController {
                               dawn: todayDaily?.dawnTime, dusk: todayDaily?.duskTime,
                               todayDaily: todayDaily)
         windGustCard.configure(hourly: data.hourly)
+        loadTideConditions()
 
         // Air quality — show card only when data is available
         if let aq = data.airQuality {
@@ -1312,12 +1337,44 @@ class MainForecastViewController: UIViewController {
             minutelyCard.isHidden = true
             aiSummaryCard.isHidden = true
             alertBannerCard.isHidden = true
+            tideCard.isHidden = true
             // Air quality / pollen / activity scores are already hidden if nil
         } else {
             removeTimeMachineBanner()
         }
 
         scrollView.setContentOffset(.zero, animated: false)
+    }
+
+    private func loadTideConditions() {
+        tideTask?.cancel()
+
+        guard !WeatherDataSourceManager.shared.isShowingHistorical,
+              let location = currentLocation else {
+            tideCard.showUnavailable()
+            return
+        }
+
+        let coordinate = location.coordinate
+        tideCard.showLoading()
+
+        tideTask = Task { [weak self] in
+            let report = try? await TideConditionsService.shared.fetchReport(for: coordinate)
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                guard let self,
+                      let current = self.currentLocation?.coordinate,
+                      abs(current.latitude - coordinate.latitude) < 0.0001,
+                      abs(current.longitude - coordinate.longitude) < 0.0001 else { return }
+
+                if let report {
+                    self.tideCard.configure(report: report)
+                } else {
+                    self.tideCard.showUnavailable()
+                }
+            }
+        }
     }
 
     // MARK: - Refresh
@@ -1669,9 +1726,22 @@ class SearchResultsViewController: UITableViewController, UISearchResultsUpdatin
         }
     }
 
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let title = self.tableView(tableView, titleForHeaderInSection: section) else { return nil }
+        let header = UITableViewHeaderFooterView(reuseIdentifier: nil)
+        var configuration = UIListContentConfiguration.groupedHeader()
+        configuration.text = title
+        configuration.textProperties.font = .appFont(forTextStyle: .headline, weight: .semibold)
+        configuration.textProperties.color = .secondaryLabel
+        header.contentConfiguration = configuration
+        return header
+    }
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         var config = cell.defaultContentConfiguration()
+        config.textProperties.font = .appFont(forTextStyle: .body)
+        config.secondaryTextProperties.font = .appFont(forTextStyle: .subheadline)
 
         switch Section(rawValue: indexPath.section) {
         case .currentLocation:

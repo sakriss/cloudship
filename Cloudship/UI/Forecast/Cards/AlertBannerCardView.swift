@@ -94,7 +94,7 @@ private final class AlertTimelineRowView: UIView {
 
     private let eventNameLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.85)
         l.numberOfLines = 1
@@ -105,7 +105,7 @@ private final class AlertTimelineRowView: UIView {
 
     private let onsetLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.70)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +114,7 @@ private final class AlertTimelineRowView: UIView {
 
     private let expiresLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.70)
         l.translatesAutoresizingMaskIntoConstraints = false
@@ -325,7 +325,7 @@ class AlertBannerCardView: CardView {
 
     private let titleLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .headline)
+        l.font = .appFont(forTextStyle: .headline)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .white
         l.numberOfLines = 1
@@ -335,7 +335,7 @@ class AlertBannerCardView: CardView {
 
     private let subtitleLabel: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption1)
+        l.font = .appFont(forTextStyle: .caption1)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = UIColor.white.withAlphaComponent(0.85)
         l.numberOfLines = 0
@@ -354,7 +354,7 @@ class AlertBannerCardView: CardView {
 
     private let alertCountBadge: UILabel = {
         let l = UILabel()
-        l.font = .preferredFont(forTextStyle: .caption2)
+        l.font = .appFont(forTextStyle: .caption2)
         l.adjustsFontForContentSizeCategory = true
         l.textColor = .white
         l.textAlignment = .center
